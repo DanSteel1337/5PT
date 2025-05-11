@@ -1,4 +1,3 @@
-/* Remove the @import statement and rely on direct import in layout.tsx */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -22,59 +21,6 @@
   --chart-4: rgb(255, 165, 0);
   --chart-5: rgb(50, 205, 50);
   --chart-6: rgb(255, 215, 0);
-
-  /* RainbowKit styles - Adding here instead of direct import */
-  --rk-blurs-modalOverlay: blur(0px);
-  --rk-fonts-body: system-ui, sans-serif;
-  --rk-radii-actionButton: 9999px;
-  --rk-radii-connectButton: 12px;
-  --rk-radii-menuButton: 12px;
-  --rk-radii-modal: 24px;
-  --rk-radii-modalMobile: 28px;
-  --rk-colors-accentColor: rgb(var(--color-secondary));
-  --rk-colors-accentColorForeground: rgb(var(--color-background));
-  --rk-colors-actionButtonBorder: rgba(0, 0, 0, 0.04);
-  --rk-colors-actionButtonBorderMobile: rgba(0, 0, 0, 0.06);
-  --rk-colors-actionButtonSecondaryBackground: rgba(0, 0, 0, 0.06);
-  --rk-colors-closeButton: rgba(60, 66, 66, 0.8);
-  --rk-colors-closeButtonBackground: rgba(0, 0, 0, 0.06);
-  --rk-colors-connectButtonBackground: rgb(var(--color-card));
-  --rk-colors-connectButtonBackgroundError: #ff494a;
-  --rk-colors-connectButtonInnerBackground: linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.12));
-  --rk-colors-connectButtonText: rgb(var(--color-foreground));
-  --rk-colors-connectButtonTextError: #fff;
-  --rk-colors-connectionIndicator: #30e000;
-  --rk-colors-downloadBottomCardBackground: linear-gradient(
-      126deg,
-      rgba(255, 255, 255, 0) 9.49%,
-      rgba(171, 171, 171, 0.04) 71.04%
-    ), rgb(var(--color-card));
-  --rk-colors-downloadTopCardBackground: linear-gradient(
-      126deg,
-      rgba(171, 171, 171, 0.2) 9.49%,
-      rgba(255, 255, 255, 0) 71.04%
-    ), rgb(var(--color-card));
-  --rk-colors-error: #ff494a;
-  --rk-colors-generalBorder: rgba(255, 255, 255, 0.08);
-  --rk-colors-generalBorderDim: rgba(255, 255, 255, 0.04);
-  --rk-colors-menuItemBackground: rgba(224, 232, 255, 0.1);
-  --rk-colors-modalBackdrop: rgba(0, 0, 0, 0.5);
-  --rk-colors-modalBackground: rgb(var(--color-card));
-  --rk-colors-modalBorder: rgba(255, 255, 255, 0.08);
-  --rk-colors-modalText: rgb(var(--color-foreground));
-  --rk-colors-modalTextDim: rgba(224, 232, 255, 0.3);
-  --rk-colors-modalTextSecondary: rgba(224, 232, 255, 0.6);
-  --rk-colors-profileAction: rgba(224, 232, 255, 0.1);
-  --rk-colors-profileActionHover: rgba(224, 232, 255, 0.2);
-  --rk-colors-profileForeground: rgba(224, 232, 255, 0.05);
-  --rk-colors-selectedOptionBorder: rgba(224, 232, 255, 0.1);
-  --rk-colors-standby: rgb(var(--color-primary));
-  --rk-shadows-connectButton: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  --rk-shadows-dialog: 0px 8px 32px rgba(0, 0, 0, 0.32);
-  --rk-shadows-profileDetailsAction: 0px 2px 6px rgba(37, 41, 46, 0.04);
-  --rk-shadows-selectedOption: 0px 2px 6px rgba(0, 0, 0, 0.24);
-  --rk-shadows-selectedWallet: 0px 2px 6px rgba(0, 0, 0, 0.12);
-  --rk-shadows-walletLogo: 0px 2px 16px rgba(0, 0, 0, 0.16);
 }
 
 /* Base styles */

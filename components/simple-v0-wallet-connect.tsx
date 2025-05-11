@@ -28,10 +28,12 @@ export function SimpleV0WalletConnect() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto bg-card/80 backdrop-blur-sm border-border/50">
       <CardHeader>
-        <CardTitle>Connect Wallet</CardTitle>
-        <CardDescription>Connect your wallet to access the 5PT dashboard</CardDescription>
+        <CardTitle className="text-2xl">Connect Wallet</CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Connect your wallet to access the 5PT dashboard
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {isPreview && (
@@ -56,17 +58,22 @@ export function SimpleV0WalletConnect() {
           </div>
         ) : (
           <div className="space-y-4">
-            {connectors.map((connector) => (
-              <Button
-                key={connector.id}
-                onClick={() => connect({ connector })}
-                disabled={!connector.ready || isLoading}
-                className="w-full"
-              >
-                {connector.name}
-                {isLoading && connector.id === "injected" && " (connecting...)"}
-              </Button>
-            ))}
+            {connectors.map((connector) => {
+              // In preview mode, don't disable buttons based on ready state
+              const isDisabled = isPreview ? isLoading : !connector.ready || isLoading
+
+              return (
+                <Button
+                  key={connector.id}
+                  onClick={() => connect({ connector })}
+                  disabled={isDisabled}
+                  className="w-full bg-gradient-to-r from-primary/80 to-secondary/80 hover:from-primary hover:to-secondary transition-all duration-300"
+                >
+                  {connector.name}
+                  {isLoading && connector.id === "injected" && " (connecting...)"}
+                </Button>
+              )
+            })}
 
             {error && <p className="text-red-500 text-sm">{error.message}</p>}
           </div>

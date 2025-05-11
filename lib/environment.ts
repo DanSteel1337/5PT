@@ -1,32 +1,36 @@
-"\"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 
-export function useIsPreviewEnvironment(): boolean {
-  const [isPreview, setIsPreview] = useState(false)
-
-  useEffect(() => {
-    // Check if we're in a browser environment
-    if (typeof window !== "undefined") {
-      // Check for v0 preview domains
-      const isV0Preview = window.location.hostname.includes("lite.vusercontent.net")
-      // Check for other preview domains
-      const isVercelPreview = window.location.hostname.includes("vercel.app")
-
-      setIsPreview(isV0Preview || isVercelPreview)
-    }
-  }, [])
-
-  return isPreview
-}
-
+/**
+ * Checks if the current environment is a preview environment
+ * @returns boolean indicating if the current environment is a preview environment
+ */
 export function isPreviewEnvironment(): boolean {
   if (typeof window === "undefined") {
     return false
   }
 
-  const isV0Preview = window.location.hostname.includes("lite.vusercontent.net")
-  const isVercelPreview = window.location.hostname.includes("vercel.app")
+  const hostname = window.location.hostname
+  return (
+    hostname.includes("vercel.app") ||
+    hostname.includes("localhost") ||
+    hostname.includes("127.0.0.1") ||
+    hostname.includes("vusercontent.net") ||
+    hostname.endsWith(".vercel.app")
+  )
+}
 
-  return isV0Preview || isVercelPreview
+/**
+ * React hook to check if the current environment is a preview environment
+ * @returns boolean indicating if the current environment is a preview environment
+ */
+export function useIsPreviewEnvironment(): boolean {
+  const [isPreview, setIsPreview] = useState(false)
+
+  useEffect(() => {
+    setIsPreview(isPreviewEnvironment())
+  }, [])
+
+  return isPreview
 }

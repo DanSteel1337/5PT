@@ -9,7 +9,18 @@ import { useEffect, useState } from "react"
 
 export function Web3Providers({ children }: { children: React.ReactNode }) {
   // Create a client
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      }),
+  )
+
   const [mounted, setMounted] = useState(false)
 
   // Prevent hydration errors
