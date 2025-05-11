@@ -13,6 +13,11 @@ interface ModernHeaderProps {
 export function ModernHeader({ onMenuClick }: ModernHeaderProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
+  // Safely check for preview environment
+  const isPreview =
+    typeof window !== "undefined" &&
+    (window.location.hostname.includes("vercel.app") || window.location.hostname === "localhost")
+
   return (
     <header className="bg-black/20 backdrop-blur-lg border-b border-white/10 p-4 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-4">
