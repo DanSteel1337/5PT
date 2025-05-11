@@ -16,14 +16,15 @@ const nextConfig = {
     // Create a safer fallback resolution mechanism
     config.resolve.fallback = {
       ...config.resolve.fallback,
-      crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'),
-      process: require.resolve('process/browser'),
-      zlib: require.resolve('browserify-zlib'),
-      assert: require.resolve('assert'),
-      buffer: require.resolve('buffer'),
-      util: require.resolve('util'),
-      events: require.resolve('events'),
+      // Don't use require.resolve - just specify the module names
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify',
+      process: 'process/browser',
+      zlib: 'browserify-zlib',
+      assert: 'assert',
+      buffer: 'buffer',
+      util: 'util',
+      events: 'events',
     };
     
     // Add plugins for polyfills
