@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAccount, useConnect, useDisconnect } from "wagmi"
 import { Button } from "@/components/ui/button"
-import { Wallet, ChevronDown, LogOut, ExternalLink, Copy, Check } from "lucide-react"
+import { Wallet, ChevronDown, LogOut, AlertTriangle } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,104 +12,107 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
+import { shouldUseMockData } from "@/lib/environment"
+import { mockUserData } from "@/lib/mock-data"
 
 interface WalletConnectorProps {
   variant?: "default" | "minimal"
-  className?: string
 }
 
-export function WalletConnector({ variant = "default", className }: WalletConnectorProps) {
-  const { address, isConnected } = useAccount()
+export function WalletConnector({ variant = "default" }: WalletConnectorProps) {
+  const [mounted, setMounted] = useState(false)
+  const [isPreview, setIsPreview] = useState(false)
+
+  // In preview mode, we'll use mock data
+  const mockAccount = shouldUseMockData()
+    ? {
+        address: mockUserData.address,
+        isConnected: mockUserData.isConnected,
+      }
+    : undefined
+
+  // Use real or mock account data
+  const { address, isConnected } = useAccount(mockAccount)
   const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
-  const { toast } = useToast()
-  const [copied, setCopied] = useState(false)
 
   // Format address for display
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
-  // Copy address to clipboard
-  const copyAddress = () => {
-    if (address) {
-      navigator.clipboard.writeText(address)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-      toast({
-        title: "Address copied",
-        description: "Wallet address copied to clipboard",
-      })
+  // Handle connection
+  const handleConnect = (connector: any) => {
+    try {
+      connect({ connector })
+    } catch (error) {
+      console.error("Failed to connect:", error)
     }
   }
 
-  // View on explorer
-  const viewOnExplorer = () => {
-    if (address) {
-      window.open(`https://bscscan.com/address/${address}`, "_blank")
-    }
-  }
+  // Check if we're in preview mode
+  useEffect(() => {
+    setMounted(true)
+    setIsPreview(shouldUseMockData())
+  }, [])
 
-  if (!isConnected) {
-    if (variant === "minimal") {
+  // Don't render anything during SSR
+  if (!mounted) return null
+
+  // Minimal variant (just the connect button)
+  if (variant === "minimal") {
+    if (isConnected) {
       return (
         <Button
+          variant="outline"
           size="sm"
-          className={cn(
-            "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700",
-            className,
-          )}
-          onClick={() => connect({ connector: connectors[0] })}
-          disabled={isPending}
+          className="border-purple-500/30 text-purple-300 hover:bg-purple-900/20"
+          onClick={() => disconnect()}
         >
-          {isPending ? "Connecting..." : "Connect"}
+          {formatAddress(address as string)}
         </Button>
       )
     }
 
     return (
       <Button
-        className={cn(
-          "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700",
-          className,
-        )}
-        onClick={() => connect({ connector: connectors[0] })}
-        disabled={isPending}
+        size="sm"
+        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        onClick={() => handleConnect(connectors[0])}
+        disabled={isPending || isPreview}
       >
-        <Wallet className="mr-2 h-4 w-4" />
-        {isPending ? "Connecting..." : "Connect Wallet"}
+        {isPreview ? (
+          <>
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            Preview Mode
+          </>
+        ) : isPending ? (
+          "Connecting..."
+        ) : (
+          <>
+            <Wallet className="mr-2 h-4 w-4" />
+            Connect Wallet
+          </>
+        )}
       </Button>
     )
   }
 
-  if (variant === "minimal") {
+  // Default variant (dropdown menu)
+  if (isConnected) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            size="sm"
-            variant="outline"
-            className={cn("border-purple-500/30 text-purple-300 hover:bg-purple-900/20", className)}
-          >
-            {formatAddress(address || "")}
+          <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-900/20">
+            <Wallet className="mr-2 h-4 w-4" />
+            {formatAddress(address as string)}
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 bg-black/80 backdrop-blur-md border-purple-500/30">
-          <DropdownMenuLabel className="text-purple-300">Wallet</DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="w-56 bg-black/80 backdrop-blur-lg border-purple-500/30">
+          <DropdownMenuLabel>My Wallet</DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-purple-500/20" />
-          <DropdownMenuItem onClick={copyAddress} className="cursor-pointer">
-            {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-            Copy Address
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={viewOnExplorer} className="cursor-pointer">
-            <ExternalLink className="mr-2 h-4 w-4" />
-            View on Explorer
-          </DropdownMenuItem>
-          <DropdownMenuSeparator className="bg-purple-500/20" />
-          <DropdownMenuItem onClick={() => disconnect()} className="cursor-pointer text-red-400">
+          <DropdownMenuItem className="text-red-400 focus:text-red-400 cursor-pointer" onClick={() => disconnect()}>
             <LogOut className="mr-2 h-4 w-4" />
             Disconnect
           </DropdownMenuItem>
@@ -122,31 +125,40 @@ export function WalletConnector({ variant = "default", className }: WalletConnec
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          className={cn("border-purple-500/30 text-purple-300 hover:bg-purple-900/20", className)}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          disabled={isPreview}
         >
-          <Wallet className="mr-2 h-4 w-4" />
-          {formatAddress(address || "")}
-          <ChevronDown className="ml-2 h-4 w-4" />
+          {isPreview ? (
+            <>
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              Preview Mode
+            </>
+          ) : (
+            <>
+              <Wallet className="mr-2 h-4 w-4" />
+              Connect Wallet
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-black/80 backdrop-blur-md border-purple-500/30">
-        <DropdownMenuLabel className="text-purple-300">Wallet</DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-purple-500/20" />
-        <DropdownMenuItem onClick={copyAddress} className="cursor-pointer">
-          {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-          Copy Address
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={viewOnExplorer} className="cursor-pointer">
-          <ExternalLink className="mr-2 h-4 w-4" />
-          View on Explorer
-        </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-purple-500/20" />
-        <DropdownMenuItem onClick={() => disconnect()} className="cursor-pointer text-red-400">
-          <LogOut className="mr-2 h-4 w-4" />
-          Disconnect
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+      {!isPreview && (
+        <DropdownMenuContent align="end" className="w-56 bg-black/80 backdrop-blur-lg border-purple-500/30">
+          <DropdownMenuLabel>Connect Wallet</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-purple-500/20" />
+          {connectors.map((connector) => (
+            <DropdownMenuItem
+              key={connector.id}
+              className="cursor-pointer"
+              onClick={() => handleConnect(connector)}
+              disabled={!connector.ready || isPending}
+            >
+              {connector.name}
+              {isPending && " (connecting...)"}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      )}
     </DropdownMenu>
   )
 }
