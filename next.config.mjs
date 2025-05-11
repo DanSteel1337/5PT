@@ -1,6 +1,3 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -12,30 +9,33 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  webpack: (config) => {
-    // Create a safer fallback resolution mechanism
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      // Don't use require.resolve - just specify the module names
-      crypto: 'crypto-browserify',
-      stream: 'stream-browserify',
-      process: 'process/browser',
-      zlib: 'browserify-zlib',
-      assert: 'assert',
-      buffer: 'buffer',
-      util: 'util',
-      events: 'events',
-    };
-    
-    // Add plugins for polyfills
-    config.plugins.push(
-      new (require('webpack')).ProvidePlugin({
-        process: 'process/browser',
-        Buffer: ['buffer', 'Buffer'],
-      })
-    );
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Replace process in client-side builds
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        stream: false,
+        process: false,
+        zlib: false,
+        assert: false,
+        buffer: false,
+        util: false,
+        events: false,
+      };
+      
+      // Provide process as a global
+      config.plugins.push(
+        new config.constructor.ProvidePlugin({
+          process: require.resolve('./lib/process-polyfill.js'),
+        })
+      );
+    }
 
-    // Handle pino-pretty as an external - don't try to resolve it
+    // Handle pino-pretty as an external
     config.externals = config.externals || [];
     config.externals.push('pino-pretty');
 

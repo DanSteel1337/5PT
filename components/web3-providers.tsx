@@ -6,8 +6,13 @@ import { WagmiProvider } from "wagmi"
 import { config } from "@/lib/wagmi-config"
 import { useState, useEffect } from "react"
 
-// Safely check for browser environment without relying on process
+// Safe environment detection
 const isBrowser = typeof window !== "undefined"
+const isPreview =
+  isBrowser &&
+  (window.location.hostname.includes("vercel.app") ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
 
 export function Web3Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -25,7 +30,7 @@ export function Web3Providers({ children }: { children: React.ReactNode }) {
 
   // Warn about preview mode
   useEffect(() => {
-    if (isBrowser && window.location.hostname.includes("vercel.app")) {
+    if (isPreview) {
       console.info("Running in preview mode with mock data. WalletConnect is disabled.")
     }
   }, [])

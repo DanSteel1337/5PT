@@ -16,6 +16,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
 
+// Safe environment detection
+const isBrowser = typeof window !== "undefined"
+const isPreview =
+  isBrowser &&
+  (window.location.hostname.includes("vercel.app") ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+
 export function Web3ConnectButton() {
   const [mounted, setMounted] = useState(false)
   const [displayAddress, setDisplayAddress] = useState<string>("")
@@ -44,6 +52,16 @@ export function Web3ConnectButton() {
   }, [])
 
   if (!mounted) return null
+
+  // In preview mode, show a mock button
+  if (isPreview) {
+    return (
+      <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+        <Wallet className="mr-2 h-4 w-4" />
+        Preview Mode
+      </Button>
+    )
+  }
 
   if (isConnected) {
     return (

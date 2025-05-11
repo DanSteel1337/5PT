@@ -8,6 +8,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Sparkles, TrendingUp, Users, Wallet } from "lucide-react"
 import { WalletConnector } from "@/components/wallet-connector"
 
+// Safe environment detection
+const isBrowser = typeof window !== "undefined"
+const isPreview =
+  isBrowser &&
+  (window.location.hostname.includes("vercel.app") ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+
 export function ModernHero() {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -15,6 +23,13 @@ export function ModernHero() {
     <div className="relative overflow-hidden bg-black circuit-pattern">
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 to-pink-900/30 z-0"></div>
+
+      {/* Preview mode banner */}
+      {isPreview && (
+        <div className="bg-yellow-600 text-white text-center py-1 px-4 text-sm font-medium relative z-50">
+          Preview Mode - Using Mock Data
+        </div>
+      )}
 
       <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">

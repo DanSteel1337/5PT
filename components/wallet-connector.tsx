@@ -1,76 +1,47 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useAccount, useConnect, useDisconnect } from "wagmi"
-import { injected } from "wagmi/connectors"
-import { useState, useEffect } from "react"
-import { shouldUseMockData } from "@/lib/environment"
+import { Wallet } from "lucide-react"
+import { useEffect, useState } from "react"
 
-interface WalletConnectorProps {
-  variant?: "default" | "minimal"
-}
+// Safe environment detection
+const isBrowser = typeof window !== "undefined"
+const isPreview =
+  isBrowser &&
+  (window.location.hostname.includes("vercel.app") ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
 
-export function WalletConnector({ variant = "default" }: WalletConnectorProps) {
+export function WalletConnector() {
   const [mounted, setMounted] = useState(false)
-  const [isPreview, setIsPreview] = useState(false)
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect()
-  const { disconnect } = useDisconnect()
 
-  // Check if we're in a preview environment
+  // Client-side only rendering to avoid hydration issues
   useEffect(() => {
     setMounted(true)
-    setIsPreview(shouldUseMockData())
   }, [])
 
-  // Handle connect
-  const handleConnect = () => {
-    if (isPreview) {
-      // In preview mode, just show a message
-      console.info("WalletConnect is disabled in preview mode")
-      return
-    }
-
-    connect({ connector: injected() })
-  }
-
-  // Handle disconnect
-  const handleDisconnect = () => {
-    if (isPreview) {
-      // In preview mode, just show a message
-      console.info("WalletConnect is disabled in preview mode")
-      return
-    }
-
-    disconnect()
-  }
-
-  // Don't render anything until mounted to avoid hydration issues
   if (!mounted) return null
 
-  // If in preview mode, show a disabled button
+  // In preview mode, show a mock button
   if (isPreview) {
     return (
-      <Button disabled className={variant === "minimal" ? "w-auto" : "w-full"}>
+      <Button variant="outline" className="bg-purple-900/20 border-purple-500/30 text-white hover:bg-purple-900/30">
+        <Wallet className="mr-2 h-4 w-4" />
         Preview Mode
       </Button>
     )
   }
 
-  // If connected, show address and disconnect button
-  if (isConnected && address) {
-    const displayAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
-
-    return (
-      <Button variant="outline" onClick={handleDisconnect} className={variant === "minimal" ? "w-auto" : "w-full"}>
-        {displayAddress}
-      </Button>
-    )
-  }
-
-  // If not connected, show connect button
   return (
-    <Button onClick={handleConnect} className={variant === "minimal" ? "w-auto" : "w-full"}>
+    <Button
+      variant="outline"
+      className="bg-purple-900/20 border-purple-500/30 text-white hover:bg-purple-900/30"
+      onClick={() => {
+        // Connect wallet logic
+        console.log("Connect wallet clicked")
+      }}
+    >
+      <Wallet className="mr-2 h-4 w-4" />
       Connect Wallet
     </Button>
   )
