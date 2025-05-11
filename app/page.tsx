@@ -1,15 +1,12 @@
-import { FuturisticHero } from "@/components/landing/futuristic-hero"
-import { CompactFeatures } from "@/components/landing/compact-features"
-import { CompactTokenomics } from "@/components/landing/compact-tokenomics"
-import { InvestmentCTA } from "@/components/landing/investment-cta"
+import { SimpleV0WalletConnect } from "@/components/simple-v0-wallet-connect"
 
 export default function Home() {
   return (
-    <div className="flex flex-col">
-      <FuturisticHero />
-      <CompactFeatures />
-      <CompactTokenomics />
-      <InvestmentCTA />
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
+      <div className="w-full max-w-5xl">
+        <h1 className="text-4xl font-bold text-center mb-8">5PT Dashboard</h1>
+        <SimpleV0WalletConnect />
+      </div>
+    </main>
   )
 }

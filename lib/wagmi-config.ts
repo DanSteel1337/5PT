@@ -1,31 +1,27 @@
-import { configureChains, createConfig } from "wagmi"
+import { http, createConfig } from "wagmi"
 import { bsc, bscTestnet } from "wagmi/chains"
-import { MetaMaskConnector } from "wagmi/connectors/metaMask"
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
-import { publicProvider } from "wagmi/providers/public"
+import { injected, walletConnect } from "wagmi/connectors"
 
+// Get WalletConnect project ID from environment variable
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
 
-const { chains, publicClient } = configureChains(
-  [
-    bsc,
-    ...(process.env.NODE_ENV === "development" ? [bscTestnet] : []), // Conditionally add testnet
-  ],
-  [publicProvider()],
-)
+// Define chains to support
+const chains = [bsc, ...(process.env.NODE_ENV === "development" ? [bscTestnet] : [])]
 
+// Create wagmi config with minimal setup
 export const config = createConfig({
-  autoConnect: true,
+  chains,
+  transports: {
+    [bsc.id]: http(),
+    ...(process.env.NODE_ENV === "development" ? { [bscTestnet.id]: http() } : {}),
+  },
   connectors: [
-    new MetaMaskConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: walletConnectProjectId,
-      },
+    injected(),
+    walletConnect({
+      projectId: walletConnectProjectId,
+      showQrModal: true,
     }),
   ],
-  publicClient,
 })
 
 // Contract addresses - Updated with deployed contracts

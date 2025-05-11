@@ -1,63 +1,43 @@
 "use client"
 
-import { ModernMobileSidebar } from "@/components/dashboard/modern-sidebar"
+import { Bell, Menu, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
-import { MoonIcon, SunIcon, BellIcon, Cpu } from "lucide-react"
-import { useTheme } from "next-themes"
-import { Badge } from "@/components/ui/badge"
-import { WalletConnect } from "@/components/wallet-connect"
+import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { Web3ConnectButton } from "@/components/web3-connect-button"
 
-export function ModernHeader() {
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
+interface ModernHeaderProps {
+  onMenuClick: () => void
+}
 
-  // Client-side only rendering to avoid hydration issues
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+export function ModernHeader({ onMenuClick }: ModernHeaderProps) {
+  const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <header className="sticky top-0 z-40 border-b border-purple-900/20 bg-black/80 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between py-4">
-        <div className="flex items-center gap-2">
-          <ModernMobileSidebar />
-          <h1 className="text-xl font-bold md:text-2xl">
-            <span className="hidden md:inline-block">Five Pillars Dashboard</span>
-            <span className="md:hidden">5PT Dashboard</span>
-          </h1>
-          <Badge
-            variant="outline"
-            className="hidden md:flex bg-purple-900/20 text-purple-300 border-purple-500/30 ml-2"
-          >
-            <Cpu className="mr-1 h-3 w-3" /> AI-Enhanced
-          </Badge>
+    <header className="bg-black/20 backdrop-blur-lg border-b border-white/10 p-4 flex items-center justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" className="lg:hidden text-white" onClick={onMenuClick}>
+          <Menu className="h-5 w-5" />
+        </Button>
+        <div className="hidden md:flex items-center gap-2">
+          <div className="relative">
+            <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              className="pl-9 bg-black/20 border-white/10 w-[200px] focus:w-[300px] transition-all duration-300"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" className="relative border-purple-500/30 hover:bg-purple-900/20">
-            <BellIcon className="h-5 w-5 text-purple-300" />
-            <span className="sr-only">Notifications</span>
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-purple-600 text-white">
-              3
-            </Badge>
-          </Button>
+      </div>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="border-purple-500/30 hover:bg-purple-900/20"
-          >
-            {mounted && theme === "dark" ? (
-              <SunIcon className="h-5 w-5 text-purple-300" />
-            ) : (
-              <MoonIcon className="h-5 w-5 text-purple-300" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-
-          <WalletConnect />
-        </div>
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" className="relative text-white">
+          <Bell className="h-5 w-5" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </Button>
+        <Web3ConnectButton />
       </div>
     </header>
   )
