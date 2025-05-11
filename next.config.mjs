@@ -39,11 +39,9 @@ const nextConfig = {
       })
     );
 
-    // Handle pino-pretty as an external if needed
+    // Handle pino-pretty as an external - don't try to resolve it
     config.externals = config.externals || [];
-    if (!require.resolve('pino-pretty', { paths: [process.cwd()] })) {
-      config.externals.push('pino-pretty');
-    }
+    config.externals.push('pino-pretty');
 
     return config;
   },
