@@ -1,6 +1,6 @@
 "use client"
 
-import { useAccount, useConnect, useDisconnect, useChainId, useConfig } from "wagmi"
+import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi"
 import { Button } from "@/components/ui/button"
 import { bsc, bscTestnet } from "viem/chains"
 import { Wallet } from "lucide-react"
@@ -16,51 +16,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
 
-// Safe environment detection
-const isBrowser = typeof window !== "undefined"
-const isPreview =
-  isBrowser &&
-  (window.location.hostname.includes("vercel.app") ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1")
-
 export function Web3ConnectButton() {
   const [mounted, setMounted] = useState(false)
   const [displayAddress, setDisplayAddress] = useState<string>("")
-
-  // Wrap wagmi hooks in try/catch to handle the case when used outside WagmiProvider
-  let isConnected = false
-  let address: `0x${string}` | undefined
-  let chainId: number | undefined
-  let connect: any
-  let connectors: any[] = []
-  let isPending = false
-  let disconnect: any
-  const config = useConfig() // Call useConfig unconditionally
-
-  try {
-    // This will throw if used outside WagmiProvider
-    // useConfig() // No longer needed here
-
-    // Now it's safe to use other wagmi hooks
-    const accountData = useAccount()
-    isConnected = accountData.isConnected
-    address = accountData.address
-
-    const connectData = useConnect()
-    connect = connectData.connect
-    connectors = connectData.connectors
-    isPending = connectData.isPending
-
-    const disconnectData = useDisconnect()
-    disconnect = disconnectData.disconnect
-
-    chainId = useChainId()
-  } catch (error) {
-    // If we're here, we're outside WagmiProvider
-    // Just render a preview button
-    console.warn("Web3ConnectButton used outside WagmiProvider:", error)
-  }
+  const { address, isConnected } = useAccount()
+  const { connect, connectors, isPending } = useConnect()
+  const { disconnect } = useDisconnect()
+  const chainId = useChainId()
 
   // Format address for display
   useEffect(() => {
@@ -82,16 +44,6 @@ export function Web3ConnectButton() {
   }, [])
 
   if (!mounted) return null
-
-  // In preview mode or if used outside WagmiProvider, show a mock button
-  if (isPreview || !address) {
-    return (
-      <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-        <Wallet className="mr-2 h-4 w-4" />
-        Preview Mode
-      </Button>
-    )
-  }
 
   if (isConnected) {
     return (

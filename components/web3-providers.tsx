@@ -17,7 +17,7 @@ export function Web3Providers({ children }: { children: React.ReactNode }) {
 
   // Prevent hydration errors by only rendering on client
   if (!mounted) {
-    return <div className="min-h-screen">{children}</div>
+    return <>{children}</>
   }
 
   return (
