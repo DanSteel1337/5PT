@@ -8,10 +8,9 @@ import { OptimizedQuickActions } from "@/components/dashboard/optimized-quick-ac
 import { EnhancedPerformanceChart } from "@/components/dashboard/enhanced-performance-chart"
 import { OptimizedTokenMetrics } from "@/components/dashboard/optimized-token-metrics"
 import { OptimizedRewardsDashboard } from "@/components/dashboard/optimized-rewards-dashboard"
-import { ConnectKitButton } from "connectkit"
-import { Button } from "@/components/ui/button"
 import { StableParticleBackground } from "@/components/ui/stable-particle-background"
 import Image from "next/image"
+import { WalletPrompt } from "@/components/ui/wallet-prompt"
 
 export default function DashboardPage() {
   const { isConnected } = useAccount()
@@ -32,16 +31,6 @@ export default function DashboardPage() {
             />
             <h1 className="text-3xl font-bold text-amber-300">Dashboard</h1>
           </div>
-
-          {!isConnected && (
-            <ConnectKitButton.Custom>
-              {({ show }) => (
-                <Button onClick={show} className="bg-amber-700 hover:bg-amber-600 text-white font-bold">
-                  Connect Wallet
-                </Button>
-              )}
-            </ConnectKitButton.Custom>
-          )}
         </div>
 
         {isConnected ? (
@@ -54,22 +43,7 @@ export default function DashboardPage() {
             <ActiveInvestments />
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-8">
-              <Image
-                src="/images/5pt-logo.png"
-                alt="Five Pillars Token"
-                width={120}
-                height={120}
-                className="rounded-full"
-              />
-            </div>
-            <h2 className="text-2xl font-bold mb-4 text-amber-300">Connect Your Wallet</h2>
-            <p className="text-gray-400 mb-8 max-w-md">
-              Connect your wallet to view your dashboard, manage investments, and track rewards.
-            </p>
-            <ConnectKitButton />
-          </div>
+          <WalletPrompt />
         )}
       </div>
     </DashboardLayout>

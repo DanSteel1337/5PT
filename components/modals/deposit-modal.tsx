@@ -16,8 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useInvestmentManager } from "@/lib/hooks/use-investment-manager"
 import { useTokenContract } from "@/lib/hooks/use-token-contract"
-import { formatEther } from "ethers"
-import { Loader2, AlertCircle, CheckCircle2, Info, ShieldAlert } from "lucide-react"
+import { Loader2, AlertCircle, CheckCircle2, Info, ShieldAlert, RefreshCw } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CONTRACT_ADDRESSES } from "@/lib/constants"
 import type { BlockchainError } from "@/lib/blockchain-errors"
@@ -67,9 +66,9 @@ const validateContractAddress = (address: string): boolean => {
 }
 
 export function DepositModal({ isOpen, onClose }: DepositModalProps) {
-  const { address } = useAccount()
+  const { address, chain } = useAccount()
   const { deposit, depositStatus, lastError } = useInvestmentManager()
-  const { useTokenBalance, useTokenAllowance, approveToken } = useTokenContract()
+  const { useTokenBalance, useTokenAllowance, approveToken, symbol } = useTokenContract()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isApproving, setIsApproving] = useState(false)
   const [needsApproval, setNeedsApproval] = useState(false)
@@ -77,6 +76,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [approvalError, setApprovalError] = useState<BlockchainError | null>(null)
   const [depositError, setDepositError] = useState<BlockchainError | null>(null)
   const [contractValidationError, setContractValidationError] = useState<boolean>(false)
+  const [isRefreshingBalance, setIsRefreshingBalance] = useState(false)
 
   // Validate contract address on component mount
   useEffect(() => {
@@ -86,8 +86,14 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   const investmentManagerAddress = CONTRACT_ADDRESSES.investmentManager as `0x${string}`
 
-  const { data: balance } = useTokenBalance(address)
-  const { data: allowance } = useTokenAllowance(address, investmentManagerAddress)
+  const {
+    data: balanceData,
+    formattedBalance,
+    isLoading: isBalanceLoading,
+    refetch: refetchBalance,
+  } = useTokenBalance(address)
+
+  const { data: allowance, refetch: refetchAllowance } = useTokenAllowance(address, investmentManagerAddress)
 
   const {
     register,
@@ -95,6 +101,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm<DepositFormValues>({
     defaultValues: {
       amount: "",
@@ -122,6 +129,21 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     setDepositError(null)
   }, [watchAmount])
 
+  // Refresh balance and allowance when chain changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      refetchBalance()
+      refetchAllowance()
+    }
+  }, [isOpen, chain, refetchBalance, refetchAllowance])
+
+  const handleRefreshBalance = async () => {
+    setIsRefreshingBalance(true)
+    await refetchBalance()
+    await refetchAllowance()
+    setTimeout(() => setIsRefreshingBalance(false), 1000)
+  }
+
   const handleApprove = async () => {
     if (!watchAmount || contractValidationError) return
 
@@ -130,6 +152,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
       setApprovalError(null)
       await approveToken(watchAmount, investmentManagerAddress)
       setNeedsApproval(false)
+
+      // Refresh allowance after approval
+      await refetchAllowance()
     } catch (error) {
       console.error("Error approving tokens:", error)
       if (error && typeof error === "object" && "type" in error) {
@@ -155,10 +180,21 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
       // Reset form after successful submission
       reset()
+
+      // Refresh balance after deposit
+      await refetchBalance()
     } catch (error) {
       console.error("Error depositing:", error)
       if (lastError) {
         setDepositError(lastError)
+      } else if (error && typeof error === "object") {
+        // Handle case where lastError might not be set
+        setDepositError({
+          type: "error",
+          title: "Transaction Failed",
+          message: "The deposit transaction failed. Please try again.",
+          suggestion: "Check your wallet and network connection.",
+        })
       }
     } finally {
       setIsSubmitting(false)
@@ -175,7 +211,13 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
     }
   }
 
-  const maxBalance = balance ? formatEther(balance) : "0"
+  const handleSetMax = () => {
+    if (formattedBalance && formattedBalance !== "0") {
+      setValue("amount", formattedBalance)
+    }
+  }
+
+  const tokenSymbol = symbol || "5PT"
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -185,7 +227,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
             Deposit Tokens
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Deposit your 5PT tokens to start earning rewards
+            Deposit your {tokenSymbol} tokens to start earning rewards
           </DialogDescription>
         </DialogHeader>
 
@@ -229,11 +271,26 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <Label htmlFor="amount" className="text-amber-400">
                   Amount
                 </Label>
-                <span className="text-sm text-gray-400">Balance: {maxBalance} 5PT</span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 rounded-full"
+                    onClick={handleRefreshBalance}
+                    disabled={isRefreshingBalance || isBalanceLoading}
+                  >
+                    <RefreshCw size={14} className={`text-amber-400 ${isRefreshingBalance ? "animate-spin" : ""}`} />
+                    <span className="sr-only">Refresh Balance</span>
+                  </Button>
+                  <span className="text-sm text-gray-400">
+                    Balance: {isBalanceLoading ? "Loading..." : formattedBalance} {tokenSymbol}
+                  </span>
+                </div>
               </div>
               <div className="relative">
                 <Input
@@ -253,7 +310,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                       if (isNaN(amount) || amount <= 0) {
                         return "Amount must be greater than 0"
                       }
-                      if (balance && amount > Number.parseFloat(maxBalance)) {
+                      if (balanceData && BigInt(amount * 10 ** 18) > balanceData) {
                         return "Amount exceeds your balance"
                       }
                       return true
@@ -265,15 +322,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
                   variant="ghost"
                   size="sm"
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-amber-400 hover:text-amber-300"
-                  disabled={contractValidationError}
-                  onClick={() => {
-                    if (balance) {
-                      const form = document.getElementById("amount") as HTMLInputElement
-                      if (form) {
-                        form.value = maxBalance
-                      }
-                    }
-                  }}
+                  disabled={contractValidationError || isBalanceLoading || formattedBalance === "0"}
+                  onClick={handleSetMax}
                 >
                   MAX
                 </Button>

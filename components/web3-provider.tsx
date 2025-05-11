@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ConnectKitProvider, getDefaultConfig } from "connectkit"
 import { mainnet, bsc, bscTestnet } from "wagmi/chains"
 import type { ReactNode } from "react"
+import { toast } from "@/components/ui/use-toast"
 
 // Create a client
 const queryClient = new QueryClient()
@@ -26,6 +27,9 @@ const config = createConfig(
       [bsc.id]: http("https://bsc-dataseed.binance.org"),
       [mainnet.id]: http(),
     },
+    walletConnectOptions: {
+      projectId,
+    },
   }),
 )
 
@@ -40,6 +44,31 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             "--ck-border-radius": "12px",
           }}
           mode="dark"
+          options={{
+            hideNoWalletCTA: false,
+            hideBalance: false,
+            hideTooltips: false,
+            hideQuestionMarkCTA: false,
+            embedGoogleFonts: true,
+            walletConnectCTA: "both",
+            language: "en-US",
+            initialChainId: bscTestnet.id,
+            enforceSupportedChains: false,
+            disableSiweRedirect: true,
+            overlayBlur: 4,
+            onConnect: () => {
+              toast({
+                title: "Wallet connected",
+                description: "Your wallet has been successfully connected.",
+              })
+            },
+            onDisconnect: () => {
+              toast({
+                title: "Wallet disconnected",
+                description: "Your wallet has been disconnected.",
+              })
+            },
+          }}
         >
           {children}
         </ConnectKitProvider>

@@ -21,7 +21,6 @@ const validateContractAddress = (address: string): boolean => {
     "0x0000000000000000000000000000000000000000",
     "0x123456789abcdef123456789abcdef123456789a",
     "0x123456789aBCdEF123456789aBCdef123456789A",
-    "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", // Remove this if it was a valid address
   ]
 
   if (invalidAddresses.includes(address.toLowerCase())) {
@@ -127,16 +126,54 @@ export function useInvestmentManager() {
   const [depositHash, setDepositHash] = useState<`0x${string}` | undefined>()
   const [claimHash, setClaimHash] = useState<`0x${string}` | undefined>()
   const [lastError, setLastError] = useState<any>(null)
+  const [isDepositing, setIsDepositing] = useState(false)
+  const [isClaiming, setIsClaiming] = useState(false)
   const { approveToken } = useTokenContract()
 
   // Transaction status
-  const depositTx = useWaitForTransactionReceipt({ hash: depositHash })
-  const claimTx = useWaitForTransactionReceipt({ hash: claimHash })
+  const depositTx = useWaitForTransactionReceipt({
+    hash: depositHash,
+    onSuccess: () => {
+      setIsDepositing(false)
+    },
+    onError: (error) => {
+      console.error("Error in deposit transaction:", error)
+      const parsedError = parseBlockchainError(error)
+      setLastError(parsedError)
+      setIsDepositing(false)
+
+      toast({
+        variant: "destructive",
+        title: parsedError.title,
+        description: parsedError.message,
+      })
+    },
+  })
+
+  const claimTx = useWaitForTransactionReceipt({
+    hash: claimHash,
+    onSuccess: () => {
+      setIsClaiming(false)
+    },
+    onError: (error) => {
+      console.error("Error in claim transaction:", error)
+      const parsedError = parseBlockchainError(error)
+      setLastError(parsedError)
+      setIsClaiming(false)
+
+      toast({
+        variant: "destructive",
+        title: parsedError.title,
+        description: parsedError.message,
+      })
+    },
+  })
 
   // Deposit tokens
   const deposit = async (amount: string, referer: `0x${string}` | undefined) => {
     try {
       setLastError(null)
+      setIsDepositing(true)
 
       // Get and validate the investment manager address
       const investmentManagerAddress = getInvestmentManagerAddress()
@@ -175,6 +212,7 @@ export function useInvestmentManager() {
       return tx
     } catch (error) {
       console.error("Error depositing tokens:", error)
+      setIsDepositing(false)
 
       // Parse the error to get user-friendly message
       const parsedError = parseBlockchainError(error)
@@ -194,6 +232,7 @@ export function useInvestmentManager() {
   const claimReward = async () => {
     try {
       setLastError(null)
+      setIsClaiming(true)
 
       // Get and validate the investment manager address
       const investmentManagerAddress = getInvestmentManagerAddress()
@@ -218,6 +257,7 @@ export function useInvestmentManager() {
       return tx
     } catch (error) {
       console.error("Error claiming rewards:", error)
+      setIsClaiming(false)
 
       // Parse the error to get user-friendly message
       const parsedError = parseBlockchainError(error)
@@ -237,13 +277,15 @@ export function useInvestmentManager() {
     deposit,
     claimReward,
     lastError,
+    isDepositing,
+    isClaiming,
     depositStatus: {
-      isLoading: depositTx.isLoading,
+      isLoading: depositTx.isLoading || isDepositing,
       isSuccess: depositTx.isSuccess,
       isError: depositTx.isError,
     },
     claimStatus: {
-      isLoading: claimTx.isLoading,
+      isLoading: claimTx.isLoading || isClaiming,
       isSuccess: claimTx.isSuccess,
       isError: claimTx.isError,
     },

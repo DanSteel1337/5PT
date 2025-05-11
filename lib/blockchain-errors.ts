@@ -30,11 +30,46 @@ export function parseBlockchainError(error: any): BlockchainError {
     errorMessage = error.error.message
   } else if (error.data && error.data.message) {
     errorMessage = error.data.message
+  } else if (error.details) {
+    errorMessage = error.details
   }
 
   errorMessage = errorMessage.toLowerCase()
 
-  // Check for specific error types
+  // Check for specific contract errors
+
+  // InvalidReferrer error
+  if (errorMessage.includes("invalidreferrer") || errorMessage.includes("invalid referrer")) {
+    return {
+      type: "invalid_referrer",
+      title: "Invalid Referrer",
+      message: "The referrer address you provided is not valid or not registered in the system.",
+      suggestion: "Please check the referrer address or leave it blank to proceed without a referrer.",
+      originalError: error,
+    }
+  }
+
+  // Insufficient balance error
+  if (errorMessage.includes("insufficient balance") || errorMessage.includes("exceeds balance")) {
+    return {
+      type: "insufficient_balance",
+      title: "Insufficient Balance",
+      message: "You don't have enough tokens to complete this deposit.",
+      suggestion: "Please check your token balance and try a smaller amount.",
+      originalError: error,
+    }
+  }
+
+  // Minimum deposit error
+  if (errorMessage.includes("minimum deposit") || errorMessage.includes("min deposit")) {
+    return {
+      type: "minimum_deposit",
+      title: "Deposit Too Small",
+      message: "Your deposit amount is below the minimum required.",
+      suggestion: "Please increase your deposit amount to meet the minimum requirement.",
+      originalError: error,
+    }
+  }
 
   // User rejected transaction
   if (
@@ -56,8 +91,8 @@ export function parseBlockchainError(error: any): BlockchainError {
     return {
       type: "insufficient_funds",
       title: "Insufficient Funds",
-      message: "You don't have enough funds to complete this transaction.",
-      suggestion: "Please add more funds to your wallet or try a smaller amount.",
+      message: "You don't have enough funds to cover the transaction fee.",
+      suggestion: "Please add more BNB to your wallet to cover gas fees.",
       originalError: error,
     }
   }
@@ -73,9 +108,26 @@ export function parseBlockchainError(error: any): BlockchainError {
       revertReason = revertMatch[1]
     }
 
+    // Check for custom error names in the error message
+    const customErrorMatch = errorMessage.match(/custom error '([^']+)'/i)
+    if (customErrorMatch && customErrorMatch[1]) {
+      const customError = customErrorMatch[1]
+
+      // Handle specific custom errors
+      if (customError.toLowerCase() === "invalidreferrer") {
+        return {
+          type: "invalid_referrer",
+          title: "Invalid Referrer",
+          message: "The referrer address you provided is not valid or not registered in the system.",
+          suggestion: "Please check the referrer address or leave it blank to proceed without a referrer.",
+          originalError: error,
+        }
+      }
+    }
+
     return {
       type: "execution_reverted",
-      title: "Transaction Would Fail",
+      title: "Transaction Failed",
       message: revertReason,
       suggestion: "Check that you meet all requirements for this action.",
       originalError: error,
