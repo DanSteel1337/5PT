@@ -47,6 +47,14 @@ export interface TokenTransfer {
   log_index: number
 }
 
+export interface PairReserves {
+  reserve0: string
+  reserve1: string
+  reserve0_formatted: string
+  reserve1_formatted: string
+  totalSupply: string
+}
+
 // Server-side only functions
 export async function getTokenMetadata(tokenAddress: string, chain = "bsc"): Promise<TokenMetadata | null> {
   try {
@@ -135,6 +143,27 @@ export async function getTokenTransfers(
     return data.result || []
   } catch (error) {
     console.error("Error fetching token transfers:", error)
+    return null
+  }
+}
+
+export async function getPairReserves(pairAddress: string, chain = "bsc"): Promise<PairReserves | null> {
+  try {
+    const url = `https://deep-index.moralis.io/api/v2.2/erc20/${pairAddress}/reserves?chain=${chain}`
+    const response = await fetch(url, {
+      headers: {
+        "X-API-Key": process.env.MORALIS_API_KEY || "",
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pair reserves: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data || null
+  } catch (error) {
+    console.error("Error fetching pair reserves:", error)
     return null
   }
 }

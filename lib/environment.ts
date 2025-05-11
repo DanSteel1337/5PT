@@ -1,36 +1,30 @@
-"use client"
-
-import { useState, useEffect } from "react"
+/**
+ * Environment detection utilities
+ */
 
 /**
- * Checks if the current environment is a preview environment
- * @returns boolean indicating if the current environment is a preview environment
+ * Detects if the current environment is a preview environment
+ * This is used to determine if we should use the injected connector only
  */
 export function isPreviewEnvironment(): boolean {
-  if (typeof window === "undefined") {
-    return false
-  }
-
-  const hostname = window.location.hostname
+  if (typeof window === "undefined") return false
   return (
-    hostname.includes("vercel.app") ||
-    hostname.includes("localhost") ||
-    hostname.includes("127.0.0.1") ||
-    hostname.includes("vusercontent.net") ||
-    hostname.endsWith(".vercel.app")
+    window.location.hostname.includes("vercel.app") ||
+    window.location.hostname.includes("localhost") ||
+    window.location.hostname.includes("127.0.0.1")
   )
 }
 
 /**
- * React hook to check if the current environment is a preview environment
- * @returns boolean indicating if the current environment is a preview environment
+ * Detects if the current environment is a production environment
  */
-export function useIsPreviewEnvironment(): boolean {
-  const [isPreview, setIsPreview] = useState(false)
+export function isProductionEnvironment(): boolean {
+  return !isPreviewEnvironment()
+}
 
-  useEffect(() => {
-    setIsPreview(isPreviewEnvironment())
-  }, [])
-
-  return isPreview
+/**
+ * Detects if the code is running in the browser
+ */
+export function isBrowser(): boolean {
+  return typeof window !== "undefined"
 }

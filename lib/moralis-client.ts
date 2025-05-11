@@ -47,6 +47,14 @@ export interface TokenTransfer {
   log_index: number
 }
 
+export interface PairReserves {
+  reserve0: string
+  reserve1: string
+  reserve0_formatted: string
+  reserve1_formatted: string
+  totalSupply: string
+}
+
 // Client-side functions that use the API route
 export async function getTokenMetadata(tokenAddress: string, chain = "bsc"): Promise<TokenMetadata | null> {
   try {
@@ -74,6 +82,21 @@ export async function getTokenPrice(tokenAddress: string, chain = "bsc"): Promis
     return await response.json()
   } catch (error) {
     console.error("Error fetching token price:", error)
+    return null
+  }
+}
+
+export async function getPairReserves(pairAddress: string, chain = "bsc"): Promise<PairReserves | null> {
+  try {
+    const response = await fetch(`/api/moralis?action=getPairReserves&pairAddress=${pairAddress}&chain=${chain}`)
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pair reserves: ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching pair reserves:", error)
     return null
   }
 }
