@@ -1,7 +1,32 @@
-import { getDefaultConfig } from "@rainbow-me/rainbowkit"
-import { http } from "viem"
-import { bsc, bscTestnet } from "viem/chains"
-import { injected } from "wagmi/connectors"
+import { configureChains, createConfig } from "wagmi"
+import { bsc, bscTestnet } from "wagmi/chains"
+import { MetaMaskConnector } from "wagmi/connectors/metaMask"
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
+import { publicProvider } from "wagmi/providers/public"
+
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
+
+const { chains, publicClient } = configureChains(
+  [
+    bsc,
+    ...(process.env.NODE_ENV === "development" ? [bscTestnet] : []), // Conditionally add testnet
+  ],
+  [publicProvider()],
+)
+
+export const config = createConfig({
+  autoConnect: true,
+  connectors: [
+    new MetaMaskConnector({ chains }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: walletConnectProjectId,
+      },
+    }),
+  ],
+  publicClient,
+})
 
 // Contract addresses - Updated with deployed contracts
 export const CONTRACT_ADDRESSES = {
@@ -14,29 +39,3 @@ export const CONTRACT_ADDRESSES = {
   pricePool: "0x231d9e7181e8479a8b40930961e93e7ed798542c" as `0x${string}`,
   wbnb: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c" as `0x${string}`,
 }
-
-// Create a single configuration with polyfills and injected connector as fallback
-export const wagmiConfig = getDefaultConfig({
-  appName: "5PT Investment Platform",
-  projectId: "61fededa0f2f506206922fa41e9cea43", // WalletConnect Project ID
-  chains: [bsc, bscTestnet],
-  transports: {
-    [bsc.id]: http("https://bsc-dataseed.binance.org"),
-    [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545"),
-  },
-  connectors: [
-    injected(), // Add injected connector explicitly as a fallback
-    // WalletConnect connectors are added automatically by getDefaultConfig
-  ],
-  walletConnectOptions: {
-    projectId: "61fededa0f2f506206922fa41e9cea43",
-    metadata: {
-      name: "5PT Investment Platform",
-      description: "Investment platform for the Five Pillars Token (5PT)",
-      url: "https://5pt.finance",
-      icons: ["https://5pt.finance/images/5pt-logo.png"],
-    },
-  },
-})
-
-// Remove the previewWagmiConfig as we're now using a single configuration approach
