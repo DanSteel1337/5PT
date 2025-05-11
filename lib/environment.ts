@@ -1,49 +1,36 @@
 /**
- * Environment detection utilities
- */
-
-/**
- * Detects if the current environment is a preview environment
- * This is used to determine if we should use the injected connector only
- */
-export function isPreviewEnvironment(): boolean {
-  if (typeof window === "undefined") return false
-  return (
-    window.location.hostname.includes("vercel.app") ||
-    window.location.hostname.includes("localhost") ||
-    window.location.hostname.includes("127.0.0.1")
-  )
-}
-
-/**
- * Detects if the current environment is a production environment
- */
-export function isProductionEnvironment(): boolean {
-  return !isPreviewEnvironment()
-}
-
-/**
- * Detects if the code is running in the browser
+ * Checks if the code is running in a browser environment
  */
 export function isBrowser(): boolean {
   return typeof window !== "undefined"
 }
 
 /**
- * Detects if the code is running during build time
+ * Checks if the current environment is a preview environment (Vercel preview or localhost)
  */
-export function isBuildTime(): boolean {
-  return typeof window === "undefined" && process.env.NODE_ENV === "production"
+export function isPreviewEnvironment(): boolean {
+  if (!isBrowser()) return false
+
+  const hostname = window.location.hostname
+  return hostname.includes("vercel.app") || hostname === "localhost" || hostname === "127.0.0.1"
 }
 
 /**
- * Safely checks if we should use mock data
- * Always returns true during build time or in preview environments
+ * Determines if mock data should be used instead of real API calls
  */
 export function shouldUseMockData(): boolean {
-  // During build time or SSR, always use mock data
-  if (typeof window === "undefined") return true
-
-  // In preview environments, use mock data
   return isPreviewEnvironment()
+}
+
+/**
+ * Safely executes browser-only code
+ */
+export function safelyExecuteInBrowser(callback: () => void): void {
+  if (isBrowser()) {
+    try {
+      callback()
+    } catch (error) {
+      console.error("Error executing browser-only code:", error)
+    }
+  }
 }

@@ -1,64 +1,73 @@
 import { parseUnits } from "viem"
 
-/**
- * Mock data for the 5PT dashboard
- * Used in preview environments where blockchain connections are not available
- */
-
-// Token data
+// Mock token data
 export const mockTokenData = {
   decimals: 18n,
-  totalSupply: parseUnits("1000000000", 18),
+  totalSupply: parseUnits("100000000", 18),
   price: 0.01,
-  priceChange: 5.2,
-  marketCap: 10000000,
-  liquidity: 2500000,
+  symbol: "5PT",
+  name: "Five Pillars Token",
 }
 
-// User data
+// Mock user data
 export const mockUserData = {
   address: "0x1234567890123456789012345678901234567890" as `0x${string}`,
   isConnected: true,
-  balance: parseUnits("25000", 18),
-  invested: parseUnits("10000", 18),
-  rewards: parseUnits("500", 18),
+  balance: parseUnits("10000", 18),
+  invested: parseUnits("5000", 18),
+  rewards: parseUnits("250", 18),
   referrals: 5,
   referralRewards: parseUnits("250", 18),
 }
 
-// Investment data
+// Mock investment data
 export const mockInvestmentData = {
-  totalDeposits: parseUnits("5000000", 18),
-  totalRewards: parseUnits("250000", 18),
+  totalDeposits: parseUnits("1000000", 18),
+  totalRewards: parseUnits("50000", 18),
   poolCriteria: [
-    parseUnits("1000", 18), // minimum deposit
-    500n, // reward rate (5.00%)
-    30n, // lock period in days
+    parseUnits("1000", 18), // Minimum deposit
+    500n, // Reward rate (5%)
+    30n, // Lock period (30 days)
   ],
 }
 
-// Generate mock price history data
-export const generateMockPriceHistory = (days: number, startPrice: number = mockTokenData.price, volatility = 0.05) => {
-  return Array.from({ length: days }, (_, i) => {
-    const date = new Date(Date.now() - (days - 1 - i) * 24 * 60 * 60 * 1000)
-    const randomFactor = 1 + (Math.random() * 2 - 1) * volatility
-    const price = startPrice * randomFactor
+// Mock price history data
+export const mockPriceHistory = {
+  "7d": Array.from({ length: 7 }, (_, i) => {
+    const date = new Date()
+    date.setDate(date.getDate() - (7 - i - 1))
     return {
       date: date.toISOString().split("T")[0],
-      price,
+      price: 0.01 * (1 + Math.sin(i / 2) * 0.1),
     }
-  })
+  }),
+  "30d": Array.from({ length: 30 }, (_, i) => {
+    const date = new Date()
+    date.setDate(date.getDate() - (30 - i - 1))
+    return {
+      date: date.toISOString().split("T")[0],
+      price: 0.01 * (1 + Math.sin(i / 5) * 0.2),
+    }
+  }),
+  "90d": Array.from({ length: 90 }, (_, i) => {
+    const date = new Date()
+    date.setDate(date.getDate() - (90 - i - 1))
+    return {
+      date: date.toISOString().split("T")[0],
+      price: 0.01 * (1 + Math.sin(i / 15) * 0.3),
+    }
+  }),
+  "1y": Array.from({ length: 365 }, (_, i) => {
+    const date = new Date()
+    date.setDate(date.getDate() - (365 - i - 1))
+    return {
+      date: date.toISOString().split("T")[0],
+      price: 0.01 * (1 + Math.sin(i / 60) * 0.5),
+    }
+  }),
 }
 
-// Mock price history for different timeframes
-export const mockPriceHistory = {
-  "7d": generateMockPriceHistory(7, mockTokenData.price, 0.05),
-  "30d": generateMockPriceHistory(30, mockTokenData.price * 0.8, 0.1),
-  "90d": generateMockPriceHistory(90, mockTokenData.price * 0.5, 0.2),
-  "1y": generateMockPriceHistory(365, mockTokenData.price * 0.1, 0.5),
-}
-
-// Mock pair reserves
+// Mock pair reserves data
 export const mockPairReserves = {
   reserve0: "1000000000000000000000",
   reserve1: "5000000000000000000000",
@@ -67,7 +76,7 @@ export const mockPairReserves = {
   totalSupply: "2236067977499789696409",
 }
 
-// Token distribution data
+// Mock distribution data
 export const mockDistributionData = [
   { name: "Liquidity", value: 30 },
   { name: "Treasury", value: 25 },
@@ -78,21 +87,57 @@ export const mockDistributionData = [
 ]
 
 // Mock pools data
-export const mockPoolsData = [1, 2, 3].map((poolId) => ({
-  id: poolId,
-  name: `Pool ${poolId}`,
-  minDeposit: 1000 * poolId,
-  rewardRate: (0.5 * poolId).toFixed(1),
-  lockPeriod: 7 * poolId,
-  annualYield: (26 * poolId).toFixed(1),
-  capacity: 65 - poolId * 15,
-  isPopular: poolId === 1,
-}))
+export const mockPoolsData = [
+  {
+    id: 1,
+    name: "Pool 1",
+    minDeposit: "1,000",
+    rewardRate: "0.5",
+    lockPeriod: "7",
+    annualYield: "26.0",
+    capacity: 50,
+    isPopular: true,
+  },
+  {
+    id: 2,
+    name: "Pool 2",
+    minDeposit: "2,000",
+    rewardRate: "1.0",
+    lockPeriod: "14",
+    annualYield: "26.0",
+    capacity: 35,
+    isPopular: false,
+  },
+  {
+    id: 3,
+    name: "Pool 3",
+    minDeposit: "3,000",
+    rewardRate: "1.5",
+    lockPeriod: "21",
+    annualYield: "26.0",
+    capacity: 20,
+    isPopular: false,
+  },
+]
 
 // Mock transactions
-export const mockTransactions = Array.from({ length: 3 }, (_, i) => ({
-  id: `tx-${i}`,
-  type: "Transfer",
-  amount: "1,000 5PT",
-  date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString(),
-}))
+export const mockTransactions = [
+  {
+    id: 1,
+    type: "Transfer",
+    date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    amount: "1,000 5PT",
+  },
+  {
+    id: 2,
+    type: "Deposit",
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    amount: "2,500 5PT",
+  },
+  {
+    id: 3,
+    type: "Reward",
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    amount: "125 5PT",
+  },
+]

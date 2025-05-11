@@ -14,47 +14,35 @@ const nextConfig = {
   },
   webpack: (config) => {
     // Create a safer fallback resolution mechanism
-    const fallbacks = {};
-    
-    // List of potential polyfills
-    const polyfills = {
-      assert: 'assert',
-      buffer: 'buffer',
+    const fallbacks = {
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
       process: 'process/browser',
+      zlib: 'browserify-zlib',
+      assert: 'assert',
+      buffer: 'buffer',
+      util: 'util',
       events: 'events',
     };
     
-    // Only add polyfills that are actually installed
-    Object.entries(polyfills).forEach(([key, value]) => {
-      try {
-        require.resolve(value);
-        fallbacks[key] = require.resolve(value);
-      } catch (error) {
-        console.warn(`Polyfill ${value} not found, skipping fallback for ${key}`);
-      }
-    });
-    
-    // Apply the fallbacks that were successfully resolved
+    // Apply fallbacks
     config.resolve.fallback = {
       ...config.resolve.fallback,
       ...fallbacks,
     };
     
-    // Only add plugins for available polyfills
-    try {
-      require.resolve('process/browser');
-      require.resolve('buffer');
-      
-      config.plugins.push(
-        new (require('webpack')).ProvidePlugin({
-          process: 'process/browser',
-          Buffer: ['buffer', 'Buffer'],
-        })
-      );
-    } catch (error) {
-      console.warn('Some polyfills not found, skipping ProvidePlugin setup');
+    // Add plugins for polyfills
+    config.plugins.push(
+      new (require('webpack')).ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer'],
+      })
+    );
+
+    // Handle pino-pretty as an external if needed
+    config.externals = config.externals || [];
+    if (!require.resolve('pino-pretty', { paths: [process.cwd()] })) {
+      config.externals.push('pino-pretty');
     }
 
     return config;

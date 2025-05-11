@@ -6,7 +6,7 @@ import { WagmiProvider } from "wagmi"
 import { config } from "@/lib/wagmi-config"
 import { useState, useEffect } from "react"
 import { ErrorBoundary } from "@/components/error-boundary"
-import { shouldUseMockData } from "@/lib/environment"
+import { shouldUseMockData, isBrowser } from "@/lib/environment"
 
 export function Web3Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -25,7 +25,7 @@ export function Web3Providers({ children }: { children: React.ReactNode }) {
 
   // Warn about preview mode
   useEffect(() => {
-    if (shouldUseMockData()) {
+    if (isBrowser() && shouldUseMockData()) {
       console.info("Running in preview mode with mock data. WalletConnect is disabled.")
     }
   }, [])
