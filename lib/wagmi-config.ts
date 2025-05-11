@@ -1,6 +1,7 @@
 import { http, createConfig } from "wagmi"
 import { bsc, bscTestnet } from "wagmi/chains"
 import { injected, walletConnect } from "wagmi/connectors"
+import { isPreviewEnvironment } from "./environment"
 
 // Get WalletConnect project ID from environment variable
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
@@ -8,20 +9,32 @@ const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID 
 // Define chains to support
 const chains = [bsc, ...(process.env.NODE_ENV === "development" ? [bscTestnet] : [])]
 
-// Create wagmi config with minimal setup
+// Create connectors based on environment
+const getConnectors = () => {
+  // Always include injected connector (MetaMask)
+  const connectors = [injected()]
+
+  // Only add WalletConnect in non-preview environments
+  if (typeof window !== "undefined" && !isPreviewEnvironment()) {
+    connectors.push(
+      walletConnect({
+        projectId: walletConnectProjectId,
+        showQrModal: true,
+      }),
+    )
+  }
+
+  return connectors
+}
+
+// Create wagmi config with environment-aware setup
 export const config = createConfig({
   chains,
   transports: {
     [bsc.id]: http(),
     ...(process.env.NODE_ENV === "development" ? { [bscTestnet.id]: http() } : {}),
   },
-  connectors: [
-    injected(),
-    walletConnect({
-      projectId: walletConnectProjectId,
-      showQrModal: true,
-    }),
-  ],
+  connectors: getConnectors(),
 })
 
 // Contract addresses - Updated with deployed contracts

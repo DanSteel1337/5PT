@@ -1,11 +1,14 @@
 "use client"
 
+import type React from "react"
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useState, useEffect, type ReactNode } from "react"
 import { WagmiProvider } from "wagmi"
 import { config } from "@/lib/wagmi-config"
+import { useEffect, useState } from "react"
 
-export function Web3Providers({ children }: { children: ReactNode }) {
+export function Web3Providers({ children }: { children: React.ReactNode }) {
+  // Create a client
   const [queryClient] = useState(() => new QueryClient())
   const [mounted, setMounted] = useState(false)
 
@@ -16,7 +19,9 @@ export function Web3Providers({ children }: { children: ReactNode }) {
 
   return (
     <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>{mounted ? children : null}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {mounted ? children : <div style={{ visibility: "hidden" }}>{children}</div>}
+      </QueryClientProvider>
     </WagmiProvider>
   )
 }
