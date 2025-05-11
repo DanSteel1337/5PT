@@ -53,11 +53,6 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        gold: {
-          light: "hsl(var(--gold-light))",
-          DEFAULT: "hsl(var(--gold))",
-          dark: "hsl(var(--gold-dark))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -73,29 +68,62 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
-        "pulse-gold": {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(212, 175, 55, 0.4)" },
-          "50%": { boxShadow: "0 0 0 10px rgba(212, 175, 55, 0)" },
+        "scale-in": {
+          "0%": { transform: "scale(0.9)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
         },
-        "rotate-slow": {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1", boxShadow: "0 0 15px rgba(0, 240, 255, 0.5)" },
+          "50%": { opacity: "0.7", boxShadow: "0 0 30px rgba(0, 240, 255, 0.8)" },
+        },
+        "data-flow": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "100% 50%" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        float: "float 3s ease-in-out infinite",
-        "pulse-gold": "pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "rotate-slow": "rotate-slow 10s linear infinite",
+        shimmer: "shimmer 2s linear infinite",
+        float: "float 6s ease-in-out infinite",
+        "scale-in": "scale-in 0.2s ease-out",
+        "pulse-glow": "pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "data-flow": "data-flow 15s linear infinite",
       },
       backgroundImage: {
-        "circuit-pattern": "url('/images/circuit-pattern.svg')",
-        "gold-gradient": "linear-gradient(to right, #b8860b, #d4af37, #f5d76e)",
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "cyber-gradient": "linear-gradient(to right, #00f0ff, #aa00ff, #ff00aa, #00f0ff)",
+        "shimmer-gradient":
+          "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(0,240,255,0.2) 25%, rgba(0,240,255,0.5) 50%, rgba(0,240,255,0.2) 75%, rgba(255,255,255,0) 100%)",
+        "dark-gradient": "linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.4))",
+        "card-gradient": "linear-gradient(135deg, rgba(0,240,255,0.05) 0%, rgba(0,0,0,0) 100%)",
+        "data-flow":
+          "linear-gradient(90deg, rgba(0,240,255,0.1), rgba(170,0,255,0.1), rgba(255,0,170,0.1), rgba(0,240,255,0.1))",
+      },
+      boxShadow: {
+        "cyber-sm": "0 1px 2px 0 rgba(0,240,255,0.05)",
+        "cyber-md": "0 4px 6px -1px rgba(0,240,255,0.1), 0 2px 4px -1px rgba(0,240,255,0.06)",
+        "cyber-lg": "0 10px 15px -3px rgba(0,240,255,0.1), 0 4px 6px -2px rgba(0,240,255,0.05)",
+        "cyber-xl": "0 20px 25px -5px rgba(0,240,255,0.1), 0 10px 10px -5px rgba(0,240,255,0.04)",
+        "cyber-2xl": "0 25px 50px -12px rgba(0,240,255,0.25)",
+        "cyber-inner": "inset 0 2px 4px 0 rgba(0,240,255,0.06)",
+      },
+      // Chart colors
+      chart: {
+        1: "var(--chart-1)",
+        2: "var(--chart-2)",
+        3: "var(--chart-3)",
+        4: "var(--chart-4)",
+        5: "var(--chart-5)",
+        6: "var(--chart-6)",
       },
     },
   },
