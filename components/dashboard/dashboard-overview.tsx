@@ -27,14 +27,26 @@ import {
   Download,
   RefreshCw,
   AlertTriangle,
+  PieChart,
 } from "lucide-react"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Cell } from "recharts"
+import {
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+  Cell,
+  PieChart as RechartsPieChart,
+  Pie,
+} from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
-import { PieChart as RechartsPieChart } from "recharts"
 import { WalletConnector } from "@/components/wallet-connector"
 
 // Mock data for pair reserves since we can't fetch it directly from client
@@ -848,19 +860,24 @@ export function DashboardOverview() {
                   }}
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart
-                      dataKey="value"
-                      data={distributionData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      nameKey="name"
-                    >
-                      {distributionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
+                    <RechartsPieChart>
+                      <Pie
+                        data={distributionData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {distributionData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<ChartTooltipContent formatter={(value) => `${value}%`} />} />
+                      <Legend />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -1033,7 +1050,7 @@ export function DashboardOverview() {
         <Link href="/dashboard/tokenomics">
           <Card className="dashboard-card hover-card transition-colors cursor-pointer">
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <RechartsPieChart className="h-8 w-8 text-purple-400 mb-2" />
+              <PieChart className="h-8 w-8 text-purple-400 mb-2" />
               <h3 className="font-medium text-center">Tokenomics</h3>
             </CardContent>
           </Card>
