@@ -1,23 +1,27 @@
-// Safe environment detection utilities
-
-// Check if code is running in a browser environment
-export const isBrowser = typeof window !== "undefined"
-
-// Check if we're in a preview environment (Vercel preview, localhost)
-export const isPreview =
-  isBrowser &&
-  (window.location.hostname.includes("vercel.app") ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1")
-
-// Determine if we should use mock data
-export const shouldUseMockData = () => isPreview
-
-// Get the current environment
-export const getEnvironment = () => {
-  if (!isBrowser) return "server"
-  if (isPreview) return "preview"
-  return "production"
+/**
+ * Checks if the code is running in a browser environment
+ */
+export const isBrowser = () => {
+  return typeof window !== "undefined"
 }
 
-export const isPreviewEnvironment = () => isPreview
+/**
+ * Checks if the current environment is a preview environment
+ * (vercel.app, localhost, etc.)
+ */
+export const isPreviewEnvironment = () => {
+  if (!isBrowser()) return false
+
+  return (
+    window.location.hostname.includes("vercel.app") ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  )
+}
+
+/**
+ * Determines if mock data should be used instead of real data
+ */
+export const shouldUseMockData = () => {
+  return isPreviewEnvironment()
+}

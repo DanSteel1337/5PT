@@ -1,3 +1,6 @@
+// Import webpack directly instead of using require
+import webpack from 'webpack';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -11,7 +14,7 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Replace process in client-side builds
+      // Replace Node.js modules in client-side builds
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
@@ -27,10 +30,16 @@ const nextConfig = {
         events: false,
       };
       
-      // Provide process as a global
+      // Provide process as a global using webpack's ProvidePlugin
       config.plugins.push(
-        new config.constructor.ProvidePlugin({
-          process: require.resolve('./lib/process-polyfill.js'),
+        new webpack.ProvidePlugin({
+          process: {
+            browser: {
+              env: {
+                NODE_ENV: process.env.NODE_ENV,
+              }
+            }
+          }
         })
       );
     }

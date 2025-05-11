@@ -1,7 +1,6 @@
 import { http, createConfig } from "wagmi"
 import { bsc, bscTestnet, mainnet } from "wagmi/chains"
 import { injected, walletConnect } from "wagmi/connectors"
-import { isBrowser, shouldUseMockData } from "@/lib/environment"
 
 // Get WalletConnect project ID from environment variable
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
@@ -11,8 +10,20 @@ const getConnectors = () => {
   // Always include injected connector
   const connectors = [injected()]
 
-  // Only add WalletConnect in production environment and in browser context
-  if (isBrowser() && !shouldUseMockData() && projectId) {
+  // Only add WalletConnect in production environment and if projectId exists
+  const isPreviewEnvironment = () => {
+    if (typeof window !== "undefined") {
+      return (
+        window.location.hostname.includes("vercel.app") ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      )
+    }
+    return false
+  }
+
+  // Only add WalletConnect if not in preview and projectId exists
+  if (!isPreviewEnvironment() && projectId) {
     try {
       connectors.push(
         walletConnect({
@@ -28,7 +39,6 @@ const getConnectors = () => {
       )
     } catch (error) {
       console.warn("Failed to initialize WalletConnect:", error)
-      // Continue with just the injected connector
     }
   }
 
