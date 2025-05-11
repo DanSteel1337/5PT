@@ -6,18 +6,31 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Sparkles, TrendingUp, Users, Wallet } from "lucide-react"
-import { WalletConnector } from "@/components/wallet-connector"
+import dynamic from "next/dynamic"
+
+// Dynamically import the WalletConnector to avoid SSR issues
+const WalletConnector = dynamic(() => import("@/components/wallet-connector").then((mod) => mod.WalletConnector), {
+  ssr: false,
+})
 
 // Safe environment detection
-const isBrowser = typeof window !== "undefined"
-const isPreview =
-  isBrowser &&
-  (window.location.hostname.includes("vercel.app") ||
+const isPreview = () => {
+  if (typeof window === "undefined") return false
+  return (
+    window.location.hostname.includes("vercel.app") ||
     window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1")
+    window.location.hostname === "127.0.0.1"
+  )
+}
 
 export function ModernHero() {
   const [isHovered, setIsHovered] = useState(false)
+  const [showPreviewBanner, setShowPreviewBanner] = useState(false)
+
+  // Check for preview mode on client side only
+  useState(() => {
+    setShowPreviewBanner(isPreview())
+  })
 
   return (
     <div className="relative overflow-hidden bg-black circuit-pattern">
@@ -25,7 +38,7 @@ export function ModernHero() {
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 to-pink-900/30 z-0"></div>
 
       {/* Preview mode banner */}
-      {isPreview && (
+      {showPreviewBanner && (
         <div className="bg-yellow-600 text-white text-center py-1 px-4 text-sm font-medium relative z-50">
           Preview Mode - Using Mock Data
         </div>
@@ -61,7 +74,15 @@ export function ModernHero() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <WalletConnector />
+              {/* Replace with a simple button in SSR */}
+              {typeof window !== "undefined" ? (
+                <WalletConnector />
+              ) : (
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                  <Wallet className="mr-2 h-4 w-4" />
+                  Connect Wallet
+                </Button>
+              )}
             </div>
           </div>
 

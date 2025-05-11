@@ -6,34 +6,19 @@ import { WagmiProvider } from "wagmi"
 import { config } from "@/lib/wagmi-config"
 import { useState, useEffect } from "react"
 
-// Safe environment detection
-const isBrowser = typeof window !== "undefined"
-const isPreview =
-  isBrowser &&
-  (window.location.hostname.includes("vercel.app") ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1")
-
 export function Web3Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            // Default query options
-            retry: 3,
-            staleTime: 1000 * 60 * 5,
-          },
-        },
-      }),
-  )
+  const [queryClient] = useState(() => new QueryClient())
+  const [mounted, setMounted] = useState(false)
 
-  // Warn about preview mode
+  // Only render children after component is mounted on client
   useEffect(() => {
-    if (isPreview) {
-      console.info("Running in preview mode with mock data. WalletConnect is disabled.")
-    }
+    setMounted(true)
   }, [])
+
+  // Prevent hydration errors by only rendering on client
+  if (!mounted) {
+    return <>{children}</>
+  }
 
   return (
     <WagmiProvider config={config}>

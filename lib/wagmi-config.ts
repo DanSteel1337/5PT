@@ -10,35 +10,32 @@ const getConnectors = () => {
   // Always include injected connector
   const connectors = [injected()]
 
-  // Only add WalletConnect in production environment and if projectId exists
-  const isPreviewEnvironment = () => {
-    if (typeof window !== "undefined") {
-      return (
-        window.location.hostname.includes("vercel.app") ||
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
-      )
-    }
-    return false
-  }
+  // Only add WalletConnect if projectId exists
+  if (projectId && typeof window !== "undefined") {
+    // Check if we're in a preview environment
+    const isPreview =
+      window.location.hostname.includes("vercel.app") ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
 
-  // Only add WalletConnect if not in preview and projectId exists
-  if (!isPreviewEnvironment() && projectId) {
-    try {
-      connectors.push(
-        walletConnect({
-          projectId,
-          showQrModal: true,
-          metadata: {
-            name: "5PT Investment Platform",
-            description: "Five Pillars Token Investment Platform",
-            url: "https://5pt.finance",
-            icons: ["https://5pt.finance/logo.png"],
-          },
-        }),
-      )
-    } catch (error) {
-      console.warn("Failed to initialize WalletConnect:", error)
+    // Only add WalletConnect in production
+    if (!isPreview) {
+      try {
+        connectors.push(
+          walletConnect({
+            projectId,
+            showQrModal: true,
+            metadata: {
+              name: "5PT Investment Platform",
+              description: "Five Pillars Token Investment Platform",
+              url: "https://5pt.finance",
+              icons: ["https://5pt.finance/logo.png"],
+            },
+          }),
+        )
+      } catch (error) {
+        console.warn("Failed to initialize WalletConnect:", error)
+      }
     }
   }
 
@@ -56,10 +53,10 @@ export const CONTRACT_ADDRESSES = {
   wbnb: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c" as `0x${string}`,
 }
 
-// Create wagmi config
+// Create wagmi config with safe fallbacks
 export const config = createConfig({
   chains: [bsc, bscTestnet, mainnet],
-  connectors: getConnectors(),
+  connectors: typeof window !== "undefined" ? getConnectors() : [injected()],
   transports: {
     [bsc.id]: http(),
     [bscTestnet.id]: http(),
