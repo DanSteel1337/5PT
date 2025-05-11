@@ -12,17 +12,19 @@ const queryClient = new QueryClient()
 // Project ID from WalletConnect Cloud
 const projectId = "61fededa0f2f506206922fa41e9cea43"
 
-const chains = [mainnet, bsc, bscTestnet]
+// Define which chains we want to support
+const chains = [bscTestnet, bsc, mainnet]
 
+// Create wagmi config with ConnectKit
 const config = createConfig(
   getDefaultConfig({
     appName: "Five Pillars Token DeFi Platform",
     projectId,
     chains,
     transports: {
+      [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545"),
+      [bsc.id]: http("https://bsc-dataseed.binance.org"),
       [mainnet.id]: http(),
-      [bsc.id]: http(),
-      [bscTestnet.id]: http(),
     },
   }),
 )
@@ -33,7 +35,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <ConnectKitProvider
           customTheme={{
-            "--ck-accent-color": "#7c3aed",
+            "--ck-accent-color": "#d4af37",
             "--ck-accent-text-color": "#ffffff",
             "--ck-border-radius": "12px",
           }}

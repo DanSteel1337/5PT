@@ -21,7 +21,8 @@ import { useState } from "react"
 
 export default function PoolsPage() {
   const { isConnected } = useAccount()
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
+  const [filterActive, setFilterActive] = useState(false)
+  const [filterEligible, setFilterEligible] = useState(false)
 
   return (
     <DashboardLayout>
@@ -30,7 +31,19 @@ export default function PoolsPage() {
       <div className="space-y-8">
         <PoolsHeader />
 
-        {isConnected ? <PoolsFilter /> : <ConnectWalletPrompt />}
+        {isConnected ? (
+          <>
+            <PoolsFilter
+              filterActive={filterActive}
+              setFilterActive={setFilterActive}
+              filterEligible={filterEligible}
+              setFilterEligible={setFilterEligible}
+            />
+            <PoolsGridComponent filterActive={filterActive} filterEligible={filterEligible} />
+          </>
+        ) : (
+          <ConnectWalletPrompt />
+        )}
       </div>
     </DashboardLayout>
   )
@@ -41,7 +54,7 @@ interface PoolsGridProps {
   filterEligible?: boolean
 }
 
-function PoolsGrid({ filterActive, filterEligible }: PoolsGridProps) {
+function PoolsGridComponent({ filterActive, filterEligible }: PoolsGridProps) {
   const { address } = useAccount()
 
   const containerVariants = {

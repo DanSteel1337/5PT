@@ -1,46 +1,270 @@
 // Contract addresses
 export const CONTRACT_ADDRESSES = {
-  token: "0x8FafdFB035C9426a50D842873D5d401C933bE09F",
-  investmentManager: "", // To be updated after deployment
+  token: "0x8FafdFB035C9426a50D842873D5d401C933bE09F", // Correct token address
+  investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc", // Updated with correct investment manager address
   treasury: "0x17D3846cC570ced5882E41a6a99CB87a8647C0Bb",
   dexRouter: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
 }
 
-// Contract ABIs
+// Contract ABIs in proper JSON format for wagmi v2
 export const TOKEN_ABI = [
   // ERC20 standard functions
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
-  "function decimals() view returns (uint8)",
-  "function totalSupply() view returns (uint256)",
-  "function balanceOf(address owner) view returns (uint256)",
-  "function transfer(address to, uint256 amount) returns (bool)",
-  "function allowance(address owner, address spender) view returns (uint256)",
-  "function approve(address spender, uint256 amount) returns (bool)",
-  "function transferFrom(address from, address to, uint256 amount) returns (bool)",
+  {
+    inputs: [],
+    name: "name",
+    outputs: [{ internalType: "string", name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "symbol",
+    outputs: [{ internalType: "string", name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "decimals",
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "owner", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "to", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "transfer",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "owner", type: "address" },
+      { internalType: "address", name: "spender", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "spender", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "from", type: "address" },
+      { internalType: "address", name: "to", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "transferFrom",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   // Custom functions
-  "function mint(address account, uint256 amount)",
-  "function burnFrom(address account, uint256 amount)",
-  "function setInvestmentManager(address manager)",
+  {
+    inputs: [
+      { internalType: "address", name: "account", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "mint",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "account", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "burnFrom",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "manager", type: "address" }],
+    name: "setInvestmentManager",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   // Events
-  "event Transfer(address indexed from, address indexed to, uint256 value)",
-  "event Approval(address indexed owner, address indexed spender, uint256 value)",
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "from", type: "address" },
+      { indexed: true, internalType: "address", name: "to", type: "address" },
+      { indexed: false, internalType: "uint256", name: "value", type: "uint256" },
+    ],
+    name: "Transfer",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "owner", type: "address" },
+      { indexed: true, internalType: "address", name: "spender", type: "address" },
+      { indexed: false, internalType: "uint256", name: "value", type: "uint256" },
+    ],
+    name: "Approval",
+    type: "event",
+  },
 ]
 
 export const INVESTMENT_MANAGER_ABI = [
   // View functions
-  "function getAccumulatedRewards() view returns (uint256)",
-  "function getLastRoundRewards() view returns (uint256 dailyReward, uint256 refReward, uint256 poolsReward)",
-  "function getInvestorInfo(address investor) view returns (tuple(uint256 totalDeposit, uint128 directRefsCount, uint128 downlineRefsCount, uint256 directRefsDeposit, uint256 downlineRefsDeposit, address referer, uint256 lastDailyReward, uint256 lastRefReward, uint256 accumulatedReward, uint32 lastClaimTimestamp, uint32 lastDepositTimestamp, uint32 updateRefRewardTimestamp))",
-  "function getInvestorPoolRewardPerTokenPaid(address investor, uint8 poolId) view returns (uint256)",
-  "function getPoolInfo(uint8 poolId) view returns (tuple(bool isActive, uint256 curReward, uint256 lastReward, uint256 participantsCount, uint256 rewardPerInvestorStored, uint128 personalInvestRequired, uint128 totalDirectInvestRequired, uint8 directRefsRequired, uint16 share))",
-  "function isInvestorInPool(address investor, uint8 poolId) view returns (bool)",
+  {
+    inputs: [],
+    name: "getAccumulatedRewards",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getLastRoundRewards",
+    outputs: [
+      { internalType: "uint256", name: "dailyReward", type: "uint256" },
+      { internalType: "uint256", name: "refReward", type: "uint256" },
+      { internalType: "uint256", name: "poolsReward", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "investor", type: "address" }],
+    name: "getInvestorInfo",
+    outputs: [
+      {
+        components: [
+          { internalType: "uint256", name: "totalDeposit", type: "uint256" },
+          { internalType: "uint128", name: "directRefsCount", type: "uint128" },
+          { internalType: "uint128", name: "downlineRefsCount", type: "uint128" },
+          { internalType: "uint256", name: "directRefsDeposit", type: "uint256" },
+          { internalType: "uint256", name: "downlineRefsDeposit", type: "uint256" },
+          { internalType: "address", name: "referer", type: "address" },
+          { internalType: "uint256", name: "lastDailyReward", type: "uint256" },
+          { internalType: "uint256", name: "lastRefReward", type: "uint256" },
+          { internalType: "uint256", name: "accumulatedReward", type: "uint256" },
+          { internalType: "uint32", name: "lastClaimTimestamp", type: "uint32" },
+          { internalType: "uint32", name: "lastDepositTimestamp", type: "uint32" },
+          { internalType: "uint32", name: "updateRefRewardTimestamp", type: "uint32" },
+        ],
+        internalType: "struct InvestmentManager.Investor",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "investor", type: "address" },
+      { internalType: "uint8", name: "poolId", type: "uint8" },
+    ],
+    name: "getInvestorPoolRewardPerTokenPaid",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint8", name: "poolId", type: "uint8" }],
+    name: "getPoolInfo",
+    outputs: [
+      {
+        components: [
+          { internalType: "bool", name: "isActive", type: "bool" },
+          { internalType: "uint256", name: "curReward", type: "uint256" },
+          { internalType: "uint256", name: "lastReward", type: "uint256" },
+          { internalType: "uint256", name: "participantsCount", type: "uint256" },
+          { internalType: "uint256", name: "rewardPerInvestorStored", type: "uint256" },
+          { internalType: "uint128", name: "personalInvestRequired", type: "uint128" },
+          { internalType: "uint128", name: "totalDirectInvestRequired", type: "uint128" },
+          { internalType: "uint8", name: "directRefsRequired", type: "uint8" },
+          { internalType: "uint16", name: "share", type: "uint16" },
+        ],
+        internalType: "struct InvestmentManager.Pool",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "investor", type: "address" },
+      { internalType: "uint8", name: "poolId", type: "uint8" },
+    ],
+    name: "isInvestorInPool",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
   // Write functions
-  "function deposit(uint256 amount, address referer)",
-  "function claimReward()",
+  {
+    inputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "address", name: "referer", type: "address" },
+    ],
+    name: "deposit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "claimReward",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   // Events
-  "event Deposit(address investor, address referer, uint256 amount)",
-  "event ClaimReward(address investor, uint256 amount)",
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "investor", type: "address" },
+      { indexed: true, internalType: "address", name: "referer", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "Deposit",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "investor", type: "address" },
+      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "ClaimReward",
+    type: "event",
+  },
 ]
 
 // Pool IDs

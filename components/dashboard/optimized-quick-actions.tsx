@@ -5,10 +5,12 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Award, RefreshCw } from "lucide-react"
 import { useInvestmentManager } from "@/lib/hooks/use-investment-manager"
+import { DepositModal } from "@/components/modals/deposit-modal"
 
 export function OptimizedQuickActions() {
   const [isClaimingRewards, setIsClaimingRewards] = useState(false)
   const [isCompounding, setIsCompounding] = useState(false)
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
   const { claimReward } = useInvestmentManager()
 
   const handleClaimRewards = async () => {
@@ -46,6 +48,7 @@ export function OptimizedQuickActions() {
           <Button
             variant="outline"
             className="bg-amber-900/20 border-amber-600/50 hover:bg-amber-800/30 text-amber-300 h-14"
+            onClick={() => setIsDepositModalOpen(true)}
           >
             <Plus className="mr-2 h-5 w-5" />
             Deposit Tokens
@@ -72,6 +75,8 @@ export function OptimizedQuickActions() {
           </Button>
         </div>
       </Card>
+
+      <DepositModal isOpen={isDepositModalOpen} onClose={() => setIsDepositModalOpen(false)} />
     </div>
   )
 }
