@@ -1,89 +1,113 @@
 /**
- * Environment detection utilities
+ * Environment utilities for the application
  */
 
 // Check if we're in a browser environment
-export const isBrowser = typeof window !== "undefined"
+const isBrowser = typeof window !== "undefined"
 
-// Check if we're in a preview environment (Vercel preview, localhost, etc.)
-export const isPreviewEnvironment = (): boolean => {
-  // Always consider server-side rendering as preview environment
-  if (!isBrowser) return true
+// Safe way to check NODE_ENV on client and server
+export function getNodeEnv(): "development" | "production" | "test" {
+  // In the browser, we can't directly access process.env.NODE_ENV
+  if (isBrowser) {
+    // Next.js replaces process.env.NODE_ENV with the actual value at build time
+    // so this is safe, but we need to handle it carefully
+    if (process.env.NODE_ENV === "development") return "development"
+    if (process.env.NODE_ENV === "test") return "test"
+    return "production"
+  }
 
-  // Check if we're in a preview environment (v0, Vercel preview, etc.)
-  return (
-    window.location.hostname.includes("vercel.app") ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.hostname.includes("vusercontent.net")
-  )
+  // On the server, we can access process.env directly
+  return (process.env.NODE_ENV as "development" | "production" | "test") || "production"
 }
 
-// Get the current site URL (safely works in both browser and server)
-export const getSiteUrl = (): string => {
-  // First check environment variable
+// Check if we're in development mode
+export function isDevelopment(): boolean {
+  return getNodeEnv() === "development"
+}
+
+// Check if we're in production mode
+export function isProduction(): boolean {
+  return getNodeEnv() === "production"
+}
+
+// Check if we're in test mode
+export function isTest(): boolean {
+  return getNodeEnv() === "test"
+}
+
+// Check if we're in a preview environment
+export function isPreviewEnvironment(): boolean {
+  // Vercel sets this environment variable in preview deployments
+  if (!isBrowser && process.env.VERCEL_ENV === "preview") {
+    return true
+  }
+
+  // For client-side, we can check the URL
+  if (isBrowser) {
+    const hostname = window.location.hostname
+    return hostname.includes("vercel.app") || hostname.includes("localhost") || hostname.includes("vusercontent.net")
+  }
+
+  return false
+}
+
+// Determine if we should use mock data
+export function shouldUseMockData(): boolean {
+  // First check for explicit environment variable
+  if (typeof process.env.NEXT_PUBLIC_USE_MOCK_DATA !== "undefined") {
+    return process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true"
+  }
+
+  // Otherwise, use mock data in preview environments
+  return isPreviewEnvironment() || isDevelopment()
+}
+
+// Get site URL
+export function getSiteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return process.env.NEXT_PUBLIC_SITE_URL
   }
 
-  // Then try to get from browser if available
   if (isBrowser) {
     return window.location.origin
   }
 
-  // Fallback for server-side rendering
-  return "https://www.solidchainsolutions.com"
+  return "https://5pt.finance"
 }
 
-// Get site name from environment variable or fallback
-export const getSiteName = (): string => {
-  return process.env.NEXT_PUBLIC_SITE_NAME || "5PT Investment Platform"
-}
-
-// Get site description from environment variable or fallback
-export const getSiteDescription = (): string => {
-  return process.env.NEXT_PUBLIC_SITE_DESCRIPTION || "Five Pillars Token Investment Platform"
-}
-
-// Get site metadata for WalletConnect
-export const getSiteMetadata = () => {
+// Get site metadata
+export function getSiteMetadata() {
   return {
-    name: getSiteName(),
-    description: getSiteDescription(),
+    name: process.env.NEXT_PUBLIC_SITE_NAME || "5PT Investment Platform",
+    description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || "Five Pillars Token Investment Platform",
     url: getSiteUrl(),
-    icons: [`${getSiteUrl()}/images/5pt-logo.png`],
+    logoUrl: `${getSiteUrl()}/images/5pt-logo.png`,
   }
 }
 
-// Determine if we should use mock data
-export const shouldUseMockData = (): boolean => {
-  // First check the environment variable
-  if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true") {
-    return true
+// Get debug level
+export function getDebugLevel(): number {
+  if (process.env.NEXT_PUBLIC_DEBUG_LEVEL) {
+    const level = Number.parseInt(process.env.NEXT_PUBLIC_DEBUG_LEVEL)
+    if (!isNaN(level)) {
+      return level
+    }
   }
 
-  // If explicitly set to false, respect that
-  if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === "false") {
-    return false
+  // Default to level 1 (ERROR) in production, 3 (INFO) in development
+  return isProduction() ? 1 : 3
+}
+
+// Get environment name
+export function getEnvironmentName(): string {
+  if (isDevelopment()) {
+    return "development"
   }
-
-  // Fall back to checking if we're in a preview environment
-  return isPreviewEnvironment()
-}
-
-// Check if we're in development mode
-export const isDevelopment = (): boolean => {
-  return process.env.NODE_ENV === "development"
-}
-
-// Check if we're in production mode
-export const isProduction = (): boolean => {
-  return process.env.NODE_ENV === "production" && !isPreviewEnvironment()
-}
-
-// Get the current environment name
-export const getEnvironmentName = (): string => {
-  if (isPreviewEnvironment()) return "preview"
-  if (isDevelopment()) return "development"
-  return "production"
+  if (isPreviewEnvironment()) {
+    return "preview"
+  }
+  if (isProduction()) {
+    return "production"
+  }
+  return "unknown"
 }

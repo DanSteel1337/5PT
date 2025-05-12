@@ -2,17 +2,25 @@
 
 import type React from "react"
 
-import { EnvironmentDebugPanel } from "./debug/environment-panel"
-import { isDevelopment, isPreviewEnvironment } from "@/lib/environment"
+import { useState, useEffect } from "react"
+import { DebugPanel } from "./debug/debug-panel"
+import { ErrorBoundary } from "./error-boundary"
 
 export function DebugProvider({ children }: { children: React.ReactNode }) {
-  // Only show debug tools in development or preview environments
-  const showDebugTools = isDevelopment() || isPreviewEnvironment()
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   return (
     <>
       {children}
-      {showDebugTools && <EnvironmentDebugPanel />}
+      {isClient && (
+        <ErrorBoundary componentName="DebugPanel" fallback={null}>
+          <DebugPanel />
+        </ErrorBoundary>
+      )}
     </>
   )
 }
