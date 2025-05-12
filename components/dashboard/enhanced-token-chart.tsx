@@ -10,6 +10,8 @@ import { mockPriceHistory, mockTimeframeData } from "@/lib/mock-data"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { QueryClientProvider } from "../providers/query-client-provider"
+import { log } from "@/lib/debug-utils"
+import { ChartContainer } from "@/components/ui/chart"
 
 // Dynamically import recharts components to reduce initial bundle size
 const ChartComponents = dynamic(() => import("../chart-components"), {
@@ -31,6 +33,9 @@ function EnhancedTokenChartContent() {
 
   useEffect(() => {
     setMounted(true)
+    return () => {
+      setMounted(false)
+    }
   }, [])
 
   // Use mock data based on timeframe with memoization
@@ -38,6 +43,7 @@ function EnhancedTokenChartContent() {
     try {
       return mockTimeframeData[timeframe] || mockPriceHistory
     } catch (err) {
+      log.error("Failed to load chart data", err)
       setError("Failed to load chart data")
       return []
     }
@@ -175,7 +181,18 @@ function EnhancedTokenChartContent() {
             <>
               <TabsContent value="price" className="h-[400px]">
                 {mounted ? (
-                  <ChartComponents data={data} chartType={chartType} />
+                  <ChartContainer
+                    config={{
+                      price: {
+                        color: "rgb(128,90,213)",
+                      },
+                      volume: {
+                        color: "rgb(90,128,213)",
+                      },
+                    }}
+                  >
+                    <ChartComponents data={data} chartType={chartType} />
+                  </ChartContainer>
                 ) : (
                   <div className="h-[400px] flex items-center justify-center">
                     <Skeleton className="h-[300px] w-full" />

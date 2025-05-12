@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { importRecharts } from "@/lib/dynamic-import-helper"
+import { ChartContainer } from "@/components/ui/chart"
+import { log } from "@/lib/debug-utils"
 
 // Types for recharts components
 type RechartsComponents = {
@@ -38,6 +40,7 @@ export function TokenChart() {
   const [chartComponents, setChartComponents] = useState<RechartsComponents | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("1m")
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
     async function loadChartComponents() {
@@ -45,7 +48,8 @@ export function TokenChart() {
         const components = await importRecharts()
         setChartComponents(components)
       } catch (error) {
-        console.error("Failed to load chart components:", error)
+        log.error("Failed to load chart components:", error)
+        setError(error instanceof Error ? error : new Error(String(error)))
       } finally {
         setIsLoading(false)
       }
@@ -70,6 +74,20 @@ export function TokenChart() {
     }
   }
 
+  if (error) {
+    return (
+      <Card className="dashboard-card hover-card">
+        <CardHeader>
+          <CardTitle>Token Price</CardTitle>
+          <CardDescription>Error loading chart</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-red-500 bg-red-50 rounded-md">Failed to load chart: {error.message}</div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="dashboard-card hover-card">
       <CardHeader>
@@ -91,7 +109,13 @@ export function TokenChart() {
               <Skeleton className="h-[250px] w-full" />
             </div>
           ) : (
-            <chartComponents.ResponsiveContainer width="100%" height="100%">
+            <ChartContainer
+              config={{
+                price: {
+                  color: "rgb(128,90,213)",
+                },
+              }}
+            >
               <chartComponents.LineChart data={getFilteredData()} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                 <chartComponents.CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <chartComponents.XAxis dataKey="date" stroke="rgba(255,255,255,0.5)" />
@@ -112,7 +136,7 @@ export function TokenChart() {
                   activeDot={{ r: 6, fill: "rgb(128,90,213)", stroke: "white", strokeWidth: 2 }}
                 />
               </chartComponents.LineChart>
-            </chartComponents.ResponsiveContainer>
+            </ChartContainer>
           )}
         </div>
       </CardContent>

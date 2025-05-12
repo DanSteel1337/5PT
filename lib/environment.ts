@@ -37,18 +37,15 @@ export function isTest(): boolean {
 
 // Check if we're in a preview environment
 export function isPreviewEnvironment(): boolean {
-  // Vercel sets this environment variable in preview deployments
-  if (!isBrowser && process.env.VERCEL_ENV === "preview") {
-    return true
-  }
-
-  // For client-side, we can check the URL
+  // Check if we're in the browser
   if (isBrowser) {
     const hostname = window.location.hostname
+    // Check if the hostname indicates a preview environment
     return hostname.includes("vercel.app") || hostname.includes("localhost") || hostname.includes("vusercontent.net")
   }
 
-  return false
+  // On the server, we can check other environment variables
+  return process.env.VERCEL_ENV === "preview" || getNodeEnv() !== "production"
 }
 
 // Determine if we should use mock data
@@ -58,8 +55,31 @@ export function shouldUseMockData(): boolean {
     return process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true"
   }
 
-  // Otherwise, use mock data in preview environments
+  // Check localStorage if we're in the browser
+  if (isBrowser) {
+    try {
+      const localStorageValue = localStorage.getItem("useMockData")
+      if (localStorageValue === "true") {
+        return true
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }
+
+  // Otherwise, use mock data in preview environments and development
   return isPreviewEnvironment() || isDevelopment()
+}
+
+// Set whether to use mock data (client-side only)
+export function setUseMockData(useMock: boolean): void {
+  if (isBrowser) {
+    try {
+      localStorage.setItem("useMockData", useMock.toString())
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }
 }
 
 // Get site URL

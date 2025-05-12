@@ -2,6 +2,7 @@
 // It should NOT be imported in client components
 
 import { shouldUseMockData } from "@/lib/environment"
+import { log } from "@/lib/debug-utils"
 
 // Types for Moralis API responses
 export interface TokenMetadata {
@@ -57,6 +58,24 @@ export interface PairReserves {
   totalSupply: string
 }
 
+// Mock data for development and testing
+const MOCK_TOKEN_PRICE: TokenPrice = {
+  nativePrice: {
+    value: "12500000000000000",
+    decimals: 18,
+    name: "BNB",
+    symbol: "BNB",
+  },
+  usdPrice: 0.025,
+  exchangeAddress: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+  exchangeName: "PancakeSwap v2",
+}
+
+// Helper function to validate token address
+function isValidTokenAddress(address: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(address)
+}
+
 // Server-side only functions
 export async function getTokenMetadata(tokenAddress: string, chain = "bsc"): Promise<TokenMetadata | null> {
   try {
@@ -94,37 +113,56 @@ export async function getTokenMetadata(tokenAddress: string, chain = "bsc"): Pro
 
 export async function getTokenPrice(tokenAddress: string, chain = "bsc"): Promise<TokenPrice | null> {
   try {
-    // Use shouldUseMockData() for consistency with other files
+    log.debug(`Getting token price for ${tokenAddress} on ${chain}`)
+
+    // Validate token address
+    if (!isValidTokenAddress(tokenAddress)) {
+      log.warn(`Invalid token address format: ${tokenAddress}`)
+      return MOCK_TOKEN_PRICE // Return mock data for invalid addresses
+    }
+
+    // Check if we should use mock data
     if (shouldUseMockData()) {
-      return {
-        nativePrice: {
-          value: "12500000000000000",
-          decimals: 18,
-          name: "BNB",
-          symbol: "BNB",
-        },
-        usdPrice: 0.025,
-        exchangeAddress: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
-        exchangeName: "PancakeSwap v2",
-      }
+      log.info(`Using mock data for token price (${tokenAddress})`)
+      return MOCK_TOKEN_PRICE
+    }
+
+    // Check if Moralis API key is available
+    if (!process.env.MORALIS_API_KEY) {
+      log.warn("Moralis API key is missing. Using mock data instead.")
+      return MOCK_TOKEN_PRICE
     }
 
     const url = `https://deep-index.moralis.io/api/v2.2/erc20/${tokenAddress}/price?chain=${chain}`
+    log.debug(`Fetching from: ${url}`)
+
     const response = await fetch(url, {
       headers: {
-        // Using environment variable from Vercel dashboard
-        "X-API-Key": process.env.MORALIS_API_KEY || "",
+        "X-API-Key": process.env.MORALIS_API_KEY,
       },
+      // Add a timeout to prevent hanging requests
+      signal: AbortSignal.timeout(10000), // 10 second timeout
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch token price: ${response.statusText}`)
+      const errorText = await response.text().catch(() => "Unknown error")
+      throw new Error(`API returned ${response.status} ${response.statusText}: ${errorText}`)
     }
 
-    return await response.json()
+    const data = await response.json()
+    log.debug(`Successfully fetched token price for ${tokenAddress}`)
+    return data
   } catch (error) {
-    console.error("Error fetching token price:", error)
-    return null
+    // More detailed error logging
+    if (error instanceof Error) {
+      console.error(`Error fetching token price for ${tokenAddress} on ${chain}: ${error.message}`)
+    } else {
+      console.error(`Unknown error fetching token price for ${tokenAddress}:`, error)
+    }
+
+    // Return mock data as fallback
+    log.warn(`Returning mock data due to error fetching token price for ${tokenAddress}`)
+    return MOCK_TOKEN_PRICE
   }
 }
 
