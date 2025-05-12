@@ -1,197 +1,120 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from "recharts"
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton"
+import { importRecharts } from "@/lib/dynamic-import-helper"
 
-// Mock data - in a real app, this would come from an API
-const generateMockData = (days: number, startPrice: number, volatility: number) => {
-  return Array.from({ length: days }, (_, i) => {
-    const date = new Date(Date.now() - (days - 1 - i) * 24 * 60 * 60 * 1000)
-    const randomFactor = 1 + (Math.random() * 2 - 1) * volatility
-    const price = startPrice * randomFactor
-
-    // Add volume data
-    const volume = Math.floor(Math.random() * 1000000) + 500000
-
-    return {
-      date: date.toISOString().split("T")[0],
-      price,
-      volume,
-    }
-  })
+// Types for recharts components
+type RechartsComponents = {
+  LineChart: any
+  Line: any
+  XAxis: any
+  YAxis: any
+  CartesianGrid: any
+  Tooltip: any
+  Legend: any
+  ResponsiveContainer: any
 }
 
-const mockPriceData = {
-  "7d": generateMockData(7, 0.01, 0.05),
-  "30d": generateMockData(30, 0.008, 0.1),
-  "90d": generateMockData(90, 0.005, 0.2),
-  "1y": generateMockData(365, 0.001, 0.5),
-}
+// Mock data for the chart
+const mockData = [
+  { date: "Jan 1", price: 0.0012 },
+  { date: "Jan 15", price: 0.0014 },
+  { date: "Feb 1", price: 0.0018 },
+  { date: "Feb 15", price: 0.0016 },
+  { date: "Mar 1", price: 0.0022 },
+  { date: "Mar 15", price: 0.0025 },
+  { date: "Apr 1", price: 0.0028 },
+  { date: "Apr 15", price: 0.0032 },
+  { date: "May 1", price: 0.0035 },
+  { date: "May 15", price: 0.0038 },
+  { date: "Jun 1", price: 0.0042 },
+  { date: "Jun 15", price: 0.0045 },
+]
 
 export function TokenChart() {
-  const [timeframe, setTimeframe] = useState<"7d" | "30d" | "90d" | "1y">("7d")
-  const [chartType, setChartType] = useState<"price" | "volume">("price")
+  const [chartComponents, setChartComponents] = useState<RechartsComponents | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("1m")
 
-  const chartData = useMemo(() => mockPriceData[timeframe], [timeframe])
+  useEffect(() => {
+    async function loadChartComponents() {
+      try {
+        const components = await importRecharts()
+        setChartComponents(components)
+      } catch (error) {
+        console.error("Failed to load chart components:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  // Calculate price change percentage
-  const priceChange = useMemo(() => {
-    if (chartData.length < 2) return 0
-    const firstPrice = chartData[0].price
-    const lastPrice = chartData[chartData.length - 1].price
-    return ((lastPrice - firstPrice) / firstPrice) * 100
-  }, [chartData])
+    loadChartComponents()
+  }, [])
 
-  // Format price change with + or - sign
-  const formattedPriceChange = useMemo(() => {
-    return `${priceChange >= 0 ? "+" : ""}${priceChange.toFixed(2)}%`
-  }, [priceChange])
-
-  // Determine color based on price change
-  const priceChangeColor = useMemo(() => {
-    return priceChange >= 0 ? "text-green-500" : "text-red-500"
-  }, [priceChange])
+  // Filter data based on active tab
+  const getFilteredData = () => {
+    switch (activeTab) {
+      case "1d":
+        return mockData.slice(-2)
+      case "1w":
+        return mockData.slice(-4)
+      case "1m":
+        return mockData.slice(-8)
+      case "1y":
+        return mockData
+      default:
+        return mockData
+    }
+  }
 
   return (
-    <Card className="col-span-1 lg:col-span-3">
+    <Card className="dashboard-card hover-card">
       <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <CardTitle>Token Price History</CardTitle>
-            <CardDescription className="flex items-center mt-1">
-              Historical data for 5PT token
-              <span className={`ml-2 font-medium ${priceChangeColor}`}>{formattedPriceChange}</span>
-            </CardDescription>
-          </div>
-          <div className="flex space-x-2">
-            <Button
-              variant={timeframe === "7d" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeframe("7d")}
-              className={timeframe === "7d" ? "bg-gold-500 hover:bg-gold-600 text-black" : ""}
-            >
-              7D
-            </Button>
-            <Button
-              variant={timeframe === "30d" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeframe("30d")}
-              className={timeframe === "30d" ? "bg-gold-500 hover:bg-gold-600 text-black" : ""}
-            >
-              30D
-            </Button>
-            <Button
-              variant={timeframe === "90d" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeframe("90d")}
-              className={timeframe === "90d" ? "bg-gold-500 hover:bg-gold-600 text-black" : ""}
-            >
-              90D
-            </Button>
-            <Button
-              variant={timeframe === "1y" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setTimeframe("1y")}
-              className={timeframe === "1y" ? "bg-gold-500 hover:bg-gold-600 text-black" : ""}
-            >
-              1Y
-            </Button>
-          </div>
-        </div>
+        <CardTitle>Token Price</CardTitle>
+        <CardDescription>5PT token price history</CardDescription>
+        <Tabs defaultValue="1m" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="1d">1D</TabsTrigger>
+            <TabsTrigger value="1w">1W</TabsTrigger>
+            <TabsTrigger value="1m">1M</TabsTrigger>
+            <TabsTrigger value="1y">1Y</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="price" className="space-y-4">
-          <TabsList>
-            <TabsTrigger
-              value="price"
-              onClick={() => setChartType("price")}
-              className="data-[state=active]:bg-gold-500 data-[state=active]:text-black"
-            >
-              Price
-            </TabsTrigger>
-            <TabsTrigger
-              value="volume"
-              onClick={() => setChartType("volume")}
-              className="data-[state=active]:bg-gold-500 data-[state=active]:text-black"
-            >
-              Volume
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="price" className="h-[400px]">
-            <ChartContainer
-              config={{
-                price: {
-                  label: "Price",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(value) => {
-                      const date = new Date(value)
-                      return `${date.getMonth() + 1}/${date.getDate()}`
-                    }}
-                  />
-                  <YAxis tickFormatter={(value) => `$${value.toFixed(4)}`} domain={["dataMin", "dataMax"]} width={80} />
-                  <Tooltip content={<ChartTooltipContent formatter={(value) => `$${Number(value).toFixed(6)}`} />} />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="price"
-                    stroke="var(--color-price)"
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 8, fill: "hsl(var(--primary))" }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </TabsContent>
-          <TabsContent value="volume" className="h-[400px]">
-            <ChartContainer
-              config={{
-                volume: {
-                  label: "Volume",
-                  color: "hsl(var(--chart-2))",
-                },
-              }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(value) => {
-                      const date = new Date(value)
-                      return `${date.getMonth() + 1}/${date.getDate()}`
-                    }}
-                  />
-                  <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(2)}M`} width={80} />
-                  <Tooltip
-                    content={<ChartTooltipContent formatter={(value) => `${Number(value).toLocaleString()}`} />}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="volume"
-                    stroke="var(--color-volume)"
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 8, fill: "hsl(var(--chart-2))" }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </TabsContent>
-        </Tabs>
+        <div className="h-[300px] w-full">
+          {isLoading || !chartComponents ? (
+            <div className="flex h-full items-center justify-center">
+              <Skeleton className="h-[250px] w-full" />
+            </div>
+          ) : (
+            <chartComponents.ResponsiveContainer width="100%" height="100%">
+              <chartComponents.LineChart data={getFilteredData()} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                <chartComponents.CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <chartComponents.XAxis dataKey="date" stroke="rgba(255,255,255,0.5)" />
+                <chartComponents.YAxis stroke="rgba(255,255,255,0.5)" />
+                <chartComponents.Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(0,0,0,0.8)",
+                    border: "1px solid rgba(128,90,213,0.3)",
+                    borderRadius: "8px",
+                  }}
+                />
+                <chartComponents.Line
+                  type="monotone"
+                  dataKey="price"
+                  stroke="rgb(128,90,213)"
+                  strokeWidth={2}
+                  dot={{ r: 4, fill: "rgb(128,90,213)", stroke: "rgb(128,90,213)" }}
+                  activeDot={{ r: 6, fill: "rgb(128,90,213)", stroke: "white", strokeWidth: 2 }}
+                />
+              </chartComponents.LineChart>
+            </chartComponents.ResponsiveContainer>
+          )}
+        </div>
       </CardContent>
     </Card>
   )

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -22,11 +21,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useReadContract } from "wagmi"
-import { CONTRACT_ADDRESSES, INVESTMENT_MANAGER_ABI } from "@/lib/contracts"
-import { ModernMobileSidebar } from "./modern-sidebar"
-import { WalletConnector } from "@/components/wallet-connector"
-import { shouldUseMockData } from "@/lib/environment"
+import { MockWeb3Button } from "@/components/mock-web3-button"
 
 interface NavItem {
   title: string
@@ -37,32 +32,15 @@ interface NavItem {
   variant?: "primary" | "secondary" | "accent"
 }
 
-interface ModernHeaderProps {
+interface MockModernHeaderProps {
   className?: string
 }
 
-export function ModernHeader({ className }: ModernHeaderProps) {
+export function MockModernHeader({ className }: MockModernHeaderProps) {
   const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
-  const isPreview = shouldUseMockData()
 
-  // Get total pools count - only enabled when mounted and not in preview
-  const { data: poolCount } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getPoolCount",
-    query: {
-      enabled: mounted && !isPreview,
-    },
-  })
-
-  // Use mock data in preview mode
-  const displayPoolCount = isPreview ? "7+" : poolCount ? Number(poolCount) : "7+"
-
-  // Client-side only rendering to avoid hydration issues
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // Use mock data
+  const displayPoolCount = "7+"
 
   const navItems: NavItem[] = [
     {
@@ -154,7 +132,39 @@ export function ModernHeader({ className }: ModernHeaderProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-full sm:w-64">
-            <ModernMobileSidebar />
+            <div className="py-4">
+              <div className="px-3 py-2">
+                <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Dashboard</h2>
+                <div className="space-y-1">
+                  {navItems.map((item) => (
+                    <Button
+                      key={item.title}
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start",
+                        pathname === item.href && "bg-accent text-accent-foreground",
+                      )}
+                      asChild
+                    >
+                      <Link href={item.href}>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {item.title}
+                        {item.badge && (
+                          <span className="ml-auto bg-primary/10 text-primary px-1.5 py-0.5 rounded text-xs">
+                            {item.badge}
+                          </span>
+                        )}
+                        {item.isNew && (
+                          <span className="ml-auto bg-green-500/10 text-green-500 px-1.5 py-0.5 rounded text-xs">
+                            New
+                          </span>
+                        )}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
         <Link href="/dashboard" className="hidden lg:flex items-center space-x-2">
@@ -166,7 +176,7 @@ export function ModernHeader({ className }: ModernHeaderProps) {
             <p>Next-gen investment platform for the Five Pillars Token (5PT)</p>
           </div>
           <div className="flex items-center space-x-2">
-            <WalletConnector />
+            <MockWeb3Button />
           </div>
         </div>
       </div>
@@ -174,7 +184,7 @@ export function ModernHeader({ className }: ModernHeaderProps) {
   )
 }
 
-export function ModernMobileHeader() {
+export function MockModernMobileHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
@@ -185,7 +195,11 @@ export function ModernMobileHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-full sm:w-64">
-            <ModernMobileSidebar />
+            <div className="py-4">
+              <div className="px-3 py-2">
+                <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Dashboard</h2>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
         <Link href="/dashboard" className="flex items-center space-x-2">
@@ -197,7 +211,7 @@ export function ModernMobileHeader() {
             <p>Next-gen investment platform for the Five Pillars Token (5PT)</p>
           </div>
           <div className="flex items-center space-x-2">
-            <WalletConnector />
+            <MockWeb3Button />
           </div>
         </div>
       </div>

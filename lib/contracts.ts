@@ -1,193 +1,150 @@
 export const TOKEN_ABI = [
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "balanceOf",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "totalSupply",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "name",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
+    outputs: [{ internalType: "string", name: "", type: "string" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
     name: "symbol",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
+    outputs: [{ internalType: "string", name: "", type: "string" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
     name: "decimals",
-    outputs: [
-      {
-        internalType: "uint8",
-        name: "",
-        type: "uint8",
-      },
-    ],
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "spender",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "approve",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "spender",
-        type: "address",
-      },
-    ],
-    name: "allowance",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+      { internalType: "address", name: "recipient", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
     ],
     name: "transfer",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
+      { internalType: "address", name: "spender", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
     ],
-    name: "transferFrom",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    name: "approve",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "nonpayable",
     type: "function",
   },
-]
+] as const
 
+// Investment Manager ABI
 export const INVESTMENT_MANAGER_ABI = [
   {
-    inputs: [
+    inputs: [],
+    name: "getTotalDeposits",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getTotalRewards",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getFeePercentage",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getDepositDelay",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getPoolCriteria",
+    outputs: [
       {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "referer",
-        type: "address",
+        components: [
+          { internalType: "uint256", name: "minDeposit", type: "uint256" },
+          { internalType: "uint256", name: "maxDeposit", type: "uint256" },
+          { internalType: "uint256", name: "rewardRate", type: "uint256" },
+          { internalType: "uint256", name: "lockPeriod", type: "uint256" },
+        ],
+        internalType: "struct IInvestmentManager.PoolCriteria",
+        name: "",
+        type: "tuple",
       },
     ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "getUserInfo",
+    outputs: [
+      {
+        components: [
+          { internalType: "uint256", name: "depositAmount", type: "uint256" },
+          { internalType: "uint256", name: "depositTime", type: "uint256" },
+          { internalType: "uint256", name: "lastRewardTime", type: "uint256" },
+          { internalType: "uint256", name: "totalRewards", type: "uint256" },
+          { internalType: "bool", name: "isActive", type: "bool" },
+        ],
+        internalType: "struct IInvestmentManager.UserInfo",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "calculateReward",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "address", name: "referrer", type: "address" },
+    ],
     name: "deposit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -200,55 +157,39 @@ export const INVESTMENT_MANAGER_ABI = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-    ],
-    name: "getUserInfo",
+    inputs: [{ internalType: "uint256", name: "poolId", type: "uint256" }],
+    name: "getPoolCriteriaById",
     outputs: [
       {
-        internalType: "uint256",
-        name: "totalDeposit",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "totalReward",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "lastClaimTime",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getTotalDeposits",
-    outputs: [
-      {
-        internalType: "uint256",
+        components: [
+          { internalType: "uint256", name: "minDeposit", type: "uint256" },
+          { internalType: "uint256", name: "rewardRate", type: "uint256" },
+          { internalType: "uint256", name: "lockPeriod", type: "uint256" },
+          { internalType: "uint256", name: "maxCapacity", type: "uint256" },
+          { internalType: "uint256", name: "personalInvestRequired", type: "uint256" },
+          { internalType: "uint256", name: "directRefsRequired", type: "uint256" },
+          { internalType: "uint256", name: "totalDirectInvestRequired", type: "uint256" },
+        ],
+        internalType: "struct IInvestmentManager.PoolCriteria",
         name: "",
-        type: "uint256",
+        type: "tuple",
       },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [],
-    name: "getTotalRewards",
+    inputs: [{ internalType: "uint256", name: "poolId", type: "uint256" }],
+    name: "getPoolStats",
     outputs: [
       {
-        internalType: "uint256",
+        components: [
+          { internalType: "uint256", name: "totalDeposits", type: "uint256" },
+          { internalType: "uint256", name: "activeInvestors", type: "uint256" },
+        ],
+        internalType: "struct IInvestmentManager.PoolStats",
         name: "",
-        type: "uint256",
+        type: "tuple",
       },
     ],
     stateMutability: "view",
@@ -256,35 +197,27 @@ export const INVESTMENT_MANAGER_ABI = [
   },
   {
     inputs: [],
-    name: "getPoolCriteria",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "minDeposit",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "rewardRate",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "lockPeriod",
-        type: "uint256",
-      },
-    ],
+    name: "getPoolCount",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [],
-    name: "getFeePercentage",
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "accountToInvestorInfo",
     outputs: [
       {
-        internalType: "uint256",
+        components: [
+          { internalType: "uint256", name: "totalDeposit", type: "uint256" },
+          { internalType: "uint256", name: "directRefsCount", type: "uint256" },
+          { internalType: "uint256", name: "downlineRefsCount", type: "uint256" },
+          { internalType: "uint256", name: "directRefsDeposit", type: "uint256" },
+          { internalType: "uint256", name: "downlineRefsDeposit", type: "uint256" },
+          { internalType: "address", name: "referer", type: "address" },
+        ],
+        internalType: "struct IInvestmentManager.InvestorInfo",
         name: "",
-        type: "uint256",
+        type: "tuple",
       },
     ],
     stateMutability: "view",
@@ -292,46 +225,37 @@ export const INVESTMENT_MANAGER_ABI = [
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
+      { internalType: "address", name: "account", type: "address" },
+      { internalType: "uint256", name: "poolId", type: "uint256" },
     ],
-    name: "calculateReward",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
+    name: "isInvestorInPool",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
-  {
-    inputs: [],
-    name: "getDepositDelay",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-]
+] as const
 
-// Contract addresses - Updated with correct values
+export const DEX_ROUTER_ABI = [
+  {
+    inputs: [
+      { internalType: "uint256", name: "amountIn", type: "uint256" },
+      { internalType: "address[]", name: "path", type: "address[]" },
+    ],
+    name: "getAmountsOut",
+    outputs: [{ internalType: "uint256[]", name: "amounts", type: "uint256[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const
+
+// Contract addresses with proper typing
 export const CONTRACT_ADDRESSES = {
   token: "0x8FafdFB035C9426a50D842873D5d401C933bE09F" as `0x${string}`, // 5PT Token
   investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc" as `0x${string}`, // Investment Manager
   treasury: "0x17D3846cC570ced5882E41a6a99CB87a8647C0Bb" as `0x${string}`,
   dexRouter: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1" as `0x${string}`,
-  // Updated with correct addresses
   priceToken: "0xfb5b838b6cfeedc2873ab27866079ac55363d37e" as `0x${string}`,
   pricePool: "0x231d9e7181e8479a8b40930961e93e7ed798542c" as `0x${string}`,
   wbnb: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c" as `0x${string}`,
+  referralSystem: "0x1234567890123456789012345678901234567890" as `0x${string}`, // Added missing referral system address
 }

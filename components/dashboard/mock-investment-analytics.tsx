@@ -17,13 +17,7 @@ import {
 } from "recharts"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useAccount } from "wagmi"
-import { formatUnits } from "viem"
 import { ArrowUpRight, TrendingUp, Calendar, Coins, Clock, Award } from "lucide-react"
-import { shouldUseMockData } from "@/lib/environment"
-import { mockUserInvestment } from "@/lib/mock-data"
-import { useTokenContract, useInvestmentManager } from "@/lib/contract-hooks"
 
 // Mock data for investment performance over time
 const generatePerformanceData = (days: number, initialValue: number, growthRate: number) => {
@@ -47,103 +41,30 @@ const investmentDistribution = [
   { name: "Pool D", value: 10 },
 ]
 
-export function InvestmentAnalytics() {
-  const isPreview = shouldUseMockData()
-  const { address, isConnected } = useAccount()
-  const [mounted, setMounted] = useState(false)
+export function MockInvestmentAnalytics() {
   const [activeTab, setActiveTab] = useState("performance")
   const [performanceData, setPerformanceData] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [investorStats, setInvestorStats] = useState({
-    totalDeposit: 0,
-    totalRewards: 0,
-    lastDepositTime: 0,
-    lastClaimTime: 0,
-  })
-  const [roi, setRoi] = useState(0)
-  const [apy, setApy] = useState(0)
-  const [lockPeriod, setLockPeriod] = useState(0)
-  const [feePercentage, setFeePercentage] = useState(0)
 
-  // Use hooks from contract-hooks.ts
-  const { useTokenDecimals } = useTokenContract()
-  const { useUserInvestmentData, usePoolCriteria, useFeePercentage } = useInvestmentManager()
-
-  // Only use contract reads if not in preview mode
-  const { data: decimals } = useTokenDecimals({
-    enabled: mounted && !isPreview && isConnected,
-  })
-
-  // Get user investment data in a single batch request
-  const { data: userInvestmentData } = useUserInvestmentData(address, {
-    enabled: mounted && !isPreview && isConnected && !!address,
-  })
-
-  // Get pool criteria
-  const { data: poolCriteriaData } = usePoolCriteria({
-    enabled: mounted && !isPreview,
-  })
-
-  // Get fee percentage
-  const { data: feePercentageData } = useFeePercentage({
-    enabled: mounted && !isPreview,
-  })
-
+  // Generate performance data on component mount
   useEffect(() => {
-    setMounted(true)
+    // In a real app, this would be fetched from an API
+    const data = generatePerformanceData(90, 1000, 0.005)
+    setPerformanceData(data)
   }, [])
 
-  // Load data based on environment
-  useEffect(() => {
-    if (!mounted) return
+  // Mock investor stats
+  const investorStats = {
+    totalDeposit: 10000,
+    totalRewards: 500,
+    lastDepositTime: Date.now() / 1000 - 7 * 24 * 60 * 60, // 7 days ago
+    lastClaimTime: Date.now() / 1000 - 3 * 24 * 60 * 60, // 3 days ago
+  }
 
-    if (isPreview) {
-      // Use mock data in preview
-      setPerformanceData(generatePerformanceData(90, 1000, 0.005))
-      setInvestorStats({
-        totalDeposit: mockUserInvestment.totalInvested,
-        totalRewards: mockUserInvestment.rewards,
-        lastDepositTime: new Date(mockUserInvestment.lastDeposit).getTime() / 1000,
-        lastClaimTime: new Date(mockUserInvestment.lastClaim).getTime() / 1000,
-      })
-      setRoi(mockUserInvestment.roi)
-      setApy(mockUserInvestment.apy)
-      setLockPeriod(mockUserInvestment.stakingPeriod)
-      setFeePercentage(2.5)
-      setIsLoading(false)
-    } else {
-      // Use real data in production
-      setPerformanceData(generatePerformanceData(90, 1000, 0.005))
+  // Calculate ROI
+  const roi = investorStats.totalDeposit > 0 ? (investorStats.totalRewards / investorStats.totalDeposit) * 100 : 0
 
-      if (userInvestmentData && userInvestmentData[0].status === "success" && decimals) {
-        const investorInfo = userInvestmentData[0].result
-        setInvestorStats({
-          totalDeposit: Number(formatUnits(investorInfo.totalDeposit || BigInt(0), decimals)),
-          totalRewards: Number(formatUnits(investorInfo.totalRewards || BigInt(0), decimals)),
-          lastDepositTime: Number(investorInfo.lastDepositTime || BigInt(0)),
-          lastClaimTime: Number(investorInfo.lastClaimTime || BigInt(0)),
-        })
-
-        // Calculate ROI
-        const totalDeposit = Number(formatUnits(investorInfo.totalDeposit || BigInt(0), decimals))
-        const totalRewards = Number(formatUnits(investorInfo.totalRewards || BigInt(0), decimals))
-        setRoi(totalDeposit > 0 ? (totalRewards / totalDeposit) * 100 : 0)
-      }
-
-      if (poolCriteriaData) {
-        const rewardRate = Number(poolCriteriaData[1]) / 100
-        const lockPeriodDays = Number(poolCriteriaData[2])
-        setLockPeriod(lockPeriodDays)
-        setApy(rewardRate * (365 / lockPeriodDays))
-      }
-
-      if (feePercentageData) {
-        setFeePercentage(Number(feePercentageData) / 100)
-      }
-
-      setIsLoading(false)
-    }
-  }, [isPreview, userInvestmentData, decimals, poolCriteriaData, feePercentageData, mounted])
+  // Mock APY
+  const apy = 26.5
 
   // Format dates
   const formatDate = (timestamp: number) => {
@@ -175,13 +96,9 @@ export function InvestmentAnalytics() {
               <Coins className="h-4 w-4 mr-1 text-purple-400" />
               Total Deposit
             </div>
-            {isLoading ? (
-              <Skeleton className="h-7 w-24" />
-            ) : (
-              <div className="text-xl font-bold text-purple-300">
-                {investorStats.totalDeposit.toLocaleString(undefined, { maximumFractionDigits: 0 })} 5PT
-              </div>
-            )}
+            <div className="text-xl font-bold text-purple-300">
+              {investorStats.totalDeposit.toLocaleString(undefined, { maximumFractionDigits: 0 })} 5PT
+            </div>
           </div>
 
           <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-500/20">
@@ -189,13 +106,9 @@ export function InvestmentAnalytics() {
               <Award className="h-4 w-4 mr-1 text-purple-400" />
               Total Rewards
             </div>
-            {isLoading ? (
-              <Skeleton className="h-7 w-24" />
-            ) : (
-              <div className="text-xl font-bold text-purple-300">
-                {investorStats.totalRewards.toLocaleString(undefined, { maximumFractionDigits: 0 })} 5PT
-              </div>
-            )}
+            <div className="text-xl font-bold text-purple-300">
+              {investorStats.totalRewards.toLocaleString(undefined, { maximumFractionDigits: 0 })} 5PT
+            </div>
           </div>
 
           <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-500/20">
@@ -203,11 +116,7 @@ export function InvestmentAnalytics() {
               <TrendingUp className="h-4 w-4 mr-1 text-purple-400" />
               ROI
             </div>
-            {isLoading ? (
-              <Skeleton className="h-7 w-24" />
-            ) : (
-              <div className="text-xl font-bold text-purple-300">{roi.toFixed(2)}%</div>
-            )}
+            <div className="text-xl font-bold text-purple-300">{roi.toFixed(2)}%</div>
           </div>
 
           <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-500/20">
@@ -215,13 +124,9 @@ export function InvestmentAnalytics() {
               <Calendar className="h-4 w-4 mr-1 text-purple-400" />
               Last Activity
             </div>
-            {isLoading ? (
-              <Skeleton className="h-7 w-24" />
-            ) : (
-              <div className="text-xl font-bold text-purple-300">
-                {formatDate(Math.max(investorStats.lastDepositTime, investorStats.lastClaimTime))}
-              </div>
-            )}
+            <div className="text-xl font-bold text-purple-300">
+              {formatDate(Math.max(investorStats.lastDepositTime, investorStats.lastClaimTime))}
+            </div>
           </div>
         </div>
 
@@ -336,9 +241,7 @@ export function InvestmentAnalytics() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium text-purple-300">
-                    {isLoading ? <Skeleton className="h-5 w-16 inline-block" /> : `${apy.toFixed(2)}%`}
-                  </div>
+                  <div className="font-medium text-purple-300">{apy.toFixed(2)}%</div>
                 </div>
               </div>
 
@@ -353,9 +256,7 @@ export function InvestmentAnalytics() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium text-purple-300">
-                    {isLoading ? <Skeleton className="h-5 w-16 inline-block" /> : `${lockPeriod} days`}
-                  </div>
+                  <div className="font-medium text-purple-300">30 days</div>
                 </div>
               </div>
 
@@ -370,9 +271,7 @@ export function InvestmentAnalytics() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium text-purple-300">
-                    {isLoading ? <Skeleton className="h-5 w-16 inline-block" /> : `${feePercentage}%`}
-                  </div>
+                  <div className="font-medium text-purple-300">2.5%</div>
                 </div>
               </div>
             </div>
@@ -400,9 +299,7 @@ export function InvestmentAnalytics() {
               <div className="flex justify-between items-center p-3 bg-purple-900/10 rounded-lg border border-purple-500/10">
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center mr-3">
-                    <ArrowUpRight
-                      className={`h-4 w-4 ${Math.random() > 0.5 ? "text-green-400" : "text-red-400 rotate-180"}`}
-                    />
+                    <ArrowUpRight className="h-4 w-4 text-green-400" />
                   </div>
                   <div>
                     <div className="font-medium">Bitcoin</div>
@@ -417,9 +314,7 @@ export function InvestmentAnalytics() {
               <div className="flex justify-between items-center p-3 bg-purple-900/10 rounded-lg border border-purple-500/10">
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center mr-3">
-                    <ArrowUpRight
-                      className={`h-4 w-4 ${Math.random() > 0.5 ? "text-green-400" : "text-red-400 rotate-180"}`}
-                    />
+                    <ArrowUpRight className="h-4 w-4 text-red-400 rotate-180" />
                   </div>
                   <div>
                     <div className="font-medium">Ethereum</div>
@@ -434,9 +329,7 @@ export function InvestmentAnalytics() {
               <div className="flex justify-between items-center p-3 bg-purple-900/10 rounded-lg border border-purple-500/10">
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center mr-3">
-                    <ArrowUpRight
-                      className={`h-4 w-4 ${Math.random() > 0.5 ? "text-green-400" : "text-red-400 rotate-180"}`}
-                    />
+                    <ArrowUpRight className="h-4 w-4 text-green-400" />
                   </div>
                   <div>
                     <div className="font-medium">DeFi Index</div>

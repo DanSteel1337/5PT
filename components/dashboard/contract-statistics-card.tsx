@@ -5,82 +5,128 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { BarChart3, Clock, Coins, DollarSign, Lock, Percent, Shield, Timer, TrendingUp, Users } from "lucide-react"
-import { useReadContract } from "wagmi"
-import { CONTRACT_ADDRESSES, INVESTMENT_MANAGER_ABI, TOKEN_ABI } from "@/lib/contracts"
+import {
+  AlertCircle,
+  BarChart3,
+  Clock,
+  Coins,
+  DollarSign,
+  Lock,
+  Percent,
+  Shield,
+  Timer,
+  TrendingUp,
+  Users,
+} from "lucide-react"
 import { formatUnits } from "viem"
+import { shouldUseMockData } from "@/lib/environment"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useInvestmentManager, useTokenContract } from "@/lib/contract-hooks"
 
 interface ContractStatisticsCardProps {
   expanded?: boolean
 }
 
 export function ContractStatisticsCard({ expanded = false }: ContractStatisticsCardProps) {
+  const [mounted, setMounted] = useState(false)
   const [countdown, setCountdown] = useState<{ hours: number; minutes: number; seconds: number }>({
     hours: 4,
     minutes: 0,
     seconds: 0,
   })
+  const [error, setError] = useState<string | null>(null)
+
+  // Use environment detection to determine if we should use mock data
+  const useMockData = shouldUseMockData()
+
+  // Use the hooks from contract-hooks.ts
+  const { useTokenDecimals } = useTokenContract()
+  const { useInvestmentData, useInvestorCount } = useInvestmentManager()
 
   // Get token decimals
-  const { data: decimals, isPending: isLoadingDecimals } = useReadContract({
-    address: CONTRACT_ADDRESSES.token,
-    abi: TOKEN_ABI,
-    functionName: "decimals",
+  const { data: decimals } = useTokenDecimals({
+    enabled: mounted && !useMockData,
   })
 
-  // Get total deposits
-  const { data: totalDeposits, isPending: isLoadingDeposits } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getTotalDeposits",
+  // Use the batched contract reads for better performance
+  const {
+    data: contractData,
+    isPending: isLoadingContractData,
+    isError,
+  } = useInvestmentData({
+    enabled: mounted && !useMockData,
+    onError: (err) => {
+      console.error("Error fetching contract data:", err)
+      setError("Failed to fetch contract data. Please try again later.")
+    },
   })
 
-  // Get total rewards
-  const { data: totalRewards, isPending: isLoadingRewards } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getTotalRewards",
+  // Use the custom hook for investor count
+  const { data: investorCount, isPending: isLoadingInvestorCount } = useInvestorCount({
+    enabled: mounted && !useMockData,
   })
 
-  // Get fee percentage
-  const { data: feePercentage, isPending: isLoadingFee } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getFeePercentage",
-  })
+  const isLoading = isLoadingContractData || isLoadingInvestorCount
 
-  // Get deposit delay
-  const { data: depositDelay, isPending: isLoadingDelay } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getDepositDelay",
-  })
+  // Extract data from the batched response with proper type safety
+  const totalDeposits = useMemo(() => {
+    if (useMockData) return BigInt(750000 * 10 ** 18)
+    if (!contractData || contractData[0].status !== "success") return BigInt(0)
+    return contractData[0].result
+  }, [contractData, useMockData])
 
-  const isLoading = isLoadingDecimals || isLoadingDeposits || isLoadingRewards || isLoadingFee || isLoadingDelay
+  const totalRewards = useMemo(() => {
+    if (useMockData) return BigInt(125000 * 10 ** 18)
+    if (!contractData || contractData[1].status !== "success") return BigInt(0)
+    return contractData[1].result
+  }, [contractData, useMockData])
 
-  // Format total deposits
+  const feePercentage = useMemo(() => {
+    if (useMockData) return BigInt(250) // 2.5%
+    if (!contractData || contractData[2].status !== "success") return BigInt(0)
+    return contractData[2].result
+  }, [contractData, useMockData])
+
+  const depositDelay = useMemo(() => {
+    if (useMockData) return BigInt(4)
+    if (!contractData || contractData[3].status !== "success") return BigInt(4)
+    return contractData[3].result
+  }, [contractData, useMockData])
+
+  // Format total deposits with memoization for better performance
   const formattedTotalDeposits = useMemo(() => {
+    if (useMockData) return "750,000"
     if (!totalDeposits || !decimals) return "0"
     return Number(formatUnits(totalDeposits, decimals)).toLocaleString(undefined, { maximumFractionDigits: 0 })
-  }, [totalDeposits, decimals])
+  }, [totalDeposits, decimals, useMockData])
 
-  // Format total rewards
+  // Format total rewards with memoization
   const formattedTotalRewards = useMemo(() => {
+    if (useMockData) return "125,000"
     if (!totalRewards || !decimals) return "0"
     return Number(formatUnits(totalRewards, decimals)).toLocaleString(undefined, { maximumFractionDigits: 0 })
-  }, [totalRewards, decimals])
+  }, [totalRewards, decimals, useMockData])
 
-  // Format fee percentage
+  // Format fee percentage with memoization
   const formattedFeePercentage = useMemo(() => {
-    if (!feePercentage) return "0"
+    if (useMockData) return 2.5
+    if (!feePercentage) return 0
     return Number(feePercentage) / 100
-  }, [feePercentage])
+  }, [feePercentage, useMockData])
 
-  // Format deposit delay
+  // Format deposit delay with memoization
   const formattedDepositDelay = useMemo(() => {
+    if (useMockData) return 4
     if (!depositDelay) return 4
     return Number(depositDelay)
-  }, [depositDelay])
+  }, [depositDelay, useMockData])
+
+  // Format investor count with memoization
+  const formattedInvestorCount = useMemo(() => {
+    if (useMockData) return "3,842"
+    if (!investorCount) return "0"
+    return Number(investorCount).toLocaleString()
+  }, [investorCount, useMockData])
 
   // Calculate contract age (mock data - in a real app, this would come from the contract)
   const contractAge = useMemo(() => {
@@ -94,6 +140,8 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
 
   // Update countdown timer
   useEffect(() => {
+    setMounted(true)
+
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev.seconds > 0) {
@@ -110,6 +158,43 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
     return () => clearInterval(timer)
   }, [formattedDepositDelay])
 
+  // Calculate progress percentage for the countdown timer
+  const progressPercentage = useMemo(() => {
+    const totalSeconds = formattedDepositDelay * 3600
+    const elapsedSeconds = totalSeconds - (countdown.hours * 3600 + countdown.minutes * 60 + countdown.seconds)
+    return Math.round((elapsedSeconds / totalSeconds) * 100)
+  }, [countdown, formattedDepositDelay])
+
+  // Show error if there was a problem fetching data
+  if (error && !useMockData) {
+    return (
+      <Card className={expanded ? "col-span-full" : ""}>
+        <CardHeader>
+          <CardTitle>Contract Statistics</CardTitle>
+          <CardDescription>Key metrics and statistics for the 5PT investment platform</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Show preview mode notice if using mock data
+  const previewModeNotice = useMockData && (
+    <Alert className="mb-4 bg-purple-900/10 border-purple-500/30">
+      <AlertCircle className="h-4 w-4 text-purple-400" />
+      <AlertTitle className="text-purple-300">Preview Mode</AlertTitle>
+      <AlertDescription className="text-muted-foreground">
+        Displaying mock data. Connect to BSC network to see live contract data.
+      </AlertDescription>
+    </Alert>
+  )
+
   return (
     <Card className={expanded ? "col-span-full" : ""}>
       <CardHeader>
@@ -117,13 +202,15 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
         <CardDescription>Key metrics and statistics for the 5PT investment platform</CardDescription>
       </CardHeader>
       <CardContent>
+        {previewModeNotice}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <div className="flex items-center text-muted-foreground text-sm">
               <Coins className="h-4 w-4 mr-1 text-purple-400" />
               Total Value Locked
             </div>
-            {isLoading ? (
+            {isLoading && !useMockData ? (
               <Skeleton className="h-8 w-24" />
             ) : (
               <div className="text-2xl font-bold text-purple-300">{formattedTotalDeposits} 5PT</div>
@@ -135,10 +222,10 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
               <Users className="h-4 w-4 mr-1 text-purple-400" />
               Total Investors
             </div>
-            {isLoading ? (
+            {isLoading && !useMockData ? (
               <Skeleton className="h-8 w-24" />
             ) : (
-              <div className="text-2xl font-bold text-purple-300">3,842</div>
+              <div className="text-2xl font-bold text-purple-300">{formattedInvestorCount}</div>
             )}
           </div>
 
@@ -147,7 +234,7 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
               <Percent className="h-4 w-4 mr-1 text-purple-400" />
               Platform Fee
             </div>
-            {isLoading ? (
+            {isLoading && !useMockData ? (
               <Skeleton className="h-8 w-24" />
             ) : (
               <div className="text-2xl font-bold text-purple-300">{formattedFeePercentage}%</div>
@@ -169,7 +256,7 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
                   <TrendingUp className="h-4 w-4 mr-1 text-purple-400" />
                   Total Rewards Paid
                 </div>
-                {isLoading ? (
+                {isLoading && !useMockData ? (
                   <Skeleton className="h-8 w-24" />
                 ) : (
                   <div className="text-2xl font-bold text-purple-300">{formattedTotalRewards} 5PT</div>
@@ -290,21 +377,10 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
               <div className="mt-3">
                 <div className="flex justify-between mb-1">
                   <span className="text-xs text-muted-foreground">Time Elapsed</span>
-                  <span className="text-xs text-muted-foreground">
-                    {Math.round(
-                      (formattedDepositDelay * 3600 -
-                        (countdown.hours * 3600 + countdown.minutes * 60 + countdown.seconds)) /
-                        (formattedDepositDelay * 36),
-                    )}
-                    %
-                  </span>
+                  <span className="text-xs text-muted-foreground">{progressPercentage}%</span>
                 </div>
                 <Progress
-                  value={
-                    (formattedDepositDelay * 3600 -
-                      (countdown.hours * 3600 + countdown.minutes * 60 + countdown.seconds)) /
-                    (formattedDepositDelay * 36)
-                  }
+                  value={progressPercentage}
                   className="h-1"
                   indicatorClassName="bg-gradient-to-r from-purple-500 to-pink-500"
                 />

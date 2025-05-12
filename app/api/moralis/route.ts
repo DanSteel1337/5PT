@@ -1,10 +1,38 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { rateLimit } from "@/lib/rate-limit"
+import { cacheResponse } from "@/lib/api-cache"
+import { MoralisApiError, handleMoralisError } from "@/lib/moralis-error-handler"
+import { validateTokenAddress, validateChain } from "@/lib/api-validation"
 
 // Using environment variable from Vercel dashboard
-// No hardcoded values or fallbacks that could leak information
 const BASE_URL = "https://deep-index.moralis.io/api/v2.2"
 
+// Define cache TTL for different endpoints (in seconds)
+const CACHE_TTL = {
+  metadata: 86400, // 24 hours
+  price: 300, // 5 minutes
+  reserves: 300, // 5 minutes
+  holders: 1800, // 30 minutes
+  transfers: 300, // 5 minutes
+}
+
+// Create a limiter with 50 requests per minute
+const limiter = rateLimit({
+  interval: 60 * 1000, // 1 minute
+  uniqueTokenPerInterval: 50, // 50 requests per minute
+})
+
 export async function GET(request: NextRequest) {
+  // Apply rate limiting
+  try {
+    await limiter.check(request, 10) // Allow 10 requests per minute per IP
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    )
+  }
+
   const searchParams = request.nextUrl.searchParams
   const action = searchParams.get("action")
   const tokenAddress = searchParams.get("tokenAddress")
@@ -12,6 +40,7 @@ export async function GET(request: NextRequest) {
   const limit = searchParams.get("limit") || "10"
   const pairAddress = searchParams.get("pairAddress")
 
+  // Validate required parameters
   if (!action) {
     return NextResponse.json({ error: "Missing action parameter" }, { status: 400 })
   }
@@ -20,26 +49,52 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing address parameter" }, { status: 400 })
   }
 
+  // Validate token address format
+  if (tokenAddress && !validateTokenAddress(tokenAddress)) {
+    return NextResponse.json({ error: "Invalid token address format" }, { status: 400 })
+  }
+
+  // Validate chain parameter
+  if (!validateChain(chain)) {
+    return NextResponse.json({ error: "Unsupported blockchain" }, { status: 400 })
+  }
+
+  // Generate cache key based on all parameters
+  const cacheKey = `moralis:${action}:${tokenAddress || ""}:${pairAddress || ""}:${chain}:${limit}`
+
   try {
+    // Check cache first
+    const cachedResponse = await cacheResponse.get(cacheKey)
+    if (cachedResponse) {
+      return NextResponse.json(JSON.parse(cachedResponse))
+    }
+
     let url = ""
+    let cacheTtl = 300 // Default 5 minutes
+
     switch (action) {
       case "getTokenMetadata":
         url = `${BASE_URL}/erc20/metadata?chain=${chain}&addresses=${tokenAddress}`
+        cacheTtl = CACHE_TTL.metadata
         break
       case "getTokenPrice":
         url = `${BASE_URL}/erc20/${tokenAddress}/price?chain=${chain}`
+        cacheTtl = CACHE_TTL.price
         break
       case "getPairReserves":
         if (!pairAddress) {
           return NextResponse.json({ error: "Missing pairAddress parameter" }, { status: 400 })
         }
         url = `${BASE_URL}/erc20/${pairAddress}/reserves?chain=${chain}`
+        cacheTtl = CACHE_TTL.reserves
         break
       case "getTokenHolders":
         url = `${BASE_URL}/erc20/${tokenAddress}/holders?chain=${chain}&limit=${limit}`
+        cacheTtl = CACHE_TTL.holders
         break
       case "getTokenTransfers":
         url = `${BASE_URL}/erc20/${tokenAddress}/transfers?chain=${chain}&limit=${limit}`
+        cacheTtl = CACHE_TTL.transfers
         break
       default:
         return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 })
@@ -47,27 +102,33 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(url, {
       headers: {
-        // Using environment variable from Vercel dashboard
         "X-API-Key": process.env.MORALIS_API_KEY || "",
+        Accept: "application/json",
       },
+      next: { revalidate: cacheTtl }, // Use Next.js built-in cache
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.statusText}`)
+      throw new MoralisApiError(`Moralis API error: ${response.statusText}`, response.status, await response.text())
     }
 
     const data = await response.json()
 
     // Format the response based on the action
+    let formattedResponse
     if (action === "getTokenMetadata") {
-      return NextResponse.json(data[0])
+      formattedResponse = data[0]
     } else if (action === "getTokenHolders" || action === "getTokenTransfers") {
-      return NextResponse.json(data.result)
+      formattedResponse = data.result
     } else {
-      return NextResponse.json(data)
+      formattedResponse = data
     }
+
+    // Cache the response
+    await cacheResponse.set(cacheKey, JSON.stringify(formattedResponse), cacheTtl)
+
+    return NextResponse.json(formattedResponse)
   } catch (error) {
-    console.error("Moralis API error:", error)
-    return NextResponse.json({ error: "Failed to fetch data from Moralis API" }, { status: 500 })
+    return handleMoralisError(error)
   }
 }

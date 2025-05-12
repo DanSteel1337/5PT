@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Coins, TrendingUp, Clock, Award, ArrowUpRight, Users } from "lucide-react"
-import { useAccount, useReadContract } from "wagmi"
-import { CONTRACT_ADDRESSES, INVESTMENT_MANAGER_ABI, TOKEN_ABI } from "@/lib/contracts"
+import { useAccount } from "wagmi"
 import { formatUnits } from "viem"
 import { useToast } from "@/hooks/use-toast"
+import { useTokenContract, useInvestmentManager } from "@/lib/contract-hooks"
+import { shouldUseMockData } from "@/lib/environment"
 
 interface InvestmentPerformanceCardProps {
   expanded?: boolean
@@ -21,68 +22,77 @@ export function InvestmentPerformanceCard({ expanded = false }: InvestmentPerfor
   const { toast } = useToast()
   const [rewardCounter, setRewardCounter] = useState(0)
   const [lastUpdate, setLastUpdate] = useState(Date.now())
+  const [mounted, setMounted] = useState(false)
+  const isPreview = shouldUseMockData()
+
+  // Use hooks from contract-hooks.ts
+  const { useTokenDecimals } = useTokenContract()
+  const { useUserInvestmentData, useCalculateReward } = useInvestmentManager()
 
   // Get token decimals
-  const { data: decimals, isPending: isLoadingDecimals } = useReadContract({
-    address: CONTRACT_ADDRESSES.token,
-    abi: TOKEN_ABI,
-    functionName: "decimals",
+  const { data: decimals, isPending: isLoadingDecimals } = useTokenDecimals({
+    enabled: mounted && !isPreview && isConnected,
   })
 
-  // Get investor info
-  const { data: investorInfo, isPending: isLoadingInvestorInfo } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "accountToInvestorInfo",
-    args: [address || "0x0000000000000000000000000000000000000000"],
-    query: {
-      enabled: isConnected,
-    },
+  // Get user investment data in a single batch request
+  const { data: userInvestmentData, isPending: isLoadingUserData } = useUserInvestmentData(address, {
+    enabled: mounted && !isPreview && isConnected && !!address,
   })
 
   // Get accumulated rewards
-  const { data: accumulatedRewards, isPending: isLoadingRewards } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getAccumulatedRewards",
-    args: [address || "0x0000000000000000000000000000000000000000"],
-    query: {
-      enabled: isConnected,
-    },
+  const { data: accumulatedRewards, isPending: isLoadingRewards } = useCalculateReward(address, {
+    enabled: mounted && !isPreview && isConnected && !!address,
   })
 
-  // Get last round rewards
-  const { data: lastRoundRewards, isPending: isLoadingLastRewards } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getLastRoundRewards",
-    args: [address || "0x0000000000000000000000000000000000000000"],
-    query: {
-      enabled: isConnected,
-    },
-  })
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  const isLoading = isLoadingDecimals || isLoadingInvestorInfo || isLoadingRewards || isLoadingLastRewards
+  const isLoading = isLoadingDecimals || isLoadingUserData || isLoadingRewards
+
+  // Extract investor info from batched response
+  const investorInfo = useMemo(() => {
+    if (isPreview) {
+      return {
+        totalDeposit: BigInt(1000 * 10 ** 18),
+        totalRewards: BigInt(300 * 10 ** 18),
+        lastDepositTime: BigInt(Date.now() / 1000 - 86400),
+        lastClaimTime: BigInt(Date.now() / 1000 - 172800),
+      }
+    }
+    if (!userInvestmentData || userInvestmentData[0].status !== "success") return null
+    return userInvestmentData[0].result
+  }, [userInvestmentData, isPreview])
+
+  // Extract last round rewards from batched response
+  const lastRoundRewards = useMemo(() => {
+    if (isPreview) {
+      return [BigInt(3 * 10 ** 18), BigInt(1.5 * 10 ** 18), BigInt(0.5 * 10 ** 18)]
+    }
+    if (!userInvestmentData || userInvestmentData[1].status !== "success") return null
+    return userInvestmentData[1].result
+  }, [userInvestmentData, isPreview])
 
   // Format total deposit
   const totalDeposit = useMemo(() => {
     if (!investorInfo || !decimals) return 0
-    return Number(formatUnits(investorInfo.totalDeposit || 0n, decimals))
+    return Number(formatUnits(investorInfo.totalDeposit || BigInt(0), decimals))
   }, [investorInfo, decimals])
 
   // Format accumulated rewards
   const formattedAccumulatedRewards = useMemo(() => {
+    if (isPreview) return 300
     if (!accumulatedRewards || !decimals) return 0
-    return Number(formatUnits(accumulatedRewards || 0n, decimals))
-  }, [accumulatedRewards, decimals])
+    return Number(formatUnits(accumulatedRewards || BigInt(0), decimals))
+  }, [accumulatedRewards, decimals, isPreview])
 
   // Format last round rewards
   const formattedLastRoundRewards = useMemo(() => {
     if (!lastRoundRewards || !decimals) return { daily: 0, referral: 0, pool: 0 }
     return {
-      daily: Number(formatUnits(lastRoundRewards[0] || 0n, decimals)),
-      referral: Number(formatUnits(lastRoundRewards[1] || 0n, decimals)),
-      pool: Number(formatUnits(lastRoundRewards[2] || 0n, decimals)),
+      daily: Number(formatUnits(lastRoundRewards[0] || BigInt(0), decimals)),
+      referral: Number(formatUnits(lastRoundRewards[1] || BigInt(0), decimals)),
+      pool: Number(formatUnits(lastRoundRewards[2] || BigInt(0), decimals)),
     }
   }, [lastRoundRewards, decimals])
 

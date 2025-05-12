@@ -107,3 +107,28 @@ export function downloadDataUrl(dataUrl: string, filename: string): void {
   link.download = filename
   link.click()
 }
+
+import { importHtml2Canvas } from "./dynamic-import-helper"
+
+export async function captureElementAsImage(element: HTMLElement): Promise<string | null> {
+  try {
+    const html2canvas = await importHtml2Canvas()
+
+    if (!html2canvas) {
+      console.warn("html2canvas could not be loaded")
+      return null
+    }
+
+    const canvas = await html2canvas(element, {
+      allowTaint: true,
+      useCORS: true,
+      scale: 2,
+      backgroundColor: null,
+    })
+
+    return canvas.toDataURL("image/png")
+  } catch (error) {
+    console.error("Error capturing element as image:", error)
+    return null
+  }
+}

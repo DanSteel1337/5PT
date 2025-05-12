@@ -38,6 +38,8 @@ import {
   ChevronRight,
   Coins,
 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { mockReferrals } from "@/lib/mock-data"
 
 // Mock data for referral earnings over time
 const generateReferralEarningsData = (days: number) => {
@@ -72,6 +74,7 @@ export function EnhancedReferralSystem() {
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [referralEarningsData, setReferralEarningsData] = useState<any[]>([])
+  const referralLink = isConnected ? `https://5pt.finance/ref/${address}` : "https://5pt.finance/ref/preview-mode"
 
   // Get investor info
   const { data: investorInfo, isPending: isLoadingInvestorInfo } = useReadContract({
@@ -127,10 +130,10 @@ export function EnhancedReferralSystem() {
   }, [investorStats.directRefsCount])
 
   // Format referral link
-  const referralLink = useMemo(() => {
-    if (!address) return ""
-    return `https://5pt.finance/ref/${address}`
-  }, [address])
+  // const referralLink = useMemo(() => {
+  //   if (!address) return ""
+  //   return `https://5pt.finance/ref/${address}`
+  // }, [address])
 
   // Handle copy referral link
   const handleCopyLink = () => {
@@ -177,6 +180,16 @@ export function EnhancedReferralSystem() {
     return directEarnings + downlineEarnings
   }, [investorStats.directRefsDeposit, investorStats.downlineRefsDeposit])
 
+  const copyToClipboard = () => {
+    setCopied(true)
+    navigator.clipboard.writeText(referralLink)
+    toast({
+      title: "Copied!",
+      description: "Referral link copied to clipboard",
+    })
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   if (!isConnected) {
     return (
       <Card className="border-purple-500/20 bg-black/40 backdrop-blur-sm">
@@ -187,12 +200,56 @@ export function EnhancedReferralSystem() {
           <CardDescription>Connect your wallet to view your referral network</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-10">
-          <div className="text-center space-y-4">
+          {/* <div className="text-center space-y-4">
             <Users className="h-16 w-16 text-purple-400 mx-auto opacity-50" />
             <h3 className="text-xl font-medium">Wallet Not Connected</h3>
             <p className="text-muted-foreground max-w-md">
               Connect your wallet to view your referral network, earnings, and status.
             </p>
+          </div> */}
+          <div className="space-y-4 w-full">
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Your Referral Link</div>
+              <div className="flex space-x-2">
+                <Input value={referralLink} readOnly className="bg-black/20 border-purple-500/30 text-purple-300" />
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="border-purple-500/30 hover:bg-purple-900/20"
+                  onClick={copyToClipboard}
+                >
+                  {copied ? <span className="text-green-500 text-xs">Copied!</span> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="text-sm font-medium">Share your link</div>
+              <div className="flex space-x-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-purple-500/30 hover:bg-purple-900/20"
+                  onClick={handleShareLink}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Recent Referrals</div>
+              <div className="space-y-2">
+                {mockReferrals.map((referral) => (
+                  <div
+                    key={referral.id}
+                    className="flex justify-between items-center p-2 rounded-md bg-black/20 border border-purple-500/10"
+                  >
+                    <div className="text-sm">{referral.address}</div>
+                    <div className="text-sm font-medium text-purple-300">${referral.earnings}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

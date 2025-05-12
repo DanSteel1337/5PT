@@ -1,45 +1,78 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
-import { XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Area, AreaChart } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getTokenPriceHistory } from "@/lib/token-price-client"
-import type { PriceDataPoint } from "@/types/token"
-import { CONTRACT_ADDRESSES } from "@/lib/contracts"
+import dynamic from "next/dynamic"
+import { mockPriceHistory, mockTimeframeData } from "@/lib/mock-data"
+import { AlertCircle } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+// Dynamically import recharts components to reduce initial bundle size
+const ChartComponents = dynamic(() => import("../chart-components"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[400px] flex items-center justify-center">
+      <Skeleton className="h-[300px] w-full" />
+    </div>
+  ),
+})
 
 export function EnhancedTokenChart() {
+  const [mounted, setMounted] = useState(false)
   const [timeframe, setTimeframe] = useState<"7d" | "30d" | "90d" | "1y">("30d")
   const [chartType, setChartType] = useState<"price" | "volume">("price")
-  const [isLoading, setIsLoading] = useState(true)
-  const [priceData, setPriceData] = useState<PriceDataPoint[]>([])
-  const [priceChange, setPriceChange] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchPriceData() {
-      setIsLoading(true)
-      try {
-        const result = await getTokenPriceHistory(CONTRACT_ADDRESSES.token, timeframe)
-        setPriceData(result.data)
-        setPriceChange(result.priceChange)
-      } catch (error) {
-        console.error("Failed to fetch price data:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+    setMounted(true)
+  }, [])
 
-    fetchPriceData()
+  // Use mock data based on timeframe with memoization
+  const data = useMemo(() => {
+    try {
+      return mockTimeframeData[timeframe] || mockPriceHistory
+    } catch (err) {
+      setError("Failed to load chart data")
+      return []
+    }
   }, [timeframe])
 
+  // Calculate price change with memoization
+  const priceChange = useMemo(() => {
+    if (data.length < 2) return 0
+    return ((data[data.length - 1].price - data[0].price) / data[0].price) * 100
+  }, [data])
+
   // Format price change with + or - sign
-  const formattedPriceChange = `${priceChange >= 0 ? "+" : ""}${priceChange.toFixed(2)}%`
+  const formattedPriceChange = useMemo(() => {
+    return `${priceChange >= 0 ? "+" : ""}${priceChange.toFixed(2)}%`
+  }, [priceChange])
 
   // Determine color based on price change
-  const priceChangeColor = priceChange >= 0 ? "text-green-500" : "text-red-500"
+  const priceChangeColor = useMemo(() => {
+    return priceChange >= 0 ? "text-green-500" : "text-red-500"
+  }, [priceChange])
+
+  if (error) {
+    return (
+      <Card className="col-span-1 lg:col-span-3 border-purple-500/20 bg-black/40 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle>Token Price History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="col-span-1 lg:col-span-3 border-purple-500/20 bg-black/40 backdrop-blur-sm">
@@ -139,95 +172,19 @@ export function EnhancedTokenChart() {
           ) : (
             <>
               <TabsContent value="price" className="h-[400px]">
-                <ChartContainer
-                  config={{
-                    price: {
-                      label: "Price",
-                      color: "hsl(var(--chart-1))",
-                    },
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={priceData}>
-                      <defs>
-                        <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis
-                        dataKey="date"
-                        tickFormatter={(value) => {
-                          const date = new Date(value)
-                          return `${date.getMonth() + 1}/${date.getDate()}`
-                        }}
-                      />
-                      <YAxis
-                        tickFormatter={(value) => `$${value.toFixed(4)}`}
-                        domain={["dataMin", "dataMax"]}
-                        width={80}
-                      />
-                      <Tooltip
-                        content={<ChartTooltipContent formatter={(value) => `$${Number(value).toFixed(6)}`} />}
-                      />
-                      <Legend />
-                      <Area
-                        type="monotone"
-                        dataKey="price"
-                        stroke="hsl(var(--chart-1))"
-                        fillOpacity={1}
-                        fill="url(#colorPrice)"
-                        strokeWidth={2}
-                        activeDot={{ r: 8, fill: "hsl(var(--primary))" }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+                {mounted ? (
+                  <ChartComponents data={data} chartType={chartType} />
+                ) : (
+                  <div className="h-[400px] flex items-center justify-center">
+                    <Skeleton className="h-[300px] w-full" />
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="volume" className="h-[400px]">
-                <ChartContainer
-                  config={{
-                    volume: {
-                      label: "Volume",
-                      color: "hsl(var(--chart-2))",
-                    },
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={priceData}>
-                      <defs>
-                        <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis
-                        dataKey="date"
-                        tickFormatter={(value) => {
-                          const date = new Date(value)
-                          return `${date.getMonth() + 1}/${date.getDate()}`
-                        }}
-                      />
-                      <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(2)}M`} width={80} />
-                      <Tooltip
-                        content={<ChartTooltipContent formatter={(value) => `${Number(value).toLocaleString()}`} />}
-                      />
-                      <Legend />
-                      <Area
-                        type="monotone"
-                        dataKey="volume"
-                        stroke="hsl(var(--chart-2))"
-                        fillOpacity={1}
-                        fill="url(#colorVolume)"
-                        strokeWidth={2}
-                        activeDot={{ r: 8, fill: "hsl(var(--chart-2))" }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+                <div className="h-full flex items-center justify-center">
+                  <p className="text-muted-foreground">Volume data is not available in preview mode.</p>
+                </div>
               </TabsContent>
             </>
           )}
