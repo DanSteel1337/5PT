@@ -22,12 +22,13 @@ import { formatUnits } from "viem"
 import { shouldUseMockData } from "@/lib/environment"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useInvestmentManager, useTokenContract } from "@/lib/contract-hooks"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
 interface ContractStatisticsCardProps {
   expanded?: boolean
 }
 
-export function ContractStatisticsCard({ expanded = false }: ContractStatisticsCardProps) {
+function ContractStatisticsCardContent({ expanded = false }: ContractStatisticsCardProps) {
   const [mounted, setMounted] = useState(false)
   const [countdown, setCountdown] = useState<{ hours: number; minutes: number; seconds: number }>({
     hours: 4,
@@ -390,5 +391,13 @@ export function ContractStatisticsCard({ expanded = false }: ContractStatisticsC
         )}
       </CardContent>
     </Card>
+  )
+}
+
+export function ContractStatisticsCard(props: ContractStatisticsCardProps) {
+  return (
+    <QueryClientProvider>
+      <ContractStatisticsCardContent {...props} />
+    </QueryClientProvider>
   )
 }

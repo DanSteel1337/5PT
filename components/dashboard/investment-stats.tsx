@@ -10,8 +10,9 @@ import { shouldUseMockData } from "@/lib/environment"
 import { useInvestmentManager, useTokenContract } from "@/lib/contract-hooks"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
-export function InvestmentStats() {
+function InvestmentStatsContent() {
   const [mounted, setMounted] = useState(false)
   const useMockData = shouldUseMockData()
 
@@ -243,5 +244,13 @@ export function InvestmentStats() {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+export function InvestmentStats() {
+  return (
+    <QueryClientProvider>
+      <InvestmentStatsContent />
+    </QueryClientProvider>
   )
 }

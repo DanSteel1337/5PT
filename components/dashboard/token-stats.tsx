@@ -10,8 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useMemo } from "react"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Pie, PieChart, ResponsiveContainer, Cell, Legend } from "recharts"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
-export function TokenStats() {
+function TokenStatsContent() {
   // Get token data from contract
   const { data: totalSupply, isPending: isLoadingSupply } = useReadContract({
     address: CONTRACT_ADDRESSES.token,
@@ -210,5 +211,13 @@ export function TokenStats() {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+export function TokenStats() {
+  return (
+    <QueryClientProvider>
+      <TokenStatsContent />
+    </QueryClientProvider>
   )
 }
