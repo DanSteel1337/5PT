@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Web3Providers } from "@/components/web3-providers"
 
 export const metadata: Metadata = {
   title: "5PT - Five Pillars Token",
@@ -21,7 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+          <Web3Providers>{children}</Web3Providers>
         </ThemeProvider>
       </body>
     </html>
