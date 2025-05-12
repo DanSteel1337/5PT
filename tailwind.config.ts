@@ -18,21 +18,6 @@ const config: Config = {
       },
     },
     extend: {
-      fontFamily: {
-        sans: [
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "'Segoe UI'",
-          "Roboto",
-          "'Helvetica Neue'",
-          "Arial",
-          "sans-serif",
-          "'Apple Color Emoji'",
-          "'Segoe UI Emoji'",
-          "'Segoe UI Symbol'",
-        ],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -67,22 +52,11 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        purple: {
-          300: "#d8b4fe",
-          400: "#c084fc",
-          500: "#a855f7",
-          600: "#9333ea",
-          900: "#581c87",
-        },
-        pink: {
-          400: "#f472b6",
-          500: "#ec4899",
-          600: "#db2777",
-          900: "#831843",
-        },
-        gold: {
-          500: "hsl(var(--gold-500))",
-          600: "hsl(var(--gold-600))",
+        // Neon colors for cyberpunk theme
+        neon: {
+          purple: "hsl(var(--neon-purple))",
+          blue: "hsl(var(--neon-blue))",
+          pink: "hsl(var(--neon-pink))",
         },
       },
       borderRadius: {
@@ -99,31 +73,28 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        gradient: {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
-        },
         pulse: {
           "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.7" },
+          "50%": { opacity: "0.5" },
         },
-        float: {
-          "0%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
-          "100%": { transform: "translateY(0px)" },
+        glow: {
+          "0%, 100%": {
+            textShadow: "0 0 5px rgba(139, 92, 246, 0.5), 0 0 15px rgba(139, 92, 246, 0.3)",
+          },
+          "50%": {
+            textShadow: "0 0 20px rgba(139, 92, 246, 0.8), 0 0 30px rgba(139, 92, 246, 0.6)",
+          },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "gradient-slow": "gradient 15s ease infinite",
-        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        float: "float 6s ease-in-out infinite",
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        glow: "glow 2s ease-in-out infinite",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+}
 
 export default config

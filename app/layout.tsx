@@ -1,16 +1,15 @@
 import type React from "react"
-import type { Metadata } from "next"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Web3Providers } from "@/components/web3-providers"
-import { DebugPanelClient } from "@/components/debug/debug-panel-client"
+import { Providers } from "@/components/providers/Providers"
+import { AppShell } from "@/components/layout/AppShell"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "5PT - Five Pillars Token",
-  description: "Investment platform for the Five Pillars Token (5PT)",
-  icons: {
-    icon: "/images/5pt-logo.png",
-  },
+  title: "Five Pillars Investment Platform",
+  description: "Invest in the Five Pillars ecosystem and earn rewards",
     generator: 'v0.dev'
 }
 
@@ -20,12 +19,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <Web3Providers>{children}</Web3Providers>
-          <DebugPanelClient />
-        </ThemeProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   )

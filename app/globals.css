@@ -2,40 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Remove Google Fonts import and use system fonts instead */
 @layer base {
-  html {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif,
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  }
-
   :root {
-    --background: 0 0% 3.9%;
+    --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+
+    --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+
+    --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 270 95% 75%;
+
+    --primary: 252 87% 67%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 14.9%;
+
+    --secondary: 217 91% 60%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 270 95% 75%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
     --radius: 0.5rem;
-    --chart-1: 270 95% 75%;
-    --chart-2: 330 95% 75%;
-    --chart-3: 210 95% 75%;
-    --chart-4: 180 95% 75%;
-    --chart-5: 120 95% 75%;
-    --chart-6: 30 95% 75%;
+
+    --neon-purple: 265 89% 78%;
+    --neon-blue: 217 91% 60%;
+    --neon-pink: 330 81% 60%;
   }
 }
 
@@ -45,452 +46,80 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-@layer components {
-  .dashboard-card {
-    @apply bg-black/40 backdrop-blur-sm border-purple-500/20 transition-all duration-300;
-  }
-
-  .hover-card {
-    @apply hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10;
-  }
-
-  .purple-text {
-    @apply bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent;
-  }
-
-  .glow {
-    @apply relative;
-  }
-
-  .glow::after {
-    @apply content-[''] absolute inset-0 rounded-full bg-purple-500/20 blur-sm -z-10;
-  }
-
-  .circuit-pattern {
-    background-image: radial-gradient(rgba(128, 90, 213, 0.1) 1px, transparent 1px),
-      radial-gradient(rgba(128, 90, 213, 0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
-
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
+/* Glassmorphism */
+.glass {
+  background: rgba(17, 17, 23, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+/* Neon text effect */
+.neon-text {
+  text-shadow: 0 0 5px rgba(139, 92, 246, 0.5), 0 0 15px rgba(139, 92, 246, 0.3);
 }
 
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+.neon-border {
+  box-shadow: 0 0 5px rgba(139, 92, 246, 0.5), 0 0 15px rgba(139, 92, 246, 0.3);
 }
 
-/* Base theme colors */
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* RainbowKit Custom Styles */
 :root {
-  /* Core colors */
-  --color-primary: 0, 240, 255; /* Cyan */
-  --color-secondary: 170, 0, 255; /* Purple */
-  --color-accent: 255, 0, 170; /* Pink */
-  --color-background: 15, 15, 25; /* Dark blue-black */
-  --color-foreground: 240, 240, 255; /* Off-white */
-  --color-card: 25, 25, 40; /* Dark blue-gray */
-  --color-muted: 100, 100, 140; /* Muted purple */
-  --color-border: 40, 40, 60; /* Dark border */
-
-  /* Chart colors */
-  /* --chart-1: rgb(0, 240, 255);
-  --chart-2: rgb(170, 0, 255);
-  --chart-3: rgb(255, 0, 170);
-  --chart-4: rgb(255, 165, 0);
-  --chart-5: rgb(50, 205, 50);
-  --chart-6: rgb(255, 215, 0); */
+  --rk-colors-accentColor: hsl(var(--primary));
+  --rk-colors-accentColorForeground: hsl(var(--primary-foreground));
+  --rk-colors-actionButtonBorder: hsl(var(--border));
+  --rk-colors-actionButtonBorderMobile: hsl(var(--border));
+  --rk-colors-actionButtonSecondaryBackground: hsl(var(--secondary));
+  --rk-colors-closeButton: hsl(var(--muted-foreground));
+  --rk-colors-closeButtonBackground: hsl(var(--muted));
+  --rk-colors-connectButtonBackground: hsl(var(--background));
+  --rk-colors-connectButtonBackgroundError: hsl(var(--destructive));
+  --rk-colors-connectButtonInnerBackground: hsl(var(--card));
+  --rk-colors-connectButtonText: hsl(var(--foreground));
+  --rk-colors-connectButtonTextError: hsl(var(--destructive-foreground));
+  --rk-colors-connectionIndicator: hsl(var(--primary));
+  --rk-colors-error: hsl(var(--destructive));
+  --rk-colors-generalBorder: hsl(var(--border));
+  --rk-colors-generalBorderDim: hsl(var(--border));
+  --rk-colors-menuItemBackground: hsl(var(--accent));
+  --rk-colors-modalBackdrop: rgba(0, 0, 0, 0.5);
+  --rk-colors-modalBackground: hsl(var(--background));
+  --rk-colors-modalBorder: hsl(var(--border));
+  --rk-colors-modalText: hsl(var(--foreground));
+  --rk-colors-modalTextDim: hsl(var(--muted-foreground));
+  --rk-colors-modalTextSecondary: hsl(var(--muted-foreground));
+  --rk-colors-profileAction: hsl(var(--muted));
+  --rk-colors-profileActionHover: hsl(var(--accent));
+  --rk-colors-profileForeground: hsl(var(--background));
+  --rk-colors-selectedOptionBorder: hsl(var(--primary));
+  --rk-colors-standby: hsl(var(--secondary));
+  --rk-radii-actionButton: var(--radius);
+  --rk-radii-connectButton: var(--radius);
+  --rk-radii-menuButton: var(--radius);
+  --rk-radii-modal: var(--radius);
+  --rk-radii-modalMobile: var(--radius);
+  --rk-fonts-body: inherit;
+  --rk-fonts-button: inherit;
 }
-
-/* Base styles */
-/* body {
-  background-color: rgb(var(--color-background));
-  color: rgb(var(--color-foreground));
-  background-image: radial-gradient(circle at 15% 50%, rgba(var(--color-primary), 0.05) 0%, transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(var(--color-secondary), 0.05) 0%, transparent 25%);
-} */
-
-/* Dashboard layout */
-.dashboard-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .dashboard-layout {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .dashboard-layout {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Card styles */
-.crypto-card {
-  background-color: rgba(var(--color-card), 0.8);
-  border-radius: 1rem;
-  border: 1px solid rgba(var(--color-border), 0.5);
-  padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.crypto-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--color-primary), 0.7),
-    rgba(var(--color-secondary), 0.7),
-    rgba(var(--color-accent), 0.7)
-  );
-  z-index: 1;
-}
-
-.crypto-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(var(--color-primary), 0.5);
-  box-shadow: 0 0 20px rgba(var(--color-primary), 0.2);
-}
-
-.crypto-card-secondary::before {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--color-secondary), 0.7),
-    rgba(var(--color-accent), 0.7),
-    rgba(var(--color-primary), 0.7)
-  );
-}
-
-.crypto-card-secondary:hover {
-  border-color: rgba(var(--color-secondary), 0.5);
-  box-shadow: 0 0 20px rgba(var(--color-secondary), 0.2);
-}
-
-.crypto-card-accent::before {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--color-accent), 0.7),
-    rgba(var(--color-primary), 0.7),
-    rgba(var(--color-secondary), 0.7)
-  );
-}
-
-.crypto-card-accent:hover {
-  border-color: rgba(var(--color-accent), 0.5);
-  box-shadow: 0 0 20px rgba(var(--color-accent), 0.2);
-}
-
-/* Card header */
-.crypto-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.crypto-card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.crypto-card-icon {
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  background-color: rgba(var(--color-primary), 0.1);
-  color: rgb(var(--color-primary));
-}
-
-/* Card content */
-.crypto-card-content {
-  margin-top: 1rem;
-}
-
-/* Card footer */
-.crypto-card-footer {
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Stats */
-.crypto-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.crypto-stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.crypto-stat-label {
-  font-size: 0.875rem;
-  color: rgba(var(--color-muted), 1);
-}
-
-/* Buttons */
-.crypto-button {
-  background-color: rgba(var(--color-primary), 1);
-  color: rgb(var(--color-background));
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.crypto-button:hover {
-  background-color: rgba(var(--color-primary), 0.8);
-}
-
-.crypto-button::after {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    to bottom right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  transform: rotate(45deg);
-  animation: button-shine 6s linear infinite;
-}
-
-@keyframes button-shine {
-  0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
-  }
-}
-
-.crypto-button-secondary {
-  background-color: rgba(var(--color-secondary), 1);
-}
-
-.crypto-button-secondary:hover {
-  background-color: rgba(var(--color-secondary), 0.8);
-}
-
-.crypto-button-outline {
-  background-color: transparent;
-  color: rgba(var(--color-primary), 1);
-  border: 1px solid rgba(var(--color-primary), 0.5);
-}
-
-.crypto-button-outline:hover {
-  background-color: rgba(var(--color-primary), 0.1);
-}
-
-/* Badges */
-.crypto-badge {
-  background-color: rgba(var(--color-primary), 0.1);
-  color: rgba(var(--color-primary), 1);
-  border-radius: 9999px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.crypto-badge-secondary {
-  background-color: rgba(var(--color-secondary), 0.1);
-  color: rgba(var(--color-secondary), 1);
-}
-
-.crypto-badge-accent {
-  background-color: rgba(var(--color-accent), 0.1);
-  color: rgba(var(--color-accent), 1);
-}
-
-/* Shimmer effect */
-.shimmer {
-  position: relative;
-  overflow: hidden;
-}
-
-.shimmer::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(var(--color-primary), 0.2), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-/* Progress bar */
-.crypto-progress {
-  height: 0.5rem;
-  width: 100%;
-  background-color: rgba(var(--color-border), 0.5);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.crypto-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, rgba(var(--color-primary), 1), rgba(var(--color-secondary), 1));
-  border-radius: 9999px;
-  transition: width 0.5s ease;
-}
-
-/* Sidebar */
-.crypto-sidebar {
-  background-color: rgba(var(--color-card), 0.9);
-  border-right: 1px solid rgba(var(--color-border), 0.5);
-  backdrop-filter: blur(10px);
-  height: 100vh;
-  width: 16rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 50;
-  transition: transform 0.3s ease;
-}
-
-@media (max-width: 768px) {
-  .crypto-sidebar {
-    transform: translateX(-100%);
-  }
-
-  .crypto-sidebar.open {
-    transform: translateX(0);
-  }
-}
-
-/* Header */
-.crypto-header {
-  background-color: rgba(var(--color-card), 0.9);
-  border-bottom: 1px solid rgba(var(--color-border), 0.5);
-  backdrop-filter: blur(10px);
-  padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--color-primary), 1),
-    rgba(var(--color-secondary), 1),
-    rgba(var(--color-accent), 1)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
-}
-
-/* Animation for gradient text */
-/* @keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-} */
-
-/* .animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient 8s ease infinite;
-} */
-
-/* .animate-pulse-slow {
-  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-} */
-
-/* @keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-} */
