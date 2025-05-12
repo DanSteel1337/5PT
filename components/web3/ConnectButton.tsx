@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react"
 import { ConnectButton as RainbowConnectButton } from "@rainbow-me/rainbowkit"
 import { Button } from "@/components/ui/button"
-import { useAccount } from "wagmi"
-import { Loader2 } from "lucide-react"
+import { useAccount, useSwitchChain } from "wagmi"
+import { Loader2, ChevronDown } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { bsc, bscTestnet } from "wagmi/chains"
 
 export function ConnectButton() {
   const [mounted, setMounted] = useState(false)
   const { isConnected } = useAccount()
+  const { switchChain } = useSwitchChain()
 
   // Only render after client-side hydration
   useEffect(() => {
@@ -55,33 +58,43 @@ export function ConnectButton() {
 
               return (
                 <div className="flex items-center gap-2">
-                  <Button
-                    onClick={openChainModal}
-                    variant="outline"
-                    size="sm"
-                    className="hidden md:flex items-center gap-2 border-purple-500/20"
-                  >
-                    {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 16,
-                          height: 16,
-                          borderRadius: 999,
-                          overflow: "hidden",
-                        }}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="hidden md:flex items-center gap-2 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400"
                       >
-                        {chain.iconUrl && (
-                          <img
-                            alt={chain.name ?? "Chain icon"}
-                            src={chain.iconUrl || "/placeholder.svg"}
-                            style={{ width: 16, height: 16 }}
-                          />
+                        {chain.hasIcon && (
+                          <div
+                            style={{
+                              background: chain.iconBackground,
+                              width: 16,
+                              height: 16,
+                              borderRadius: 999,
+                              overflow: "hidden",
+                            }}
+                          >
+                            {chain.iconUrl && (
+                              <img
+                                alt={chain.name ?? "Chain icon"}
+                                src={chain.iconUrl || "/placeholder.svg"}
+                                style={{ width: 16, height: 16 }}
+                              />
+                            )}
+                          </div>
                         )}
-                      </div>
-                    )}
-                    {chain.name}
-                  </Button>
+                        {chain.name}
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[180px]">
+                      <DropdownMenuItem onClick={() => switchChain({ chainId: bsc.id })}>BSC Mainnet</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => switchChain({ chainId: bscTestnet.id })}>
+                        BSC Testnet
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
                   <Button
                     onClick={openAccountModal}

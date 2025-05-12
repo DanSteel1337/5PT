@@ -4,12 +4,13 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Loader2, AlertCircle, CheckCircle2, Sparkles } from "lucide-react"
 import { useInvestmentManager } from "@/hooks/useInvestmentManager"
 import { useFivePillarsToken } from "@/hooks/useFivePillarsToken"
 import { formatUnits, parseUnits } from "viem"
 import { TransactionStatus } from "@/types/contracts"
 import { useWaitForTransactionReceipt } from "wagmi"
+import { motion } from "framer-motion"
 
 export function RewardsClaimer() {
   const [mounted, setMounted] = useState(false)
@@ -41,9 +42,9 @@ export function RewardsClaimer() {
 
   if (isLoading) {
     return (
-      <Card className="glass border-border/40">
+      <Card className="glass border-purple-500/20">
         <CardContent className="pt-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
         </CardContent>
       </Card>
     )
@@ -51,7 +52,7 @@ export function RewardsClaimer() {
 
   if (isError || !investorInfo) {
     return (
-      <Card className="glass border-border/40">
+      <Card className="glass border-purple-500/20">
         <CardContent className="pt-6">
           <Alert className="bg-destructive/10 border-destructive/30 text-destructive">
             <AlertCircle className="h-4 w-4" />
@@ -79,21 +80,33 @@ export function RewardsClaimer() {
   }
 
   return (
-    <Card className="glass border-border/40">
-      <CardHeader>
-        <CardTitle>Claim Rewards</CardTitle>
+    <Card className="glass-card overflow-hidden border-purple-500/20">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-purple-400" />
+          <CardTitle>Claim Rewards</CardTitle>
+        </div>
         <CardDescription>Claim your earned 5PT tokens</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-lg border border-purple-500/20">
+        <motion.div
+          className="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-lg border border-purple-500/20"
+          whileHover={{ y: -2, boxShadow: "0 8px 32px -8px rgba(139, 92, 246, 0.25)" }}
+        >
           <h3 className="text-sm text-muted-foreground">Available to Claim</h3>
-          <p className="text-3xl font-bold mt-2">{Number.parseFloat(formattedRewards).toFixed(4)} 5PT</p>
+          <motion.p
+            className="text-3xl font-bold mt-2 neon-text"
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+          >
+            {Number.parseFloat(formattedRewards).toFixed(4)} 5PT
+          </motion.p>
           {hasRewards && (
             <p className="text-sm text-muted-foreground mt-1">
               ≈ ${(Number.parseFloat(formattedRewards) * 1.25).toFixed(2)} USD
             </p>
           )}
-        </div>
+        </motion.div>
 
         {status === TransactionStatus.SUCCESS && (
           <Alert className="mt-4 bg-green-500/10 border-green-500/30 text-green-500">

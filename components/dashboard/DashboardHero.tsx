@@ -7,6 +7,8 @@ import { Sparkles, TrendingUp, TrendingDown, Users, BarChart3, Zap } from "lucid
 import { motion } from "framer-motion"
 import { formatCurrency } from "@/lib/format"
 import { cn } from "@/lib/utils"
+import { useAccount } from "wagmi"
+import { useFivePillarsToken } from "@/hooks/useFivePillarsToken"
 
 // Mock data for token metrics
 const tokenData = {
@@ -20,6 +22,9 @@ const tokenData = {
 export function DashboardHero() {
   const [mounted, setMounted] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const { isConnected } = useAccount()
+  const { useTokenBalance, formatTokenBalance } = useFivePillarsToken()
+  const { data: balance } = useTokenBalance()
 
   // Only render after client-side hydration
   useEffect(() => {
@@ -29,6 +34,7 @@ export function DashboardHero() {
   if (!mounted) return null
 
   const isPriceUp = tokenData.priceChange > 0
+  const formattedBalance = balance ? formatTokenBalance(balance) : "0"
 
   return (
     <div className="relative overflow-hidden rounded-xl">
@@ -119,26 +125,55 @@ export function DashboardHero() {
 
           {/* Price and change */}
           <div className="flex flex-col items-end">
-            <div className="flex items-center gap-2">
-              <motion.span
-                className="text-2xl font-bold neon-text"
-                animate={{ scale: [1, 1.03, 1] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-              >
-                ${tokenData.price.toFixed(2)}
-              </motion.span>
-              <Badge
-                className={cn(
-                  "flex items-center gap-1",
-                  isPriceUp ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500",
-                )}
-              >
-                {isPriceUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                {isPriceUp ? "+" : ""}
-                {tokenData.priceChange.toFixed(2)}%
-              </Badge>
-            </div>
-            <span className="text-sm text-muted-foreground">Last updated: {new Date().toLocaleTimeString()}</span>
+            {isConnected ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <motion.span
+                    className="text-2xl font-bold neon-text"
+                    animate={{ scale: [1, 1.03, 1] }}
+                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                  >
+                    {formattedBalance} 5PT
+                  </motion.span>
+                  <Badge
+                    className={cn(
+                      "flex items-center gap-1",
+                      isPriceUp ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500",
+                    )}
+                  >
+                    {isPriceUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {isPriceUp ? "+" : ""}
+                    {tokenData.priceChange.toFixed(2)}%
+                  </Badge>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  ≈ ${(Number(formattedBalance) * 1.25).toFixed(2)} USD
+                </span>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <motion.span
+                    className="text-2xl font-bold neon-text"
+                    animate={{ scale: [1, 1.03, 1] }}
+                    transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                  >
+                    ${tokenData.price.toFixed(2)}
+                  </motion.span>
+                  <Badge
+                    className={cn(
+                      "flex items-center gap-1",
+                      isPriceUp ? "bg-green-500/20 text-green-500" : "bg-red-500/20 text-red-500",
+                    )}
+                  >
+                    {isPriceUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {isPriceUp ? "+" : ""}
+                    {tokenData.priceChange.toFixed(2)}%
+                  </Badge>
+                </div>
+                <span className="text-sm text-muted-foreground">Last updated: {new Date().toLocaleTimeString()}</span>
+              </>
+            )}
           </div>
         </div>
 

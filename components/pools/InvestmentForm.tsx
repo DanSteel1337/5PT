@@ -11,12 +11,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2 } from "lucide-react"
+import { Loader2, Sparkles } from "lucide-react"
 import { type PoolInfo, TransactionStatus } from "@/types/contracts"
 import { useInvestmentManager } from "@/hooks/useInvestmentManager"
 import { useFivePillarsToken } from "@/hooks/useFivePillarsToken"
 import { getContractAddress } from "@/contracts/addresses"
 import { formatCurrency, formatDuration, formatPercentage } from "@/lib/format"
+import { motion } from "framer-motion"
 
 interface InvestmentFormProps {
   pool: PoolInfo
@@ -127,9 +128,12 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
   const buttonState = getButtonState()
 
   return (
-    <Card className="glass border-border/40">
-      <CardHeader>
-        <CardTitle>Invest in {pool.name}</CardTitle>
+    <Card className="glass-card overflow-hidden border-purple-500/20">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-purple-400" />
+          <CardTitle>Invest in {pool.name}</CardTitle>
+        </div>
         <CardDescription>Enter the amount you want to invest</CardDescription>
       </CardHeader>
       <CardContent>
@@ -142,7 +146,11 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
                 <FormItem>
                   <FormLabel>Investment Amount</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="0.00" />
+                    <Input
+                      {...field}
+                      placeholder="0.00"
+                      className="border-purple-500/20 focus-visible:border-purple-500/50 focus-visible:ring-purple-500/20"
+                    />
                   </FormControl>
                   <FormDescription className="flex justify-between">
                     <span>Min: {formatCurrency(formattedPool.minInvestmentFormatted)}</span>
@@ -170,21 +178,32 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
               </Alert>
             )}
 
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-              disabled={buttonState.disabled}
-            >
-              {buttonState.loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {buttonState.text}
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                disabled={buttonState.disabled}
+              >
+                {buttonState.loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {buttonState.text}
+              </Button>
+            </motion.div>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col items-start text-xs text-muted-foreground">
-        <p>• Funds will be locked for {formatDuration(Number(pool.lockPeriod))}</p>
-        <p>• Expected APY: {formatPercentage(formattedPool.apyFormatted)}</p>
-        <p>• Early withdrawal may incur penalties</p>
+        <p className="flex items-center gap-1">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+          Funds will be locked for {formatDuration(Number(pool.lockPeriod))}
+        </p>
+        <p className="flex items-center gap-1">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+          Expected APY: {formatPercentage(formattedPool.apyFormatted)}
+        </p>
+        <p className="flex items-center gap-1">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          Early withdrawal may incur penalties
+        </p>
       </CardFooter>
     </Card>
   )

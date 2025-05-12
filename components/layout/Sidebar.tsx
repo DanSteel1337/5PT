@@ -5,9 +5,11 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Droplets, Award, Users, Settings, ExternalLink, ChevronDown } from "lucide-react"
+import { LayoutDashboard, Droplets, Award, Users, Settings, ExternalLink, ChevronDown, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useAccount, useDisconnect } from "wagmi"
+import { Button } from "@/components/ui/button"
 
 interface SidebarProps {
   isOpen: boolean
@@ -59,6 +61,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null)
+  const { isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
 
   // Only render after client-side hydration
   useEffect(() => {
@@ -91,7 +95,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          "fixed top-16 bottom-0 left-0 z-40 w-64 glass border-r border-border/40 transition-transform duration-300 ease-in-out",
+          "fixed top-16 bottom-0 left-0 z-40 w-64 glass border-r border-purple-500/20 transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
@@ -110,9 +114,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       <button
                         className={cn(
                           "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
-                          "hover:bg-muted/50 hover:text-primary",
+                          "hover:bg-purple-500/10 hover:text-purple-400",
                           pathname.startsWith(item.href) || openCollapsible === item.title
-                            ? "bg-muted text-primary"
+                            ? "bg-purple-500/10 text-purple-400"
                             : "text-muted-foreground",
                         )}
                       >
@@ -133,8 +137,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           href={subItem.href}
                           className={cn(
                             "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                            "hover:bg-muted/50 hover:text-primary",
-                            pathname === subItem.href ? "bg-muted/30 text-primary" : "text-muted-foreground",
+                            "hover:bg-purple-500/10 hover:text-purple-400",
+                            pathname === subItem.href ? "bg-purple-500/10 text-purple-400" : "text-muted-foreground",
                           )}
                         >
                           {subItem.title}
@@ -147,8 +151,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     href={item.href}
                     className={cn(
                       "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                      "hover:bg-muted/50 hover:text-primary",
-                      pathname === item.href ? "bg-muted text-primary" : "text-muted-foreground",
+                      "hover:bg-purple-500/10 hover:text-purple-400",
+                      pathname === item.href ? "bg-purple-500/10 text-purple-400" : "text-muted-foreground",
                     )}
                     target={item.isExternal ? "_blank" : undefined}
                     rel={item.isExternal ? "noopener noreferrer" : undefined}
@@ -162,16 +166,28 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             ))}
           </nav>
 
-          <div className="px-4 mt-6">
-            <div className="p-4 rounded-lg bg-muted/30 border border-border/40">
-              <h4 className="font-medium text-sm mb-2 text-primary">Need Help?</h4>
+          <div className="px-4 mt-6 space-y-4">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-500/20">
+              <h4 className="font-medium text-sm mb-2 text-purple-400">Need Help?</h4>
               <p className="text-xs text-muted-foreground mb-3">
                 Have questions or need assistance with your investments?
               </p>
-              <Link href="/support" className="text-xs text-primary hover:underline">
+              <Link href="/support" className="text-xs text-purple-400 hover:underline">
                 Contact Support
               </Link>
             </div>
+
+            {isConnected && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400 flex items-center gap-2"
+                onClick={() => disconnect()}
+              >
+                <LogOut className="h-4 w-4" />
+                Disconnect Wallet
+              </Button>
+            )}
           </div>
         </div>
       </aside>
