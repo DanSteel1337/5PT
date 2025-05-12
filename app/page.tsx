@@ -1,5 +1,6 @@
 import { ModernHero } from "@/components/landing/modern-hero"
 import { Features } from "@/components/landing/features"
+import { Tokenomics } from "@/components/landing/tokenomics-fixed"
 import { InvestmentCTA } from "@/components/landing/investment-cta"
 
 export default function Home() {
@@ -7,12 +8,7 @@ export default function Home() {
     <main className="min-h-screen">
       <ModernHero />
       <Features />
-
-      {/* TODO: Fix Tokenomics component - potentially causing build errors
-         Temporary commented out for diagnostic purposes */}
-      {/* import { Tokenomics } from "@/components/landing/tokenomics" */}
-      {/* <Tokenomics /> */}
-
+      <Tokenomics />
       <InvestmentCTA />
     </main>
   )
