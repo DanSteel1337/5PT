@@ -1,7 +1,7 @@
 import { http, createConfig } from "wagmi"
 import { bsc, bscTestnet, mainnet } from "wagmi/chains"
 import { injected, walletConnect } from "wagmi/connectors"
-import { isPreviewEnvironment } from "@/lib/environment"
+import { isPreviewEnvironment, getSiteMetadata } from "@/lib/environment"
 
 // Get WalletConnect project ID from environment variable
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
@@ -14,16 +14,13 @@ const getConnectors = () => {
   // Only add WalletConnect in production environment with valid projectId
   if (!isPreviewEnvironment() && projectId) {
     try {
+      const metadata = getSiteMetadata()
+
       connectors.push(
         walletConnect({
           projectId,
           showQrModal: true,
-          metadata: {
-            name: "5PT Investment Platform",
-            description: "Five Pillars Token Investment Platform",
-            url: "https://5pt.finance",
-            icons: ["https://5pt.finance/logo.png"],
-          },
+          metadata,
         }),
       )
     } catch (error) {
@@ -56,3 +53,6 @@ export const config = createConfig({
     [mainnet.id]: http(),
   },
 })
+
+// Also export as default for backward compatibility
+export default config

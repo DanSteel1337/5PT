@@ -6,13 +6,15 @@ import { EnhancedTokenChart } from "./enhanced-token-chart"
 import { EnhancedReferralSystem } from "./enhanced-referral-system"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
-import { shouldUseMockData } from "@/lib/environment"
+import { shouldUseMockData, getEnvironmentName } from "@/lib/environment"
 import { QueryClientProvider } from "../providers/query-client-provider"
 
 // The component content
 function DashboardOverviewClientContent() {
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
+  const useMockData = shouldUseMockData()
+  const envName = getEnvironmentName()
 
   // Dynamically import the component to prevent errors during SSR
   const [InvestmentAnalyticsComponent, setInvestmentAnalyticsComponent] = useState<any>(null)
@@ -38,12 +40,12 @@ function DashboardOverviewClientContent() {
 
   return (
     <div className="space-y-6">
-      {shouldUseMockData() && (
+      {useMockData && (
         <Alert className="bg-yellow-900/20 border-yellow-500/50 text-yellow-300">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Preview Mode</AlertTitle>
+          <AlertTitle>Preview Mode ({envName})</AlertTitle>
           <AlertDescription>
-            Running in preview mode with mock data. Wallet connection and blockchain interactions are disabled.
+            Running in {envName} mode with mock data. Wallet connection and blockchain interactions are disabled.
           </AlertDescription>
         </Alert>
       )}
