@@ -28,6 +28,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { shouldUseMockData } from "@/lib/environment"
 import { usePoolCount } from "@/lib/contract-hooks"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
 interface NavItem {
   title: string
@@ -38,7 +39,8 @@ interface NavItem {
   variant?: "primary" | "secondary" | "accent"
 }
 
-export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
+// Wrap the sidebar content with QueryClientProvider
+function ModernSidebarContent({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
   const useMockData = shouldUseMockData()
@@ -50,12 +52,12 @@ export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement
 
   // Only call hooks when the component is mounted
   const poolCountResult = usePoolCount({
-    enabled: !useMockData,
+    enabled: mounted && !useMockData,
   })
 
   // Safely handle pool count with fallbacks
   const displayPoolCount = useMemo(() => {
-    if (!mounted || poolCountResult.isLoading) return "..."
+    if (!mounted || poolCountResult.isPending) return "..."
     if (useMockData || !poolCountResult.data || poolCountResult.isError) return "7+"
 
     try {
@@ -64,7 +66,7 @@ export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement
       console.error("Error processing pool count:", error)
       return "7+"
     }
-  }, [mounted, poolCountResult.isLoading, useMockData, poolCountResult.data, poolCountResult.isError])
+  }, [mounted, poolCountResult.isPending, useMockData, poolCountResult.data, poolCountResult.isError])
 
   // Memoize nav items to prevent unnecessary re-renders
   const navItems: NavItem[] = useMemo(
@@ -196,7 +198,7 @@ export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement
                       item.isNew
                         ? `bg-${item.variant || "primary"} text-${item.variant || "primary"}-foreground`
                         : "bg-muted",
-                      poolCountResult.isLoading && !useMockData ? "animate-pulse" : "",
+                      poolCountResult.isPending && !useMockData ? "animate-pulse" : "",
                     )}
                   >
                     {item.badge}
@@ -252,6 +254,15 @@ export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement
         </div>
       </div>
     </div>
+  )
+}
+
+// Export the wrapped component
+export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <QueryClientProvider>
+      <ModernSidebarContent className={className} />
+    </QueryClientProvider>
   )
 }
 

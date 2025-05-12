@@ -9,6 +9,7 @@ import dynamic from "next/dynamic"
 import { mockPriceHistory, mockTimeframeData } from "@/lib/mock-data"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
 // Dynamically import recharts components to reduce initial bundle size
 const ChartComponents = dynamic(() => import("../chart-components"), {
@@ -20,7 +21,8 @@ const ChartComponents = dynamic(() => import("../chart-components"), {
   ),
 })
 
-export function EnhancedTokenChart() {
+// Component implementation
+function EnhancedTokenChartContent() {
   const [mounted, setMounted] = useState(false)
   const [timeframe, setTimeframe] = useState<"7d" | "30d" | "90d" | "1y">("30d")
   const [chartType, setChartType] = useState<"price" | "volume">("price")
@@ -191,5 +193,14 @@ export function EnhancedTokenChart() {
         </Tabs>
       </CardContent>
     </Card>
+  )
+}
+
+// Export the wrapped component
+export function EnhancedTokenChart() {
+  return (
+    <QueryClientProvider>
+      <EnhancedTokenChartContent />
+    </QueryClientProvider>
   )
 }

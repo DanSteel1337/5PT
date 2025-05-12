@@ -4,17 +4,31 @@ import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EnhancedTokenChart } from "./enhanced-token-chart"
 import { EnhancedReferralSystem } from "./enhanced-referral-system"
-import { getInvestmentAnalyticsComponent } from "../component-factory"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import { shouldUseMockData } from "@/lib/environment"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
-export function DashboardOverviewClient() {
+// The component content
+function DashboardOverviewClientContent() {
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
-  const InvestmentAnalyticsComponent = getInvestmentAnalyticsComponent()
+
+  // Dynamically import the component to prevent errors during SSR
+  const [InvestmentAnalyticsComponent, setInvestmentAnalyticsComponent] = useState<any>(null)
 
   useEffect(() => {
+    // Safely import the component factory
+    const loadComponentFactory = async () => {
+      try {
+        const { getInvestmentAnalyticsComponent } = await import("../component-factory")
+        setInvestmentAnalyticsComponent(getInvestmentAnalyticsComponent())
+      } catch (error) {
+        console.error("Failed to load component factory:", error)
+      }
+    }
+
+    loadComponentFactory()
     setMounted(true)
   }, [])
 
@@ -52,7 +66,7 @@ export function DashboardOverviewClient() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <InvestmentAnalyticsComponent />
+          {InvestmentAnalyticsComponent && <InvestmentAnalyticsComponent />}
         </TabsContent>
 
         <TabsContent value="referrals" className="space-y-6">
@@ -60,5 +74,14 @@ export function DashboardOverviewClient() {
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+// Export the wrapped component
+export function DashboardOverviewClient() {
+  return (
+    <QueryClientProvider>
+      <DashboardOverviewClientContent />
+    </QueryClientProvider>
   )
 }

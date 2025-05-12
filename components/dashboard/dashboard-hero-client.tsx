@@ -12,20 +12,18 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { shouldUseMockData } from "@/lib/environment"
-import { useTokenContract, useInvestmentManager } from "@/lib/contract-hooks"
+import { useTokenDecimals, useTokenTotalSupply, useInvestmentData } from "@/lib/contract-hooks"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { QueryClientProvider } from "../providers/query-client-provider"
 
-export function DashboardHeroClient() {
+// Wrap the actual component implementation
+function DashboardHeroClientContent() {
   const [mounted, setMounted] = useState(false)
   const { address, isConnected } = useAccount()
   const useMockData = shouldUseMockData()
 
   // Use our custom hooks
-  const { useTokenDecimals, useTokenTotalSupply } = useTokenContract()
-  const { useInvestmentData } = useInvestmentManager()
-
-  // Get token decimals
   const { data: decimals, isPending: isLoadingDecimals } = useTokenDecimals({
     enabled: mounted && isConnected && !useMockData,
   })
@@ -231,5 +229,14 @@ export function DashboardHeroClient() {
         </Card>
       </div>
     </div>
+  )
+}
+
+// Export the wrapped component
+export function DashboardHeroClient() {
+  return (
+    <QueryClientProvider>
+      <DashboardHeroClientContent />
+    </QueryClientProvider>
   )
 }
