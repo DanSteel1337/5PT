@@ -6,13 +6,24 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Sparkles, TrendingUp, Users, Wallet } from "lucide-react"
-// Import dynamically to avoid SSR issues
 import dynamic from "next/dynamic"
 
 // Dynamically import the WalletConnector with SSR disabled
-const WalletConnector = dynamic(() => import("@/components/wallet-connector").then((mod) => mod.WalletConnector), {
-  ssr: false,
-})
+const DynamicWalletConnector = dynamic(
+  () => import("@/components/wallet-connector").then((mod) => mod.WalletConnector),
+  {
+    ssr: false,
+    loading: () => (
+      <Button
+        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+        size="lg"
+      >
+        <Wallet className="mr-2 h-4 w-4" />
+        Loading...
+      </Button>
+    ),
+  },
+)
 
 export function ModernHero() {
   const [isHovered, setIsHovered] = useState(false)
@@ -57,7 +68,7 @@ export function ModernHero() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              {mounted && <WalletConnector />}
+              {mounted && <DynamicWalletConnector />}
             </div>
           </div>
 
