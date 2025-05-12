@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Sparkles, TrendingUp, TrendingDown, Users, BarChart3 } from "lucide-react"
 import { motion } from "framer-motion"
@@ -55,14 +56,20 @@ export function DashboardHero() {
           {/* Logo and token info */}
           <div className="flex items-center gap-4">
             <motion.div
-              className="relative w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center shadow-lg"
+              className="relative w-16 h-16 rounded-full overflow-hidden shadow-lg"
               whileHover={{ scale: 1.05 }}
               onHoverStart={() => setIsHovered(true)}
               onHoverEnd={() => setIsHovered(false)}
             >
-              <span className="font-bold text-2xl text-white">5P</span>
+              <Image
+                src="/images/5pt-logo.png"
+                alt="Five Pillars Token"
+                width={64}
+                height={64}
+                className="object-cover"
+              />
               <motion.div
-                className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-600/50 to-blue-600/50 blur-sm z-0"
+                className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500/50 to-amber-300/50 blur-sm z-0"
                 animate={{
                   scale: isHovered ? [1, 1.2, 1] : 1,
                   opacity: isHovered ? [0.7, 1, 0.7] : 0.7,
@@ -77,7 +84,7 @@ export function DashboardHero() {
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 Five Pillars Token
-                <Badge className="ml-2 bg-gradient-to-r from-purple-600 to-blue-600">5PT</Badge>
+                <Badge className="ml-2 bg-gradient-to-r from-amber-500 to-amber-300 text-black">5PT</Badge>
               </h2>
               <p className="text-muted-foreground">The future of decentralized investments</p>
             </div>
@@ -105,48 +112,48 @@ export function DashboardHero() {
         {/* Token metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           <motion.div
-            className="glass p-4 rounded-lg border border-purple-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(139, 92, 246, 0.3)" }}
+            className="glass p-4 rounded-lg border border-amber-500/20"
+            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="h-4 w-4 text-purple-400" />
+              <BarChart3 className="h-4 w-4 text-amber-400" />
               <span className="text-sm text-muted-foreground">Market Cap</span>
             </div>
             <span className="text-xl font-bold">{formatCurrency(tokenData.marketCap)}</span>
           </motion.div>
 
           <motion.div
-            className="glass p-4 rounded-lg border border-blue-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.3)" }}
+            className="glass p-4 rounded-lg border border-amber-500/20"
+            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <Users className="h-4 w-4 text-blue-400" />
+              <Users className="h-4 w-4 text-amber-400" />
               <span className="text-sm text-muted-foreground">Holders</span>
             </div>
             <span className="text-xl font-bold">{tokenData.holders.toLocaleString()}</span>
           </motion.div>
 
           <motion.div
-            className="glass p-4 rounded-lg border border-cyan-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(34, 211, 238, 0.3)" }}
+            className="glass p-4 rounded-lg border border-amber-500/20"
+            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-cyan-400" />
+              <TrendingUp className="h-4 w-4 text-amber-400" />
               <span className="text-sm text-muted-foreground">24h Volume</span>
             </div>
             <span className="text-xl font-bold">{formatCurrency(tokenData.volume24h)}</span>
           </motion.div>
 
           <motion.div
-            className="glass p-4 rounded-lg border border-purple-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(139, 92, 246, 0.3)" }}
+            className="glass p-4 rounded-lg border border-amber-500/20"
+            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-purple-400" />
+              <Sparkles className="h-4 w-4 text-amber-400" />
               <span className="text-sm text-muted-foreground">Staking APY</span>
             </div>
             <span className="text-xl font-bold">12.5%</span>

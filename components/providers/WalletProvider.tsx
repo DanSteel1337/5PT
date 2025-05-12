@@ -6,21 +6,22 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import { http } from "wagmi"
 import { bsc, bscTestnet } from "wagmi/chains"
-import { useState, type ReactNode } from "react"
+import { useState, type ReactNode, useEffect } from "react"
 import { customTheme } from "@/lib/rainbowkit-theme"
+import "@rainbow-me/rainbowkit/styles.css"
 
 // Always use environment variables for sensitive configuration
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
 // Verify that the projectId is available
 if (!walletConnectProjectId) {
-  throw new Error("NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID is not defined")
+  console.error("NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID is not defined")
 }
 
 // Create the Wagmi config inside the client component
 const config = getDefaultConfig({
-  appName: "BSC Investment Platform",
-  projectId: walletConnectProjectId,
+  appName: "Five Pillars Investment Platform",
+  projectId: walletConnectProjectId || "MISSING_PROJECT_ID", // Fallback to prevent runtime errors
   chains: [bsc, bscTestnet],
   transports: {
     [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
@@ -34,6 +35,8 @@ interface WalletProviderProps {
 }
 
 export function WalletProvider({ children }: WalletProviderProps) {
+  const [mounted, setMounted] = useState(false)
+
   // Create a client for TanStack Query
   const [queryClient] = useState(
     () =>
@@ -47,6 +50,16 @@ export function WalletProvider({ children }: WalletProviderProps) {
         },
       }),
   )
+
+  // Only render after client-side hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Prevent hydration errors by rendering nothing until mounted
+  if (!mounted) {
+    return null
+  }
 
   return (
     <WagmiProvider config={config}>

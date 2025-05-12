@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Search, Menu } from "lucide-react"
 import { ConnectButton } from "@/components/web3/ConnectButton"
 import { Input } from "@/components/ui/input"
@@ -30,8 +31,14 @@ export function Header({ toggleSidebar }: HeaderProps) {
           </Button>
 
           <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
-              <span className="font-bold text-white">5P</span>
+            <div className="relative w-8 h-8 rounded-full overflow-hidden">
+              <Image
+                src="/images/5pt-logo.png"
+                alt="Five Pillars Token"
+                width={32}
+                height={32}
+                className="object-cover"
+              />
             </div>
             <span className="font-bold text-xl hidden md:inline-block animate-glow">Five Pillars</span>
           </Link>

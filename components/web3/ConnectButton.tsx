@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { ConnectButton as RainbowConnectButton } from "@rainbow-me/rainbowkit"
 import { Button } from "@/components/ui/button"
 import { useAccount } from "wagmi"
+import { Loader2 } from "lucide-react"
 
 export function ConnectButton() {
   const [mounted, setMounted] = useState(false)
@@ -14,7 +15,14 @@ export function ConnectButton() {
     setMounted(true)
   }, [])
 
-  if (!mounted) return null
+  if (!mounted) {
+    return (
+      <Button variant="outline" size="default" disabled className="opacity-70">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        Loading...
+      </Button>
+    )
+  }
 
   return (
     <RainbowConnectButton.Custom>
@@ -38,7 +46,7 @@ export function ConnectButton() {
                 return (
                   <Button
                     onClick={openConnectModal}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                    className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-black font-medium"
                   >
                     Connect Wallet
                   </Button>
@@ -47,15 +55,42 @@ export function ConnectButton() {
 
               return (
                 <div className="flex items-center gap-2">
-                  <Button onClick={openChainModal} variant="outline" size="sm" className="hidden md:flex">
+                  <Button
+                    onClick={openChainModal}
+                    variant="outline"
+                    size="sm"
+                    className="hidden md:flex items-center gap-2 border-amber-500/20"
+                  >
+                    {chain.hasIcon && (
+                      <div
+                        style={{
+                          background: chain.iconBackground,
+                          width: 16,
+                          height: 16,
+                          borderRadius: 999,
+                          overflow: "hidden",
+                        }}
+                      >
+                        {chain.iconUrl && (
+                          <img
+                            alt={chain.name ?? "Chain icon"}
+                            src={chain.iconUrl || "/placeholder.svg"}
+                            style={{ width: 16, height: 16 }}
+                          />
+                        )}
+                      </div>
+                    )}
                     {chain.name}
                   </Button>
 
                   <Button
                     onClick={openAccountModal}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-black font-medium"
                   >
                     {account.displayName}
+                    {account.displayBalance && (
+                      <span className="hidden md:inline-block ml-2 opacity-80">{account.displayBalance}</span>
+                    )}
                   </Button>
                 </div>
               )
