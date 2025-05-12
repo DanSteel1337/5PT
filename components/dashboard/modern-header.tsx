@@ -22,11 +22,11 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useReadContract } from "wagmi"
-import { CONTRACT_ADDRESSES, INVESTMENT_MANAGER_ABI } from "@/lib/contracts"
+import { useAccount } from "wagmi"
 import { ModernMobileSidebar } from "./modern-sidebar"
 import { WalletConnector } from "@/components/wallet-connector"
 import { shouldUseMockData } from "@/lib/environment"
+import { useInvestmentManager, useEnsResolver } from "@/lib/contract-hooks"
 
 interface NavItem {
   title: string
@@ -44,25 +44,30 @@ interface ModernHeaderProps {
 export function ModernHeader({ className }: ModernHeaderProps) {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
-  const isPreview = shouldUseMockData()
+  const { address, isConnected } = useAccount()
+  const useMockData = shouldUseMockData()
 
-  // Get total pools count - only enabled when mounted and not in preview
-  const { data: poolCount } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getPoolCount",
-    query: {
-      enabled: mounted && !isPreview,
-    },
+  // Use the abstracted hooks from contract-hooks.ts
+  const { usePoolCount } = useInvestmentManager()
+  const { useEnsName } = useEnsResolver()
+
+  // Get pool count with proper error handling
+  const { data: poolCount, isLoading: isLoadingPoolCount } = usePoolCount({
+    enabled: mounted && !useMockData,
   })
 
-  // Use mock data in preview mode
-  const displayPoolCount = isPreview ? "7+" : poolCount ? Number(poolCount) : "7+"
+  // Get ENS name if available
+  const { data: ensName, isLoading: isLoadingEns } = useEnsName(address, {
+    enabled: isConnected && !!address && mounted && !useMockData,
+  })
 
   // Client-side only rendering to avoid hydration issues
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Safely handle pool count with fallbacks
+  const displayPoolCount = useMockData ? "7+" : poolCount ? Number(poolCount).toString() : "7+"
 
   const navItems: NavItem[] = [
     {

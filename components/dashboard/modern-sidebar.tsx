@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -27,8 +26,8 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
-import { useReadContract } from "wagmi"
-import { CONTRACT_ADDRESSES, INVESTMENT_MANAGER_ABI } from "@/lib/contracts"
+import { shouldUseMockData } from "@/lib/environment"
+import { usePoolCount } from "@/lib/contract-hooks"
 
 interface NavItem {
   title: string
@@ -42,101 +41,117 @@ interface NavItem {
 export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
-
-  // Get total pools count
-  const { data: poolCount } = useReadContract({
-    address: CONTRACT_ADDRESSES.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-    functionName: "getPoolCount",
-    query: {
-      enabled: mounted,
-    },
-  })
+  const useMockData = shouldUseMockData()
 
   // Client-side only rendering to avoid hydration issues
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const navItems: NavItem[] = [
-    {
-      title: "Overview",
-      href: "/dashboard",
-      icon: Home,
-      variant: "primary",
-    },
-    {
-      title: "Investment Pools",
-      href: "/dashboard/pools",
-      icon: Layers,
-      badge: poolCount ? Number(poolCount) : "7+",
-      isNew: true,
-      variant: "secondary",
-    },
-    {
-      title: "My Investments",
-      href: "/dashboard/investments",
-      icon: Coins,
-      variant: "primary",
-    },
-    {
-      title: "Transactions",
-      href: "/dashboard/transactions",
-      icon: History,
-      variant: "accent",
-    },
-    {
-      title: "Referrals",
-      href: "/dashboard/referrals",
-      icon: Users,
-      variant: "secondary",
-    },
-    {
-      title: "Analytics",
-      href: "/dashboard/analytics",
-      icon: BarChart3,
-      variant: "primary",
-    },
-    {
-      title: "Tokenomics",
-      href: "/dashboard/tokenomics",
-      icon: PieChart,
-      variant: "accent",
-    },
-    {
-      title: "Token Price",
-      href: "/dashboard/price",
-      icon: TrendingUp,
-      variant: "secondary",
-    },
-    {
-      title: "Wallet",
-      href: "/dashboard/wallet",
-      icon: CreditCard,
-      variant: "primary",
-    },
-  ]
+  // Only call hooks when the component is mounted
+  const poolCountResult = usePoolCount({
+    enabled: !useMockData,
+  })
 
-  const secondaryNavItems: NavItem[] = [
-    {
-      title: "Share & Earn",
-      href: "/dashboard/share",
-      icon: Share2,
-      variant: "secondary",
-    },
-    {
-      title: "Help & Support",
-      href: "/dashboard/help",
-      icon: HelpCircle,
-      variant: "accent",
-    },
-    {
-      title: "Settings",
-      href: "/dashboard/settings",
-      icon: Settings,
-      variant: "primary",
-    },
-  ]
+  // Safely handle pool count with fallbacks
+  const displayPoolCount = useMemo(() => {
+    if (!mounted || poolCountResult.isLoading) return "..."
+    if (useMockData || !poolCountResult.data || poolCountResult.isError) return "7+"
+
+    try {
+      return Number(poolCountResult.data).toString()
+    } catch (error) {
+      console.error("Error processing pool count:", error)
+      return "7+"
+    }
+  }, [mounted, poolCountResult.isLoading, useMockData, poolCountResult.data, poolCountResult.isError])
+
+  // Memoize nav items to prevent unnecessary re-renders
+  const navItems: NavItem[] = useMemo(
+    () => [
+      {
+        title: "Overview",
+        href: "/dashboard",
+        icon: Home,
+        variant: "primary",
+      },
+      {
+        title: "Investment Pools",
+        href: "/dashboard/pools",
+        icon: Layers,
+        badge: displayPoolCount,
+        isNew: true,
+        variant: "secondary",
+      },
+      {
+        title: "My Investments",
+        href: "/dashboard/investments",
+        icon: Coins,
+        variant: "primary",
+      },
+      {
+        title: "Transactions",
+        href: "/dashboard/transactions",
+        icon: History,
+        variant: "accent",
+      },
+      {
+        title: "Referrals",
+        href: "/dashboard/referrals",
+        icon: Users,
+        variant: "secondary",
+      },
+      {
+        title: "Analytics",
+        href: "/dashboard/analytics",
+        icon: BarChart3,
+        variant: "primary",
+      },
+      {
+        title: "Tokenomics",
+        href: "/dashboard/tokenomics",
+        icon: PieChart,
+        variant: "accent",
+      },
+      {
+        title: "Token Price",
+        href: "/dashboard/price",
+        icon: TrendingUp,
+        variant: "secondary",
+      },
+      {
+        title: "Wallet",
+        href: "/dashboard/wallet",
+        icon: CreditCard,
+        variant: "primary",
+      },
+    ],
+    [displayPoolCount],
+  )
+
+  const secondaryNavItems: NavItem[] = useMemo(
+    () => [
+      {
+        title: "Share & Earn",
+        href: "/dashboard/share",
+        icon: Share2,
+        variant: "secondary",
+      },
+      {
+        title: "Help & Support",
+        href: "/dashboard/help",
+        icon: HelpCircle,
+        variant: "accent",
+      },
+      {
+        title: "Settings",
+        href: "/dashboard/settings",
+        icon: Settings,
+        variant: "primary",
+      },
+    ],
+    [],
+  )
 
   return (
     <div className={cn("pb-12 circuit-bg", className)}>
@@ -181,6 +196,7 @@ export function ModernSidebar({ className }: React.HTMLAttributes<HTMLDivElement
                       item.isNew
                         ? `bg-${item.variant || "primary"} text-${item.variant || "primary"}-foreground`
                         : "bg-muted",
+                      poolCountResult.isLoading && !useMockData ? "animate-pulse" : "",
                     )}
                   >
                     {item.badge}

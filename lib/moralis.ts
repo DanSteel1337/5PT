@@ -1,6 +1,8 @@
 // IMPORTANT: This file should only be imported in server components or API routes
 // It should NOT be imported in client components
 
+import { shouldUseMockData } from "@/lib/environment"
+
 // Types for Moralis API responses
 export interface TokenMetadata {
   address: string
@@ -58,6 +60,18 @@ export interface PairReserves {
 // Server-side only functions
 export async function getTokenMetadata(tokenAddress: string, chain = "bsc"): Promise<TokenMetadata | null> {
   try {
+    // Use shouldUseMockData() for consistency with other files
+    if (shouldUseMockData()) {
+      return {
+        address: tokenAddress,
+        name: "Five Pillars Token",
+        symbol: "5PT",
+        decimals: "18",
+        logo: "https://example.com/logo.png",
+        validated: true,
+      }
+    }
+
     const url = `https://deep-index.moralis.io/api/v2.2/erc20/metadata?chain=${chain}&addresses=${tokenAddress}`
     const response = await fetch(url, {
       headers: {
@@ -80,6 +94,21 @@ export async function getTokenMetadata(tokenAddress: string, chain = "bsc"): Pro
 
 export async function getTokenPrice(tokenAddress: string, chain = "bsc"): Promise<TokenPrice | null> {
   try {
+    // Use shouldUseMockData() for consistency with other files
+    if (shouldUseMockData()) {
+      return {
+        nativePrice: {
+          value: "12500000000000000",
+          decimals: 18,
+          name: "BNB",
+          symbol: "BNB",
+        },
+        usdPrice: 0.025,
+        exchangeAddress: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+        exchangeName: "PancakeSwap v2",
+      }
+    }
+
     const url = `https://deep-index.moralis.io/api/v2.2/erc20/${tokenAddress}/price?chain=${chain}`
     const response = await fetch(url, {
       headers: {
@@ -101,6 +130,17 @@ export async function getTokenPrice(tokenAddress: string, chain = "bsc"): Promis
 
 export async function getTokenHolders(tokenAddress: string, chain = "bsc", limit = 10): Promise<TokenHolder[] | null> {
   try {
+    // Use shouldUseMockData() for consistency with other files
+    if (shouldUseMockData()) {
+      return Array.from({ length: limit }, (_, i) => ({
+        token_address: tokenAddress,
+        address: `0x${Math.random().toString(16).substring(2, 42)}`,
+        balance: (Math.random() * 10000000 + 1000000).toString(),
+        block_number: (12345678 + i).toString(),
+        block_timestamp: new Date(Date.now() - i * 3600000).toISOString(),
+      }))
+    }
+
     const url = `https://deep-index.moralis.io/api/v2.2/erc20/${tokenAddress}/holders?chain=${chain}&limit=${limit}`
     const response = await fetch(url, {
       headers: {
@@ -127,6 +167,28 @@ export async function getTokenTransfers(
   limit = 10,
 ): Promise<TokenTransfer[] | null> {
   try {
+    // Use shouldUseMockData() for consistency with other files
+    if (shouldUseMockData()) {
+      return Array.from({ length: limit }, (_, i) => ({
+        transaction_hash: `0x${Math.random().toString(16).substring(2, 66)}`,
+        address: tokenAddress,
+        block_timestamp: new Date(Date.now() - i * 3600000).toISOString(),
+        block_number: (12345678 + i).toString(),
+        block_hash: `0x${Math.random().toString(16).substring(2, 66)}`,
+        to_address:
+          i % 5 === 0
+            ? "0x0000000000000000000000000000000000000000"
+            : `0x${Math.random().toString(16).substring(2, 42)}`,
+        from_address:
+          i % 3 === 0
+            ? "0x0000000000000000000000000000000000000000"
+            : `0x${Math.random().toString(16).substring(2, 42)}`,
+        value: (Math.random() * 1000000 + 100000).toString(),
+        transaction_index: i,
+        log_index: i * 2,
+      }))
+    }
+
     const url = `https://deep-index.moralis.io/api/v2.2/erc20/${tokenAddress}/transfers?chain=${chain}&limit=${limit}`
     const response = await fetch(url, {
       headers: {
@@ -149,6 +211,17 @@ export async function getTokenTransfers(
 
 export async function getPairReserves(pairAddress: string, chain = "bsc"): Promise<PairReserves | null> {
   try {
+    // Use shouldUseMockData() for consistency with other files
+    if (shouldUseMockData()) {
+      return {
+        reserve0: "12500000000000000000000",
+        reserve1: "500000000000000000000",
+        reserve0_formatted: "12500",
+        reserve1_formatted: "500",
+        totalSupply: "2500000000000000000000",
+      }
+    }
+
     const url = `https://deep-index.moralis.io/api/v2.2/erc20/${pairAddress}/reserves?chain=${chain}`
     const response = await fetch(url, {
       headers: {

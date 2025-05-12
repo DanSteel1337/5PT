@@ -34,7 +34,7 @@ export function Web3Providers({ children }: { children: React.ReactNode }) {
 
   // Prevent hydration errors by only rendering on client
   if (!mounted) {
-    return <>{children}</>
+    return null // Return nothing during SSR
   }
 
   return (
