@@ -12,21 +12,15 @@ import { customTheme } from "@/lib/rainbowkit-theme"
 // Always use environment variables for sensitive configuration
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
-// Verify that the projectId is available
-if (!walletConnectProjectId) {
-  console.error("NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID is not defined")
-}
-
 // Create the Wagmi config inside the client component
 const config = getDefaultConfig({
   appName: "Five Pillars Investment Platform",
-  projectId: walletConnectProjectId || "MISSING_PROJECT_ID", // Fallback to prevent runtime errors
+  projectId: walletConnectProjectId || "", // Use empty string as fallback
   chains: [bsc, bscTestnet],
   transports: {
     [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
     [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
   },
-  ssr: true, // ✅ SSR flag inside a client component
 })
 
 interface WalletProviderProps {
@@ -35,8 +29,6 @@ interface WalletProviderProps {
 
 export function WalletProvider({ children }: WalletProviderProps) {
   const [mounted, setMounted] = useState(false)
-
-  // Create a client for TanStack Query
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -53,6 +45,13 @@ export function WalletProvider({ children }: WalletProviderProps) {
   // Only render after client-side hydration
   useEffect(() => {
     setMounted(true)
+
+    // Log warning if project ID is missing
+    if (!walletConnectProjectId) {
+      console.warn(
+        "WalletConnect ProjectID is missing. Please set NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID environment variable.",
+      )
+    }
   }, [])
 
   // Prevent hydration errors by rendering nothing until mounted
@@ -63,7 +62,9 @@ export function WalletProvider({ children }: WalletProviderProps) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={customTheme}>{children}</RainbowKitProvider>
+        <RainbowKitProvider theme={customTheme} modalSize="compact">
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )

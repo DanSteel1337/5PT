@@ -12,17 +12,39 @@ export function ConnectButton() {
   const [mounted, setMounted] = useState(false)
   const { isConnected } = useAccount()
   const { switchChain } = useSwitchChain()
+  const [isError, setIsError] = useState(false)
 
   // Only render after client-side hydration
   useEffect(() => {
     setMounted(true)
+
+    // Reset error state when component mounts
+    setIsError(false)
   }, [])
+
+  // Handle network switch with error handling
+  const handleNetworkSwitch = (chainId: number) => {
+    try {
+      switchChain({ chainId })
+    } catch (error) {
+      console.error("Failed to switch network:", error)
+      setIsError(true)
+    }
+  }
 
   if (!mounted) {
     return (
       <Button variant="outline" size="default" disabled className="opacity-70">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         Loading...
+      </Button>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Button variant="destructive" size="default" onClick={() => setIsError(false)} className="opacity-90">
+        Wallet Error
       </Button>
     )
   }
@@ -89,8 +111,8 @@ export function ConnectButton() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[180px]">
-                      <DropdownMenuItem onClick={() => switchChain({ chainId: bsc.id })}>BSC Mainnet</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => switchChain({ chainId: bscTestnet.id })}>
+                      <DropdownMenuItem onClick={() => handleNetworkSwitch(bsc.id)}>BSC Mainnet</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleNetworkSwitch(bscTestnet.id)}>
                         BSC Testnet
                       </DropdownMenuItem>
                     </DropdownMenuContent>
