@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, TrendingUp, TrendingDown, Users, BarChart3 } from "lucide-react"
+import { Sparkles, TrendingUp, TrendingDown, Users, BarChart3, Zap } from "lucide-react"
 import { motion } from "framer-motion"
 import { formatCurrency } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -32,14 +32,25 @@ export function DashboardHero() {
 
   return (
     <div className="relative overflow-hidden rounded-xl">
-      {/* Background with animated gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 to-blue-900/30 z-0">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.png')] opacity-20"></div>
+      {/* Animated background with grid pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 z-0 grid-bg">
+        <motion.div
+          className="absolute inset-0 bg-[url('/grid-pattern.png')] opacity-20"
+          animate={{
+            backgroundPosition: ["0px 0px", "100px 100px"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Number.POSITIVE_INFINITY,
+            repeatType: "loop",
+            ease: "linear",
+          }}
+        />
       </div>
 
-      {/* Animated glow effect */}
+      {/* Animated glow effects */}
       <motion.div
-        className="absolute -inset-[100px] bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full blur-3xl z-0"
+        className="absolute -inset-[100px] bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20 rounded-full blur-3xl z-0"
         animate={{
           scale: [1, 1.1, 1],
           opacity: [0.3, 0.5, 0.3],
@@ -51,13 +62,27 @@ export function DashboardHero() {
         }}
       />
 
+      <motion.div
+        className="absolute -inset-[150px] translate-x-[40%] bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 rounded-full blur-3xl z-0"
+        animate={{
+          scale: [1.1, 1, 1.1],
+          opacity: [0.2, 0.4, 0.2],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Number.POSITIVE_INFINITY,
+          repeatType: "reverse",
+          delay: 1,
+        }}
+      />
+
       <div className="relative z-10 p-6 md:p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           {/* Logo and token info */}
           <div className="flex items-center gap-4">
             <motion.div
-              className="relative w-16 h-16 rounded-full overflow-hidden shadow-lg"
-              whileHover={{ scale: 1.05 }}
+              className="relative w-16 h-16 rounded-full overflow-hidden shadow-lg holographic"
+              whileHover={{ scale: 1.05, rotate: 5 }}
               onHoverStart={() => setIsHovered(true)}
               onHoverEnd={() => setIsHovered(false)}
             >
@@ -69,7 +94,7 @@ export function DashboardHero() {
                 className="object-cover"
               />
               <motion.div
-                className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500/50 to-amber-300/50 blur-sm z-0"
+                className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500/50 to-blue-500/50 blur-sm z-0"
                 animate={{
                   scale: isHovered ? [1, 1.2, 1] : 1,
                   opacity: isHovered ? [0.7, 1, 0.7] : 0.7,
@@ -84,16 +109,24 @@ export function DashboardHero() {
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 Five Pillars Token
-                <Badge className="ml-2 bg-gradient-to-r from-amber-500 to-amber-300 text-black">5PT</Badge>
+                <Badge className="ml-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white">5PT</Badge>
               </h2>
-              <p className="text-muted-foreground">The future of decentralized investments</p>
+              <p className="text-muted-foreground flex items-center gap-1">
+                <Zap className="h-3 w-3 text-purple-400" /> The future of decentralized investments
+              </p>
             </div>
           </div>
 
           {/* Price and change */}
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">${tokenData.price.toFixed(2)}</span>
+              <motion.span
+                className="text-2xl font-bold neon-text"
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              >
+                ${tokenData.price.toFixed(2)}
+              </motion.span>
               <Badge
                 className={cn(
                   "flex items-center gap-1",
@@ -112,51 +145,59 @@ export function DashboardHero() {
         {/* Token metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           <motion.div
-            className="glass p-4 rounded-lg border border-amber-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
-            transition={{ type: "spring", stiffness: 300 }}
+            className="data-card p-4 rounded-lg"
+            whileHover={{ y: -5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="h-4 w-4 text-amber-400" />
+              <BarChart3 className="h-4 w-4 text-purple-400" />
               <span className="text-sm text-muted-foreground">Market Cap</span>
             </div>
-            <span className="text-xl font-bold">{formatCurrency(tokenData.marketCap)}</span>
+            <span className="text-xl font-bold neon-text">{formatCurrency(tokenData.marketCap)}</span>
           </motion.div>
 
           <motion.div
-            className="glass p-4 rounded-lg border border-amber-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
-            transition={{ type: "spring", stiffness: 300 }}
+            className="data-card p-4 rounded-lg"
+            whileHover={{ y: -5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <Users className="h-4 w-4 text-amber-400" />
+              <Users className="h-4 w-4 text-blue-400" />
               <span className="text-sm text-muted-foreground">Holders</span>
             </div>
-            <span className="text-xl font-bold">{tokenData.holders.toLocaleString()}</span>
+            <span className="text-xl font-bold neon-text-blue">{tokenData.holders.toLocaleString()}</span>
           </motion.div>
 
           <motion.div
-            className="glass p-4 rounded-lg border border-amber-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
-            transition={{ type: "spring", stiffness: 300 }}
+            className="data-card p-4 rounded-lg"
+            whileHover={{ y: -5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-amber-400" />
+              <TrendingUp className="h-4 w-4 text-indigo-400" />
               <span className="text-sm text-muted-foreground">24h Volume</span>
             </div>
-            <span className="text-xl font-bold">{formatCurrency(tokenData.volume24h)}</span>
+            <span className="text-xl font-bold neon-text">{formatCurrency(tokenData.volume24h)}</span>
           </motion.div>
 
           <motion.div
-            className="glass p-4 rounded-lg border border-amber-500/20"
-            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)" }}
-            transition={{ type: "spring", stiffness: 300 }}
+            className="data-card p-4 rounded-lg"
+            whileHover={{ y: -5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-amber-400" />
+              <Sparkles className="h-4 w-4 text-cyan-400" />
               <span className="text-sm text-muted-foreground">Staking APY</span>
             </div>
-            <span className="text-xl font-bold">12.5%</span>
+            <span className="text-xl font-bold neon-text-cyan">12.5%</span>
           </motion.div>
         </div>
       </div>

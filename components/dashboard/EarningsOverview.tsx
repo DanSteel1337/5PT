@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { TrendingUp, Calendar, ArrowRight, Loader2 } from "lucide-react"
+import { TrendingUp, Calendar, ArrowRight, Loader2, Sparkles } from "lucide-react"
 import { formatCurrency } from "@/lib/format"
 import { useInvestmentManager } from "@/hooks/useInvestmentManager"
 import { useFivePillarsToken } from "@/hooks/useFivePillarsToken"
@@ -50,40 +50,69 @@ export function EarningsOverview() {
   const maxValue = Math.max(...chartData)
 
   return (
-    <Card className="glass border-border/40 overflow-hidden">
+    <Card className="glass-card overflow-hidden border-purple-500/20">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl">Earnings Overview</CardTitle>
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-purple-400" />
+          <CardTitle className="text-xl">Earnings Overview</CardTitle>
+        </div>
         <CardDescription>Track your investment performance over time</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="flex flex-col">
+          <motion.div
+            className="flex flex-col"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <span className="text-sm text-muted-foreground">Total Earnings</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold neon-text">
+              <motion.span
+                className="text-3xl font-bold neon-text"
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              >
                 {Number.parseFloat(formattedEarnings).toFixed(4)} 5PT
-              </span>
+              </motion.span>
               <span className="text-green-500">+12.5%</span>
             </div>
             <span className="text-muted-foreground">{formatCurrency(earningsInUsd)}</span>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col md:items-end justify-center">
-            <Button
-              variant="outline"
-              className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-purple-500/20 hover:border-purple-500/40"
-            >
+          <motion.div
+            className="flex flex-col md:items-end justify-center"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Button className="btn-futuristic">
               Claim All Rewards <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <span className="text-xs text-muted-foreground mt-2">Last claimed: 3 days ago</span>
-          </div>
+          </motion.div>
         </div>
 
         <Tabs defaultValue="daily" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="daily">Daily</TabsTrigger>
-            <TabsTrigger value="weekly">Weekly</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 mb-4 bg-background/50 border border-purple-500/20">
+            <TabsTrigger
+              value="daily"
+              className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400"
+            >
+              Daily
+            </TabsTrigger>
+            <TabsTrigger
+              value="weekly"
+              className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400"
+            >
+              Weekly
+            </TabsTrigger>
+            <TabsTrigger
+              value="monthly"
+              className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400"
+            >
+              Monthly
+            </TabsTrigger>
           </TabsList>
 
           <AnimatePresence mode="wait">
@@ -92,11 +121,11 @@ export function EarningsOverview() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3 }}
             >
               {isLoading ? (
                 <div className="h-[200px] flex items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
                 </div>
               ) : (
                 <div className="relative h-[200px] w-full">
@@ -104,12 +133,25 @@ export function EarningsOverview() {
                     {chartData.map((value, index) => (
                       <motion.div
                         key={index}
-                        className="w-full bg-gradient-to-t from-purple-600 to-blue-600 rounded-t-sm mx-1"
+                        className="w-full bg-gradient-to-t from-purple-600 via-indigo-600 to-blue-600 rounded-t-sm mx-1 relative overflow-hidden"
                         style={{ height: `${(value / maxValue) * 100}%` }}
                         initial={{ height: 0 }}
                         animate={{ height: `${(value / maxValue) * 100}%` }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
-                      />
+                        whileHover={{ filter: "brightness(1.2)" }}
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-white/10"
+                          animate={{
+                            y: ["100%", "-100%"],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Number.POSITIVE_INFINITY,
+                            ease: "linear",
+                          }}
+                        />
+                      </motion.div>
                     ))}
                   </div>
                   <div className="absolute bottom-[-20px] left-0 right-0 flex justify-between px-1">

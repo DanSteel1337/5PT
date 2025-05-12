@@ -8,7 +8,6 @@ import { http } from "wagmi"
 import { bsc, bscTestnet } from "wagmi/chains"
 import { useState, type ReactNode, useEffect } from "react"
 import { customTheme } from "@/lib/rainbowkit-theme"
-import "@rainbow-me/rainbowkit/styles.css"
 
 // Always use environment variables for sensitive configuration
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID

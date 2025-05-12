@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { Droplets, TrendingUp, Clock, ArrowRight, Loader2 } from "lucide-react"
+import { Droplets, TrendingUp, Clock, ArrowRight, Loader2, Database } from "lucide-react"
 import Link from "next/link"
 import { formatPercentage, formatDuration } from "@/lib/format"
 
@@ -46,32 +46,51 @@ export function ActivePools() {
   if (!mounted) return null
 
   return (
-    <Card className="glass border-border/40 overflow-hidden">
+    <Card className="glass-card overflow-hidden border-purple-500/20">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <div>
+          <div className="flex items-center gap-2">
+            <Database className="h-5 w-5 text-purple-400" />
             <CardTitle className="text-xl">Active Investments</CardTitle>
-            <CardDescription>Your current pool investments</CardDescription>
           </div>
           <Badge className="bg-gradient-to-r from-purple-600 to-blue-600">{activePools.length} Active</Badge>
         </div>
+        <CardDescription>Your current pool investments</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="h-[200px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
           </div>
         ) : (
           <div className="space-y-4">
             {activePools.map((pool, index) => (
               <motion.div
                 key={pool.id}
-                className="p-4 rounded-lg bg-gradient-to-r from-background to-background/50 border border-border/40"
+                className="p-4 rounded-lg bg-gradient-to-r from-background to-background/50 border border-purple-500/20 relative overflow-hidden"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{ y: -2, boxShadow: "0 10px 25px -5px rgba(139, 92, 246, 0.1)" }}
+                whileHover={{
+                  y: -2,
+                  boxShadow: "0 8px 25px -5px rgba(139, 92, 246, 0.2)",
+                  borderColor: "rgba(139, 92, 246, 0.3)",
+                }}
               >
+                {/* Animated gradient line at top */}
+                <motion.div
+                  className="absolute top-0 left-0 h-[2px] bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600"
+                  style={{ width: "100%" }}
+                  animate={{
+                    backgroundPosition: ["0% 0%", "100% 0%"],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Number.POSITIVE_INFINITY,
+                    repeatType: "reverse",
+                  }}
+                />
+
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="font-medium">{pool.name}</h3>
                   <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
@@ -81,19 +100,19 @@ export function ActivePools() {
 
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4 mb-3">
                   <div className="flex items-center gap-1">
-                    <Droplets className="h-3 w-3 text-muted-foreground" />
+                    <Droplets className="h-3 w-3 text-purple-400" />
                     <span className="text-xs text-muted-foreground">Invested:</span>
                     <span className="text-xs font-medium ml-auto">{pool.invested} 5PT</span>
                   </div>
 
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3 text-muted-foreground" />
+                    <TrendingUp className="h-3 w-3 text-blue-400" />
                     <span className="text-xs text-muted-foreground">APY:</span>
                     <span className="text-xs font-medium text-green-500 ml-auto">{formatPercentage(pool.apy)}</span>
                   </div>
 
                   <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
+                    <Clock className="h-3 w-3 text-indigo-400" />
                     <span className="text-xs text-muted-foreground">Lock Period:</span>
                     <span className="text-xs font-medium ml-auto">{formatDuration(pool.lockPeriod * 86400)}</span>
                   </div>
@@ -101,13 +120,22 @@ export function ActivePools() {
                   <div className="flex items-center gap-1">
                     <Droplets className="h-3 w-3 text-purple-400" />
                     <span className="text-xs text-muted-foreground">Pending:</span>
-                    <span className="text-xs font-medium text-purple-400 ml-auto">
+                    <motion.span
+                      className="text-xs font-medium text-purple-400 ml-auto"
+                      animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                    >
                       {pool.pendingRewards.toFixed(4)} 5PT
-                    </span>
+                    </motion.span>
                   </div>
                 </div>
 
-                <Button asChild variant="ghost" size="sm" className="w-full">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="w-full hover:bg-purple-500/10 hover:text-purple-400"
+                >
                   <Link href={`/pools/${pool.id}`}>
                     View Details <ArrowRight className="ml-1 h-3 w-3" />
                   </Link>

@@ -46,7 +46,7 @@ export function ConnectButton() {
                 return (
                   <Button
                     onClick={openConnectModal}
-                    className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-black font-medium"
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
                   >
                     Connect Wallet
                   </Button>
@@ -59,7 +59,7 @@ export function ConnectButton() {
                     onClick={openChainModal}
                     variant="outline"
                     size="sm"
-                    className="hidden md:flex items-center gap-2 border-amber-500/20"
+                    className="hidden md:flex items-center gap-2 border-purple-500/20"
                   >
                     {chain.hasIcon && (
                       <div
@@ -85,7 +85,7 @@ export function ConnectButton() {
 
                   <Button
                     onClick={openAccountModal}
-                    className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-black font-medium"
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
                   >
                     {account.displayName}
                     {account.displayBalance && (

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { Sparkles, Brain, Lightbulb, RefreshCw, Loader2 } from "lucide-react"
+import { Sparkles, Lightbulb, RefreshCw, Cpu, Zap } from "lucide-react"
 
 // Mock AI insights
 const insights = [
@@ -39,6 +39,7 @@ export function AiInsights() {
   const [mounted, setMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [currentInsight, setCurrentInsight] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   // Only render after client-side hydration
   useEffect(() => {
@@ -55,19 +56,25 @@ export function AiInsights() {
   const insight = insights[currentInsight]
 
   const handleNextInsight = () => {
+    if (isAnimating) return
+    setIsAnimating(true)
     setCurrentInsight((prev) => (prev + 1) % insights.length)
+    setTimeout(() => setIsAnimating(false), 300)
   }
 
   const handlePrevInsight = () => {
+    if (isAnimating) return
+    setIsAnimating(true)
     setCurrentInsight((prev) => (prev - 1 + insights.length) % insights.length)
+    setTimeout(() => setIsAnimating(false), 300)
   }
 
   return (
-    <Card className="glass border-border/40 overflow-hidden">
+    <Card className="glass-card overflow-hidden border-purple-500/20">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-purple-400" />
+            <Cpu className="h-5 w-5 text-purple-400" />
             <CardTitle className="text-xl">AI Insights</CardTitle>
           </div>
           <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 flex items-center gap-1">
@@ -79,8 +86,26 @@ export function AiInsights() {
       <CardContent>
         {isLoading ? (
           <div className="h-[200px] flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <motion.div
+              animate={{
+                rotate: 360,
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                rotate: { duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
+                scale: { duration: 1, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" },
+              }}
+            >
+              <Cpu className="h-8 w-8 text-purple-400" />
+            </motion.div>
             <p className="text-sm text-muted-foreground">Analyzing your investment data...</p>
+            <motion.div className="w-48 h-1 bg-muted rounded-full overflow-hidden" initial={{ width: "48px" }}>
+              <motion.div
+                className="h-full bg-gradient-to-r from-purple-600 to-blue-600"
+                animate={{ x: [-100, 100] }}
+                transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }}
+              />
+            </motion.div>
           </div>
         ) : (
           <div className="relative overflow-hidden">
@@ -128,21 +153,17 @@ export function AiInsights() {
               <p className="text-muted-foreground mb-6">{insight.description}</p>
 
               <div className="flex justify-between items-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-purple-500/20 hover:border-purple-500/40"
-                >
-                  {insight.action}
+                <Button className="bg-gradient-to-r from-purple-600/80 to-blue-600/80 hover:from-purple-600 hover:to-blue-600 border-none">
+                  <Zap className="mr-2 h-4 w-4" /> {insight.action}
                 </Button>
 
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 hover:bg-purple-500/10 hover:text-purple-400"
                     onClick={handlePrevInsight}
-                    disabled={insights.length <= 1}
+                    disabled={insights.length <= 1 || isAnimating}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -164,9 +185,9 @@ export function AiInsights() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 hover:bg-purple-500/10 hover:text-purple-400"
                     onClick={handleNextInsight}
-                    disabled={insights.length <= 1}
+                    disabled={insights.length <= 1 || isAnimating}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
