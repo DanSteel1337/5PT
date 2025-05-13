@@ -13,12 +13,12 @@
 
 @layer base {
   :root {
-    /* Base theme variables */
-    --background: 240 10% 3.9%;
+    /* Base theme variables - LIGHTENED for better visibility */
+    --background: 240 10% 5%; /* Slightly lighter */
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 240 10% 7%; /* Lighter card background */
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 240 10% 7%; /* Lighter popover background */
     --popover-foreground: 0 0% 98%;
     --primary: 263.4 70% 50.4%;
     --primary-foreground: 210 40% 98%;
@@ -91,9 +91,9 @@
   body {
     @apply bg-background text-foreground;
     position: relative; /* DO NOT REMOVE - Required for RainbowKit modal */
-    background-color: #000000;
-    background-image: radial-gradient(circle at 20% 30%, rgba(76, 29, 149, 0.15) 0%, rgba(0, 0, 0, 0) 30%),
-      radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.1) 0%, rgba(0, 0, 0, 0) 30%);
+    background-color: #0a0a0a; /* Slightly lighter than pure black */
+    background-image: radial-gradient(circle at 20% 30%, rgba(76, 29, 149, 0.2) 0%, rgba(0, 0, 0, 0) 40%),
+      radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.15) 0%, rgba(0, 0, 0, 0) 40%);
     background-size: 100% 100%;
     background-attachment: fixed;
   }
@@ -126,12 +126,13 @@
   width: 100% !important;
 }
 
-/* Dialog overlay */
+/* Dialog overlay - ONLY ACTIVE WHEN DIALOG IS OPEN */
 [data-radix-dialog-overlay] {
   position: fixed !important;
   inset: 0 !important;
   background-color: rgba(0, 0, 0, 0.5) !important;
   z-index: 9998 !important;
+  pointer-events: auto !important; /* Ensure it only captures events when visible */
 }
 
 /* RainbowKit specific styles */
@@ -156,7 +157,7 @@
   z-index: var(--rk-overlay-z-index) !important;
 }
 
-/* Ensure the overlay covers the entire screen */
+/* Ensure the overlay covers the entire screen ONLY WHEN DIALOG IS OPEN */
 [data-rk] [role="dialog"]::before {
   content: "";
   position: fixed;
@@ -164,6 +165,7 @@
   background-color: var(--rk-overlay-background-color);
   backdrop-filter: var(--rk-overlay-backdrop-filter);
   z-index: -1;
+  pointer-events: none; /* Allow clicks to pass through when not needed */
 }
 
 /* Fix for RainbowKit modal positioning */
@@ -174,9 +176,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none; /* Allow clicks to pass through when not needed */
 }
 
-/* Cyberpunk animations */
+#radix-\:r0[data-state="open"] {
+  pointer-events: auto; /* Capture clicks only when open */
+}
+
+/* Add these animations for the token burning visualization */
+@keyframes float-to-center {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(50vw - 50% - var(--x))) translateY(calc(50vh - 50% - var(--y))) scale(0.1);
+  }
+}
+
+.animate-float-to-center {
+  animation: float-to-center 3s infinite;
+}
+
 @keyframes float {
   0% {
     transform: translateY(0px);
@@ -361,25 +383,27 @@
   animation: particle-flow 3s ease-out infinite;
 }
 
+/* UPDATED: Lighter glass card with better visibility */
 .glass-card {
-  background: rgba(23, 23, 23, 0.7);
+  background: rgba(30, 30, 40, 0.6); /* Lighter background */
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
+  box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.3); /* Brighter shadow */
 }
 
 .glass-card-purple {
-  background: rgba(23, 23, 23, 0.7);
+  background: rgba(30, 30, 40, 0.6); /* Lighter background */
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); /* Brighter shadow */
 }
 
+/* UPDATED: Lighter cyber card with better visibility */
 .cyber-card {
-  background: rgba(13, 13, 20, 0.7);
+  background: rgba(20, 20, 35, 0.6); /* Lighter background */
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); /* Brighter shadow */
   position: relative;
   overflow: hidden;
 }
@@ -397,8 +421,8 @@
 
 .cyber-border {
   position: relative;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); /* Brighter shadow */
 }
 
 .cyber-border::after {
@@ -408,16 +432,14 @@
   left: -1px;
   right: -1px;
   bottom: -1px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.4); /* More visible border */
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); /* Brighter shadow */
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   animation: glitch 10s infinite;
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #c084fc, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500;
 }
 
 .text-cyber {
@@ -440,8 +462,8 @@
 }
 
 .cyber-grid {
-  background-image: linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(147, 51, 234, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(147, 51, 234, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -477,8 +499,8 @@
 }
 
 .cyber-input {
-  background: rgba(13, 13, 20, 0.7);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(20, 20, 35, 0.7); /* Lighter background */
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
   color: white;
   padding: 0.75rem 1rem;
   outline: none;
@@ -500,21 +522,19 @@
 }
 
 .cyber-glow {
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 10px rgba(147, 51, 234, 0.5), 0 0 20px rgba(147, 51, 234, 0.3);
 }
 
 .cyber-panel {
-  background: rgba(13, 13, 20, 0.7);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  background: rgba(20, 20, 35, 0.7); /* Lighter background */
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); /* Brighter shadow */
   clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
   padding: 1.5rem;
 }
 
 .cyber-stat {
-  background: rgba(13, 13, 20, 0.7);
-  border-left: 3px solid #8b5cf6;
-  padding: 1rem;
+  @apply bg-black/30 border border-purple-500/30 rounded-lg;
   position: relative;
   overflow: hidden;
 }
@@ -526,13 +546,13 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to right, rgba(139, 92, 246, 0.1), transparent);
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.15), transparent);
 }
 
 /* Futuristic UI elements */
 .futuristic-border {
   position: relative;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
   overflow: hidden;
 }
 
@@ -543,7 +563,7 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: conic-gradient(transparent, rgba(139, 92, 246, 0.3), transparent, transparent);
+  background: conic-gradient(transparent, rgba(139, 92, 246, 0.4), transparent, transparent);
   animation: rotate 4s linear infinite;
 }
 
@@ -551,7 +571,7 @@
   content: "";
   position: absolute;
   inset: 1px;
-  background: rgba(13, 13, 20, 0.7);
+  background: rgba(20, 20, 35, 0.7); /* Lighter background */
   border-radius: inherit;
 }
 
@@ -563,7 +583,7 @@
   content: "";
   position: absolute;
   inset: -5px;
-  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.5), transparent 70%);
+  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.6), transparent 70%);
   border-radius: inherit;
   z-index: -1;
   opacity: 0;
@@ -594,18 +614,36 @@
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(139, 92, 246, 0.5);
 }
 
-/* CRITICAL FIX: Force consistent background opacity for all sections */
-section#early-investor > div > div > div {
-  background-color: rgba(0, 0, 0, 0.4) !important;
-  backdrop-filter: blur(4px) !important;
+/* NEW: Enhanced visibility classes */
+.enhanced-text {
+  text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+  color: rgba(255, 255, 255, 0.95);
 }
 
-/* Reset any potential stacking or inheritance issues */
-section#early-investor * {
-  opacity: 1 !important;
+.enhanced-heading {
+  text-shadow: 0 0 15px rgba(147, 51, 234, 0.4);
+  color: rgba(255, 255, 255, 0.98);
+  letter-spacing: 0.5px;
 }
 
-/* Force consistent card styling */
-section#early-investor .bg-black\/40 {
-  background-color: rgba(0, 0, 0, 0.4) !important;
+.enhanced-card {
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.2), 0 0 40px rgba(147, 51, 234, 0.1), inset 0 0 20px rgba(139, 92, 246, 0.1);
+  background: rgba(30, 30, 45, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+
+.enhanced-glow {
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+}
+
+.light-overlay {
+  position: relative;
+}
+
+.light-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03), transparent 70%);
+  pointer-events: none;
 }

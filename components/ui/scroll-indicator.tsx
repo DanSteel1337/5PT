@@ -4,7 +4,11 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ChevronDown } from "lucide-react"
 
-export function ScrollIndicator() {
+interface ScrollIndicatorProps {
+  targetId?: string
+}
+
+export function ScrollIndicator({ targetId = "features" }: ScrollIndicatorProps) {
   const [mounted, setMounted] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
 
@@ -25,6 +29,13 @@ export function ScrollIndicator() {
 
   if (!mounted) return null
 
+  const handleClick = () => {
+    const targetElement = document.getElementById(targetId)
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   return (
     <motion.div
       className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
@@ -37,7 +48,7 @@ export function ScrollIndicator() {
     >
       <motion.div
         className="flex flex-col items-center cursor-pointer"
-        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+        onClick={handleClick}
         whileHover={{ scale: 1.1 }}
       >
         <span className="text-white/70 text-sm mb-2">Scroll Down</span>

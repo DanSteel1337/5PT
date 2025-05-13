@@ -7,7 +7,7 @@ import { Features } from "@/components/landing/features"
 import { PoolQualification } from "@/components/landing/pool-qualification"
 import { Tokenomics } from "@/components/landing/tokenomics"
 import { OnboardingGuide } from "@/components/landing/onboarding-guide"
-import { CTA } from "@/components/landing/cta"
+import { ConversionSection } from "@/components/landing/conversion-section"
 import { Footer } from "@/components/layout/footer"
 import { ScrollIndicator } from "@/components/ui/scroll-indicator"
 import { PageLoading } from "@/components/ui/page-loading"
@@ -36,7 +36,7 @@ export default function ClientPage() {
       <PoolQualification />
       <Tokenomics />
       <OnboardingGuide />
-      <CTA />
+      <ConversionSection />
       <Footer />
       <ScrollIndicator />
     </main>

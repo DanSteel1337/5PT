@@ -130,14 +130,14 @@ export function Hero() {
               </Link>
             </motion.div>
 
-            {/* Stats */}
+            {/* Stats - Updated to match contract values */}
             <motion.div
               className="grid grid-cols-3 gap-4 mt-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.1, duration: 0.8 }}
             >
-              <StatCard value="0.35%" label="Daily Return" icon={<Zap className="w-5 h-5" />} />
+              <StatCard value="0.3%" label="Daily Return" icon={<Zap className="w-5 h-5" />} />
               <StatCard value="9" label="Reward Pools" icon={<Target className="w-5 h-5" />} />
               <StatCard value="10%" label="Referral Bonus" icon={<Users className="w-5 h-5" />} />
             </motion.div>
@@ -190,7 +190,7 @@ export function Hero() {
               ))}
             </div>
 
-            {/* Floating data cards */}
+            {/* Floating data cards - Updated to match contract values */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -200,7 +200,7 @@ export function Hero() {
             >
               <div className="text-sm font-medium text-purple-300">Pool Rewards</div>
               <div className="text-xs text-gray-400 mt-1">
-                Qualify for exclusive pools with up to 0.035% daily share
+                Qualify for exclusive pools with up to 0.0175% daily share
               </div>
             </motion.div>
 
@@ -212,7 +212,7 @@ export function Hero() {
               style={{ animationDelay: "1.5s" }}
             >
               <div className="text-sm font-medium text-blue-300">Referral Network</div>
-              <div className="text-xs text-gray-400 mt-1">Earn 0.05% on direct referrals and 0.0135% on downline</div>
+              <div className="text-xs text-gray-400 mt-1">Earn 0.025% on direct referrals and 0.06% on downline</div>
             </motion.div>
           </motion.div>
         </div>

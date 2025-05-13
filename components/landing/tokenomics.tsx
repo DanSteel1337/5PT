@@ -7,6 +7,7 @@ import { ParallaxLayer } from "@/components/parallax/parallax-layer"
 import { TiltCard } from "@/components/parallax/tilt-card"
 import { SectionContainer } from "@/components/ui/section-container"
 import { ContentCard } from "@/components/ui/content-card"
+import { PieChart, Layers, Coins, Shield } from "lucide-react"
 
 export function Tokenomics() {
   const [mounted, setMounted] = useState(false)
@@ -25,28 +26,14 @@ export function Tokenomics() {
 
   if (!mounted) return null
 
+  // Updated tokenomics data from contract documentation
   const tokenDistribution = [
-    { name: "Liquidity Pool", percentage: 40 },
-    { name: "Staking Rewards", percentage: 30 },
-    { name: "Team & Development", percentage: 15 },
-    { name: "Marketing", percentage: 10 },
-    { name: "Community Rewards", percentage: 5 },
-  ]
-
-  const rewardMechanisms = [
-    { title: "DAILY BONUS", description: "Earn 0.35% daily on your invested capital with no team tokens." },
-    {
-      title: "REFERRAL BONUS",
-      description: "Gain an additional 0.05% daily bonus on deposits made by direct referrals.",
-    },
-    {
-      title: "DOWNLINE BONUS",
-      description: "Receive 0.0135% per level (up to levels 2–10) from your extended network.",
-    },
-    {
-      title: "POOL BONUS",
-      description: "Nine pools filled daily with a percentage of the total deposit volume.",
-    },
+    { name: "Airdrop Campaign", percentage: 29.7, color: "bg-purple-500" },
+    { name: "Presale + Referral", percentage: 5.0, color: "bg-blue-500" },
+    { name: "DEX Liquidity", percentage: 5.0, color: "bg-cyan-500" },
+    { name: "Treasury", percentage: 10.0, color: "bg-indigo-500" },
+    { name: "CEX / Marketing", percentage: 20.0, color: "bg-violet-500" },
+    { name: "Reserve", percentage: 30.3, color: "bg-fuchsia-500" },
   ]
 
   return (
@@ -89,7 +76,7 @@ export function Tokenomics() {
                 transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, delay: 1 }}
               ></motion.div>
 
-              {/* Logo with rotation based on scroll - Fixed orientation by removing style rotation */}
+              {/* Logo with rotation based on scroll */}
               <motion.div
                 className="absolute inset-8 rounded-full bg-black/50 flex items-center justify-center"
                 style={{
@@ -138,52 +125,125 @@ export function Tokenomics() {
               <div className="grid grid-cols-2 gap-4">
                 <TokenDetail label="Name" value="Five Pillars Token" />
                 <TokenDetail label="Symbol" value="5PT" />
-                <TokenDetail label="Total Supply" value="1,000,000,000" />
-                <TokenDetail label="Blockchain" value="Binance Smart Chain" />
-                <TokenDetail label="Contract" value="0x8FafdFB035C9426a50D842873D5d401C933bE09F" />
-                <TokenDetail label="Investment Manager" value="0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc" />
+                <TokenDetail label="Total Supply" value="100,000,000,000" />
+                <TokenDetail label="Initial Price" value="$0.00175" />
+              </div>
+            </ContentCard>
+          </TiltCard>
+
+          {/* Visual token distribution chart */}
+          <TiltCard>
+            <ContentCard className="mt-6">
+              <h4 className="card-title">TOKEN DISTRIBUTION</h4>
+              <div className="mt-4">
+                {/* Visual distribution bars */}
+                <div className="flex h-8 w-full rounded-md overflow-hidden mb-4">
+                  {tokenDistribution.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`${item.color} h-full`}
+                      style={{ width: `${item.percentage}%` }}
+                      title={`${item.name}: ${item.percentage}%`}
+                    />
+                  ))}
+                </div>
+
+                {/* Legend */}
+                <div className="grid grid-cols-2 gap-2">
+                  {tokenDistribution.map((item, index) => (
+                    <div key={index} className="flex items-center text-xs">
+                      <div className={`w-3 h-3 rounded-full ${item.color} mr-2`}></div>
+                      <span className="text-gray-300 truncate">{item.name}</span>
+                      <span className="ml-auto text-purple-400 font-medium">{item.percentage}%</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </ContentCard>
           </TiltCard>
         </ParallaxLayer>
 
         <ParallaxLayer speed={0.3} direction="right">
+          {/* Key tokenomics highlights */}
+          <div className="grid grid-cols-2 gap-4">
+            <TokenomicsCard
+              icon={<PieChart className="h-8 w-8 text-purple-400" />}
+              title="TOTAL SUPPLY"
+              value="100B"
+              subtitle="Fixed supply, no inflation"
+            />
+
+            <TokenomicsCard
+              icon={<Layers className="h-8 w-8 text-blue-400" />}
+              title="INITIAL MCAP"
+              value="$10.5M"
+              subtitle="At token listing"
+            />
+
+            <TokenomicsCard
+              icon={<Coins className="h-8 w-8 text-cyan-400" />}
+              title="AIRDROP"
+              value="29.7%"
+              subtitle="6-year distribution"
+            />
+
+            <TokenomicsCard
+              icon={<Shield className="h-8 w-8 text-violet-400" />}
+              title="LIQUIDITY"
+              value="5%"
+              subtitle="Locked for 3 years"
+            />
+          </div>
+
+          {/* Tax structure simplified */}
           <TiltCard>
-            <ContentCard className="mb-6">
-              <h3 className="card-title">GLOBAL YIELD SYSTEM</h3>
+            <ContentCard className="mt-6">
+              <h4 className="card-title">TAX STRUCTURE</h4>
+              <div className="grid grid-cols-1 gap-4 mt-4">
+                <div className="bg-black/30 p-4 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-purple-900/50 flex items-center justify-center mr-3">
+                        <span className="text-lg font-bold text-purple-400">10%</span>
+                      </div>
+                      <div>
+                        <h5 className="text-purple-400 font-bold">FIXED TAX RATE</h5>
+                        <p className="text-xs text-gray-400">Applied to deposits and claims</p>
+                      </div>
+                    </div>
+                  </div>
 
-              <p className="text-gray-300 mb-6">
-                The Five Pillars Token implements a comprehensive global yield system with multiple reward components:
-              </p>
-
-              <div className="space-y-6">
-                {rewardMechanisms.map((item, index) => (
-                  <RewardMechanismItem
-                    key={index}
-                    title={item.title}
-                    description={item.description}
-                    delay={index * 0.1}
-                  />
-                ))}
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="bg-black/20 p-2 rounded">
+                      <p className="text-xs text-gray-400">Treasury</p>
+                      <p className="text-sm text-white font-medium">70% of tax</p>
+                    </div>
+                    <div className="bg-black/20 p-2 rounded">
+                      <p className="text-xs text-gray-400">Secondary Treasury</p>
+                      <p className="text-sm text-white font-medium">30% of tax</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </ContentCard>
           </TiltCard>
 
+          {/* Contract addresses */}
           <TiltCard>
             <ContentCard className="mt-6">
-              <h4 className="card-title">POOL DISTRIBUTION</h4>
-              <div className="space-y-4">
-                <div className="bg-black/50 p-3 rounded">
-                  <p className="text-gray-400 text-xs mb-1">Pools 1-5</p>
-                  <p className="font-medium text-purple-400">0.035% Daily Share Each</p>
+              <h4 className="card-title">CONTRACT ADDRESSES</h4>
+              <div className="space-y-3 mt-4">
+                <div className="bg-black/30 p-3 rounded">
+                  <p className="text-xs text-gray-400 mb-1">Token Contract</p>
+                  <p className="text-sm text-purple-400 font-mono break-all">
+                    0x8FafdFB035C9426a50D842873D5d401C933bE09F
+                  </p>
                 </div>
-                <div className="bg-black/50 p-3 rounded">
-                  <p className="text-gray-400 text-xs mb-1">Pools 6-9</p>
-                  <p className="font-medium text-purple-400">0.02% Daily Share Each</p>
-                </div>
-                <div className="bg-black/50 p-3 rounded">
-                  <p className="text-gray-400 text-xs mb-1">Pools 8-9 Access</p>
-                  <p className="font-medium text-purple-400">Whitelist Only</p>
+                <div className="bg-black/30 p-3 rounded">
+                  <p className="text-xs text-gray-400 mb-1">Investment Manager</p>
+                  <p className="text-sm text-purple-400 font-mono break-all">
+                    0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc
+                  </p>
                 </div>
               </div>
             </ContentCard>
@@ -203,17 +263,17 @@ function TokenDetail({ label, value }) {
   )
 }
 
-function RewardMechanismItem({ title, description, delay = 0 }) {
+function TokenomicsCard({ icon, title, value, subtitle }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-      className="bg-black/30 p-4 rounded-lg"
+      className="bg-black/30 p-4 rounded-lg flex flex-col items-center text-center"
+      whileHover={{ y: -2, backgroundColor: "rgba(0,0,0,0.4)" }}
+      transition={{ duration: 0.2 }}
     >
-      <h4 className="text-purple-400 font-bold mb-2">{title}</h4>
-      <p className="text-gray-300 text-sm">{description}</p>
+      <div className="mb-2">{icon}</div>
+      <h5 className="text-xs text-gray-400">{title}</h5>
+      <p className="text-xl font-bold text-white my-1">{value}</p>
+      <p className="text-xs text-gray-500">{subtitle}</p>
     </motion.div>
   )
 }

@@ -5,33 +5,65 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useInvestmentData } from "@/hooks/useInvestmentData"
 import { formatCrypto, formatPercent } from "@/lib/utils"
-import { PlusCircle, ArrowUpRight } from "lucide-react"
+import { PlusCircle, ArrowUpRight, Info } from "lucide-react"
 
-// Sample pool data
+// Updated pool data from latest contract documentation
 const POOLS = [
   {
     id: 1,
     name: "Starter Pool",
-    dailyRate: 5,
-    minDeposit: 100,
-    lockPeriod: 7,
+    dailyRate: 0.0175, // Updated from 0.035%
+    minDeposit: 550, // ~$1,000
+    lockPeriod: 0, // No lock period specified in contract
     totalStaked: 1250000,
   },
   {
     id: 2,
     name: "Growth Pool",
-    dailyRate: 8,
-    minDeposit: 500,
-    lockPeriod: 14,
+    dailyRate: 0.0175, // Updated from 0.035%
+    minDeposit: 1450, // ~$2,500
+    lockPeriod: 0, // No lock period specified in contract
     totalStaked: 2500000,
   },
   {
     id: 3,
     name: "Premium Pool",
-    dailyRate: 15,
-    minDeposit: 1000,
-    lockPeriod: 30,
+    dailyRate: 0.0175, // Updated from 0.035%
+    minDeposit: 3000, // ~$5,000
+    lockPeriod: 0, // No lock period specified in contract
     totalStaked: 800000,
+  },
+  {
+    id: 4,
+    name: "Elite Pool",
+    dailyRate: 0.0175, // Updated from 0.035%
+    minDeposit: 5500, // ~$10,000
+    lockPeriod: 0, // No lock period specified in contract
+    totalStaked: 1500000,
+  },
+  {
+    id: 5,
+    name: "Platinum Pool",
+    dailyRate: 0.0175, // Updated from 0.035%
+    minDeposit: 14250, // ~$25,000
+    lockPeriod: 0, // No lock period specified in contract
+    totalStaked: 3000000,
+  },
+  {
+    id: 6,
+    name: "Diamond Pool",
+    dailyRate: 0.01, // Updated from 0.02%
+    minDeposit: 28500, // ~$50,000
+    lockPeriod: 0, // No lock period specified in contract
+    totalStaked: 5000000,
+  },
+  {
+    id: 7,
+    name: "Royal Pool",
+    dailyRate: 0.01, // Updated from 0.02%
+    minDeposit: 57000, // ~$100,000
+    lockPeriod: 0, // No lock period specified in contract
+    totalStaked: 7000000,
   },
 ]
 
@@ -39,6 +71,7 @@ export function InvestmentPools() {
   const { tokenSymbol, userRank } = useInvestmentData()
   const [mounted, setMounted] = useState(false)
   const [activePool, setActivePool] = useState(1)
+  const [showTaxInfo, setShowTaxInfo] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -86,10 +119,12 @@ export function InvestmentPools() {
                     <p className="text-gray-400 text-xs mb-1">Daily Yield</p>
                     <p className="font-medium">{formatPercent(pool.dailyRate)}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-400 text-xs mb-1">Lock Period</p>
-                    <p className="font-medium">{pool.lockPeriod} days</p>
-                  </div>
+                  {pool.lockPeriod > 0 && (
+                    <div>
+                      <p className="text-gray-400 text-xs mb-1">Lock Period</p>
+                      <p className="font-medium">{pool.lockPeriod} days</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-gray-400 text-xs mb-1">Min. Deposit</p>
                     <p className="font-medium">{formatCrypto(pool.minDeposit, tokenSymbol)}</p>
@@ -129,6 +164,40 @@ export function InvestmentPools() {
                     <ArrowUpRight className="mr-2 h-4 w-4" />
                     Withdraw
                   </Button>
+                </div>
+
+                {/* Tax information button */}
+                <div className="mt-4">
+                  <button
+                    className="flex items-center text-xs text-gray-400 hover:text-purple-400 transition-colors"
+                    onClick={() => setShowTaxInfo(!showTaxInfo)}
+                  >
+                    <Info className="h-3 w-3 mr-1" />
+                    {showTaxInfo ? "Hide" : "Show"} tax information
+                  </button>
+
+                  {showTaxInfo && (
+                    <div className="mt-2 p-3 bg-black/20 rounded-lg text-xs text-gray-300">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-purple-400 font-medium">Deposit Tax:</span>
+                        <span className="bg-purple-900/50 px-2 py-1 rounded text-xs font-bold">10%</span>
+                      </div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-purple-400 font-medium">Claim Tax:</span>
+                        <span className="bg-purple-900/50 px-2 py-1 rounded text-xs font-bold">10%</span>
+                      </div>
+                      <div className="h-px bg-purple-500/20 my-2"></div>
+                      <p className="mb-1">When claiming rewards:</p>
+                      <div className="flex justify-between items-center">
+                        <span>To wallet:</span>
+                        <span>50%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Auto-reinvested:</span>
+                        <span>50%</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

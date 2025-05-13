@@ -23,7 +23,7 @@ import {
 import { SectionContainer } from "@/components/ui/section-container"
 import { ContentCard } from "@/components/ui/content-card"
 
-// Pool data based on 5PT Investment Contract - moved to the top level
+// Pool data based on latest 5PT Investment Contract - moved to the top level
 const pools = [
   {
     id: 1,
@@ -31,7 +31,9 @@ const pools = [
     personalInvestRequired: 550,
     totalDirectInvestRequired: 550,
     directRefsRequired: 1,
-    share: 0.035,
+    share: 0.0175,
+    usdValuePersonal: 962.5,
+    usdValueDirect: 962.5,
   },
   {
     id: 2,
@@ -39,7 +41,9 @@ const pools = [
     personalInvestRequired: 1450,
     totalDirectInvestRequired: 1450,
     directRefsRequired: 3,
-    share: 0.035,
+    share: 0.0175,
+    usdValuePersonal: 2537.5,
+    usdValueDirect: 2537.5,
   },
   {
     id: 3,
@@ -47,7 +51,9 @@ const pools = [
     personalInvestRequired: 3000,
     totalDirectInvestRequired: 6000,
     directRefsRequired: 5,
-    share: 0.035,
+    share: 0.0175,
+    usdValuePersonal: 5250,
+    usdValueDirect: 10500,
   },
   {
     id: 4,
@@ -55,7 +61,9 @@ const pools = [
     personalInvestRequired: 5500,
     totalDirectInvestRequired: 11000,
     directRefsRequired: 10,
-    share: 0.035,
+    share: 0.0175,
+    usdValuePersonal: 9625,
+    usdValueDirect: 19250,
   },
   {
     id: 5,
@@ -63,7 +71,9 @@ const pools = [
     personalInvestRequired: 14250,
     totalDirectInvestRequired: 28500,
     directRefsRequired: 15,
-    share: 0.035,
+    share: 0.0175,
+    usdValuePersonal: 24937.5,
+    usdValueDirect: 49875,
   },
   {
     id: 6,
@@ -71,7 +81,9 @@ const pools = [
     personalInvestRequired: 28500,
     totalDirectInvestRequired: 85500,
     directRefsRequired: 20,
-    share: 0.02,
+    share: 0.01,
+    usdValuePersonal: 49875,
+    usdValueDirect: 149625,
   },
   {
     id: 7,
@@ -79,7 +91,9 @@ const pools = [
     personalInvestRequired: 57000,
     totalDirectInvestRequired: 171000,
     directRefsRequired: 20,
-    share: 0.02,
+    share: 0.01,
+    usdValuePersonal: 99750,
+    usdValueDirect: 299250,
   },
   {
     id: 8,
@@ -89,6 +103,8 @@ const pools = [
     directRefsRequired: 0,
     share: 0.02,
     whitelistOnly: true,
+    usdValuePersonal: 175000,
+    usdValueDirect: 0,
   },
   {
     id: 9,
@@ -98,6 +114,8 @@ const pools = [
     directRefsRequired: 0,
     share: 0.02,
     whitelistOnly: true,
+    usdValuePersonal: 350000,
+    usdValueDirect: 0,
   },
 ]
 
@@ -109,8 +127,8 @@ export function OnboardingGuide() {
   const [referralVolume, setReferralVolume] = useState(5000)
   const [simulationDays, setSimulationDays] = useState(30)
   const [showSettings, setShowSettings] = useState(false)
-  const [depositTax, setDepositTax] = useState(10) // Default 10%
-  const [claimTax, setClaimTax] = useState(10) // Default 10%
+  const [depositTax, setDepositTax] = useState(10) // Fixed 10%
+  const [claimTax, setClaimTax] = useState(10) // Fixed 10%
   const [reinvestPercentage, setReinvestPercentage] = useState(50) // Default 50%
   const [autoCompound, setAutoCompound] = useState(true)
   const [claimFrequency, setClaimFrequency] = useState(7) // Default claim every 7 days
@@ -227,8 +245,8 @@ export function OnboardingGuide() {
 
     // Daily simulation
     for (let day = 1; day <= simulationDays; day++) {
-      // Calculate daily base reward (0.35% of current investment)
-      const dailyBaseReward = currentInvestment * 0.0035
+      // Calculate daily base reward (0.3% of current investment) - Updated from 0.35%
+      const dailyBaseReward = currentInvestment * 0.003
 
       // Calculate pool rewards (if eligible for any pools)
       let poolRewards = 0
@@ -237,7 +255,7 @@ export function OnboardingGuide() {
       // This is a simplification for the calculator
       const assumedTotalBurned = actualInvestedAmount * 10
 
-      // Daily pool distribution is 0.215% of total burned tokens
+      // Daily pool distribution calculation based on latest contract
       const dailyPoolDistribution = assumedTotalBurned * 0.00215
 
       // Calculate rewards from each eligible pool
@@ -251,8 +269,15 @@ export function OnboardingGuide() {
         }
       })
 
+      // Calculate referral rewards (0.025% of referral volume) - Updated from 0.05%
+      const referralReward = referralVolume * 0.00025 * referrals
+
+      // Calculate downline rewards (0.06% of referral volume) - Updated from 0.0135%
+      // Simplified calculation assuming each referral has 2 downline referrals
+      const downlineReward = referrals > 0 ? referralVolume * 0.0006 * referrals * 2 : 0
+
       // Total daily rewards
-      const dailyTotalReward = dailyBaseReward + poolRewards
+      const dailyTotalReward = dailyBaseReward + poolRewards + referralReward + downlineReward
 
       // Handle claiming and reinvesting based on settings
       if (autoCompound) {
@@ -288,6 +313,8 @@ export function OnboardingGuide() {
         dailyReward: dailyTotalReward,
         baseReward: dailyBaseReward,
         poolRewards: poolRewards,
+        referralReward: referralReward,
+        downlineReward: downlineReward,
       })
 
       // Update total earnings
@@ -310,6 +337,11 @@ export function OnboardingGuide() {
 
   const results = calculateReturns()
   const lastDayResult = results.dailyResults[results.dailyResults.length - 1]
+
+  // Format number with 3 decimal places
+  const formatWithDecimals = (value) => {
+    return value.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })
+  }
 
   return (
     <SectionContainer
@@ -497,15 +529,18 @@ export function OnboardingGuide() {
                   </div>
                   <Slider
                     value={[depositTax]}
-                    min={0}
+                    min={10}
                     max={10}
                     step={1}
                     onValueChange={(value) => setDepositTax(value[0])}
                     className="mb-1"
+                    disabled={true}
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>0%</span>
-                    <span>10%</span>
+                    <span>Fixed at 10%</span>
+                    <span className="text-xs bg-purple-900/50 px-2 py-0.5 rounded text-purple-200 border border-purple-500/30">
+                      Fixed Rate
+                    </span>
                   </div>
                 </div>
 
@@ -517,15 +552,18 @@ export function OnboardingGuide() {
                   </div>
                   <Slider
                     value={[claimTax]}
-                    min={0}
+                    min={10}
                     max={10}
                     step={1}
                     onValueChange={(value) => setClaimTax(value[0])}
                     className="mb-1"
+                    disabled={true}
                   />
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>0%</span>
-                    <span>10%</span>
+                    <span>Fixed at 10%</span>
+                    <span className="text-xs bg-purple-900/50 px-2 py-0.5 rounded text-purple-200 border border-purple-500/30">
+                      Fixed Rate
+                    </span>
                   </div>
                 </div>
 
@@ -589,7 +627,7 @@ export function OnboardingGuide() {
             <div className="mb-8">
               <div className="flex justify-between mb-2">
                 <label className="text-gray-300">Investment Amount (5PT)</label>
-                <span className="text-blue-400 font-bold">{investmentAmount.toLocaleString()} 5PT</span>
+                <span className="text-blue-400 font-bold">{formatWithDecimals(investmentAmount)} 5PT</span>
               </div>
               <Slider
                 value={[investmentAmount]}
@@ -635,7 +673,7 @@ export function OnboardingGuide() {
             <div className="mb-8">
               <div className="flex justify-between mb-2">
                 <label className="text-gray-300">Total Referral Volume (5PT)</label>
-                <span className="text-blue-400 font-bold">{referralVolume.toLocaleString()} 5PT</span>
+                <span className="text-blue-400 font-bold">{formatWithDecimals(referralVolume)} 5PT</span>
               </div>
               <Slider
                 value={[referralVolume]}
@@ -721,13 +759,19 @@ export function OnboardingGuide() {
                   <h4 className="text-gray-300">Daily Rewards (Day {simulationDays})</h4>
                   <ArrowRight className="h-4 w-4 text-blue-400" />
                 </div>
-                <p className="text-3xl font-bold text-white">{lastDayResult?.dailyReward.toFixed(2)} 5PT</p>
+                <p className="text-3xl font-bold text-white">{lastDayResult?.dailyReward.toFixed(3)} 5PT</p>
                 <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                   <div className="text-gray-400">
-                    <span className="text-blue-400">•</span> Base (0.35%): {lastDayResult?.baseReward.toFixed(2)} 5PT
+                    <span className="text-blue-400">•</span> Base (0.3%): {lastDayResult?.baseReward.toFixed(3)} 5PT
                   </div>
                   <div className="text-gray-400">
-                    <span className="text-purple-400">•</span> Pools: {lastDayResult?.poolRewards.toFixed(2)} 5PT
+                    <span className="text-purple-400">•</span> Pools: {lastDayResult?.poolRewards.toFixed(3)} 5PT
+                  </div>
+                  <div className="text-gray-400">
+                    <span className="text-green-400">•</span> Referrals: {lastDayResult?.referralReward.toFixed(3)} 5PT
+                  </div>
+                  <div className="text-gray-400">
+                    <span className="text-indigo-400">•</span> Downline: {lastDayResult?.downlineReward.toFixed(3)} 5PT
                   </div>
                 </div>
               </div>
@@ -738,14 +782,15 @@ export function OnboardingGuide() {
                   <h4 className="text-gray-300">Investment Growth</h4>
                   <ArrowRight className="h-4 w-4 text-purple-400" />
                 </div>
-                <p className="text-3xl font-bold text-white">{results.currentInvestment.toFixed(2)} 5PT</p>
+                <p className="text-3xl font-bold text-white">{formatWithDecimals(results.currentInvestment)} 5PT</p>
                 <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                   <div className="text-gray-400">
-                    <span className="text-blue-400">•</span> Initial: {results.afterTaxInvestment.toFixed(2)} 5PT
+                    <span className="text-blue-400">•</span> Initial: {formatWithDecimals(results.afterTaxInvestment)}{" "}
+                    5PT
                   </div>
                   <div className="text-gray-400">
                     <span className="text-green-400">•</span> Growth:{" "}
-                    {(results.currentInvestment - results.afterTaxInvestment).toFixed(2)} 5PT
+                    {formatWithDecimals(results.currentInvestment - results.afterTaxInvestment)} 5PT
                   </div>
                 </div>
               </div>
@@ -760,22 +805,22 @@ export function OnboardingGuide() {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Total Earnings:</span>
-                    <span className="text-green-400 font-bold">{results.totalEarnings.toFixed(2)} 5PT</span>
+                    <span className="text-green-400 font-bold">{formatWithDecimals(results.totalEarnings)} 5PT</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-400">Reinvested:</span>
-                    <span className="text-blue-400">{results.totalReinvested.toFixed(2)} 5PT</span>
+                    <span className="text-blue-400">{formatWithDecimals(results.totalReinvested)} 5PT</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-400">Claimed:</span>
-                    <span className="text-purple-400">{results.totalClaimed.toFixed(2)} 5PT</span>
+                    <span className="text-purple-400">{formatWithDecimals(results.totalClaimed)} 5PT</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-400">Deposit Tax Paid:</span>
-                    <span className="text-red-400">{results.depositTaxPaid.toFixed(2)} 5PT</span>
+                    <span className="text-red-400">{formatWithDecimals(results.depositTaxPaid)} 5PT</span>
                   </div>
 
                   <div className="border-t border-gray-700 pt-2 mt-2">

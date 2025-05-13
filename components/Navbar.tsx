@@ -69,6 +69,7 @@ export function Navbar() {
             <NavLink href="/#features" label="Features" />
             <NavLink href="/#tokenomics" label="Tokenomics" />
             <NavLink href="/#roadmap" label="Roadmap" />
+            {/* Removed any links to early-investor section if they existed */}
           </motion.div>
 
           <motion.div
@@ -117,6 +118,7 @@ export function Navbar() {
               <MobileNavLink href="/#features" label="Features" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#tokenomics" label="Tokenomics" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#roadmap" label="Roadmap" onClick={() => setIsMobileMenuOpen(false)} />
+              {/* Removed any links to early-investor section if they existed */}
               <div className="pt-2">
                 <CustomConnectButton />
               </div>

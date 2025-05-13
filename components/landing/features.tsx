@@ -22,19 +22,23 @@ export function Features() {
       icon: <Layers className="h-8 w-8" />,
       title: "GLOBAL YIELD SYSTEM",
       description: "Earn daily rewards through our comprehensive multi-component yield system.",
-      points: ["0.35% daily bonus on invested capital", "No team tokens - designed for investors"],
+      points: ["0.3% daily bonus on invested capital", "No team tokens - designed for investors"],
     },
     {
       icon: <TrendingUp className="h-8 w-8" />,
       title: "MULTI-TIER POOLS",
       description: "Access 9 different investment pools with varying qualification criteria and rewards.",
-      points: ["Pools 1-5: 0.035% daily pool share each", "Pools 6-9: 0.02% daily pool share each"],
+      points: [
+        "Pools 1-5: 0.0175% daily pool share each",
+        "Pools 6-7: 0.01% daily pool share each",
+        "Pools 8-9: 0.02% daily pool share each (whitelist)",
+      ],
     },
     {
       icon: <Users className="h-8 w-8" />,
       title: "REFERRAL BONUSES",
       description: "Earn additional income by referring new investors to the platform.",
-      points: ["0.05% daily bonus on direct referral deposits", "0.0135% daily bonus per level (levels 2-10)"],
+      points: ["0.025% daily bonus on direct referral deposits", "0.06% daily bonus per level (levels 2-10)"],
     },
     {
       icon: <Award className="h-8 w-8" />,

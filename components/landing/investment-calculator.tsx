@@ -8,48 +8,41 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { CyberButton } from "@/components/ui/cyber-button"
 import { TiltCard } from "@/components/parallax/tilt-card"
-import { Calculator, TrendingUp, BarChart3, Calendar } from "lucide-react"
-import { formatCrypto, formatNumber, formatPercent } from "@/lib/utils"
+import { Calculator, TrendingUp, BarChart3, Calendar, Info } from "lucide-react"
+import { formatCrypto, formatPercent } from "@/lib/utils"
 import Link from "next/link"
 import { ContentCard } from "@/components/ui/content-card"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-// Pool data from the smart contract
+// Updated pool data from the latest contract documentation
 const INVESTMENT_POOLS = [
   {
     id: "starter",
     name: "Starter Pool",
-    dailyRate: 5,
-    minDeposit: 100,
-    lockPeriod: 7,
+    dailyRate: 0.3, // Base daily rate (not pool rate)
+    minDeposit: 550, // ~$1,000 at $0.00175 per token
+    lockPeriod: 0,
     rankRequired: 0,
     description: "Perfect for beginners. Low risk with steady returns.",
   },
   {
     id: "growth",
     name: "Growth Pool",
-    dailyRate: 8,
-    minDeposit: 500,
-    lockPeriod: 14,
+    dailyRate: 0.3, // Base daily rate (not pool rate)
+    minDeposit: 1450, // ~$2,500 at $0.00175 per token
+    lockPeriod: 0,
     rankRequired: 2,
     description: "Balanced risk-reward ratio for experienced investors.",
   },
   {
     id: "premium",
     name: "Premium Pool",
-    dailyRate: 15,
-    minDeposit: 1000,
-    lockPeriod: 30,
+    dailyRate: 0.3, // Base daily rate (not pool rate)
+    minDeposit: 3000, // ~$5,000 at $0.00175 per token
+    lockPeriod: 0,
     rankRequired: 5,
-    description: "Highest returns for committed investors. VIP benefits included.",
-  },
-  {
-    id: "exclusive",
-    name: "Whitelist Pool",
-    dailyRate: 0.02,
-    minDeposit: 5000,
-    lockPeriod: 90,
-    rankRequired: 8,
-    description: "Exclusive pool for whitelisted addresses with special benefits.",
+    description: "Higher returns for committed investors.",
   },
 ]
 
@@ -63,13 +56,31 @@ const TIMEFRAME_OPTIONS = [
   { value: 365, label: "1 Year" },
 ]
 
-// Referral tiers based on rank
-const REFERRAL_RATES = [
-  { rank: 0, rate: 5 }, // Novice: 5%
-  { rank: 3, rate: 8 }, // Expert: 8%
-  { rank: 5, rate: 10 }, // Master: 10%
-  { rank: 8, rate: 15 }, // Divine: 15%
-]
+// Updated reward rates based on latest contract
+const REWARD_RATES = {
+  dailyBase: 0.3, // 0.3% daily on invested capital
+  directReferral: 0.025, // 0.025% daily on direct referrals' deposits
+  downlineBonus: 0.06, // 0.06% per level (levels 2-10)
+  poolBonuses: {
+    pools1to5: 0.0175, // 0.0175% each for pools 1-5
+    pools6to7: 0.01, // 0.01% each for pools 6-7
+    pools8to9: 0.02, // 0.02% each for pools 8-9
+  },
+}
+
+// Tax rates (fixed at 10%)
+const TAX_RATES = {
+  deposit: 10,
+  claim: 10,
+}
+
+// Helper function to format with specific decimals
+function formatWithDecimals(value: number, decimals = 3): string {
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+}
 
 export function InvestmentCalculator() {
   // State for calculator inputs
@@ -79,6 +90,8 @@ export function InvestmentCalculator() {
   const [isCompounding, setIsCompounding] = useState(true)
   const [referralCount, setReferralCount] = useState(0)
   const [referralInvestment, setReferralInvestment] = useState(500)
+  const [downlineCount, setDownlineCount] = useState(0)
+  const [downlineInvestment, setDownlineInvestment] = useState(300)
   const [mounted, setMounted] = useState(false)
 
   // Set mounted state for client-side rendering
@@ -92,75 +105,127 @@ export function InvestmentCalculator() {
   // Calculate investment returns
   const calculationResults = useMemo(() => {
     // Base calculation variables
-    const dailyRate = pool.dailyRate / 100
+    const dailyRate = REWARD_RATES.dailyBase / 100
     const days = timeframe
     let totalValue = investmentAmount
     const dailyValues = [{ day: 0, value: investmentAmount }]
 
-    // Calculate compounding or simple interest
-    if (isCompounding) {
-      // Compound interest calculation (reinvest daily)
-      for (let day = 1; day <= days; day++) {
-        totalValue = totalValue * (1 + dailyRate)
-        dailyValues.push({ day, value: totalValue })
+    // Apply deposit tax (10%)
+    const afterTaxInvestment = investmentAmount * 0.9 // 10% tax
+    let workingCapital = afterTaxInvestment
+
+    // Calculate daily rewards
+    const dailyRewards = []
+    let totalPoolEarnings = 0
+    let totalReferralEarnings = 0
+    let totalDownlineEarnings = 0
+
+    for (let day = 1; day <= days; day++) {
+      // Base daily reward (0.3%)
+      const baseReward = workingCapital * dailyRate
+
+      // Pool rewards (varies by pool type)
+      let poolReward = 0
+      if (selectedPool === "starter") {
+        poolReward = workingCapital * (REWARD_RATES.poolBonuses.pools1to5 / 100)
+      } else if (selectedPool === "growth") {
+        poolReward = workingCapital * ((REWARD_RATES.poolBonuses.pools1to5 * 3) / 100) // Assuming 3 pools
+      } else if (selectedPool === "premium") {
+        poolReward =
+          workingCapital * ((REWARD_RATES.poolBonuses.pools1to5 * 5 + REWARD_RATES.poolBonuses.pools6to7 * 2) / 100) // All pools
       }
-    } else {
-      // Simple interest calculation (withdraw daily)
-      const dailyEarning = investmentAmount * dailyRate
-      const totalEarnings = dailyEarning * days
-      totalValue = investmentAmount + totalEarnings
 
-      // Generate daily values for chart
-      for (let day = 1; day <= days; day++) {
-        dailyValues.push({
-          day,
-          value: investmentAmount + dailyEarning * day,
-        })
+      // Referral rewards (0.025% on direct referrals)
+      const referralReward =
+        referralCount > 0 ? referralCount * referralInvestment * (REWARD_RATES.directReferral / 100) : 0
+
+      // Downline rewards (0.06% on downline)
+      const downlineReward =
+        downlineCount > 0 ? downlineCount * downlineInvestment * (REWARD_RATES.downlineBonus / 100) : 0
+
+      // Total daily reward
+      const dailyReward = baseReward + poolReward + referralReward + downlineReward
+
+      // Apply claim tax (10%)
+      const afterTaxReward = dailyReward * 0.9 // 10% tax
+
+      // Track earnings by type
+      totalPoolEarnings += baseReward + poolReward
+      totalReferralEarnings += referralReward
+      totalDownlineEarnings += downlineReward
+
+      // Store daily reward details
+      dailyRewards.push({
+        day,
+        baseReward,
+        poolReward,
+        referralReward,
+        downlineReward,
+        totalReward: dailyReward,
+        afterTaxReward,
+      })
+
+      // Update working capital based on compounding setting
+      if (isCompounding) {
+        // For compounding, 50% of after-tax rewards are auto-reinvested
+        const reinvestedAmount = afterTaxReward * 0.5
+        workingCapital += reinvestedAmount
+        totalValue = workingCapital + afterTaxReward * 0.5 * day // Add accumulated withdrawable rewards
+      } else {
+        // For non-compounding, all rewards are withdrawn
+        totalValue = workingCapital + afterTaxReward * day
       }
-    }
 
-    // Calculate referral earnings (if any)
-    let referralEarnings = 0
-    if (referralCount > 0) {
-      // Find appropriate referral rate based on estimated rank
-      const estimatedRank = Math.min(8, Math.floor(investmentAmount / 1000))
-      const referralRate = REFERRAL_RATES.reduce((prev, curr) => (estimatedRank >= curr.rank ? curr : prev)).rate / 100
-
-      // Calculate total referral earnings
-      referralEarnings = referralCount * referralInvestment * referralRate
+      // Store daily value for chart
+      dailyValues.push({ day, value: totalValue })
     }
 
     // Calculate final results
     const initialInvestment = investmentAmount
-    const poolEarnings = totalValue + referralEarnings - initialInvestment
-    const totalEarnings = poolEarnings + referralEarnings
-    const roi = (totalEarnings / initialInvestment) * 100
-    const dailyAverage = totalEarnings / days
+    const afterTaxInitial = afterTaxInvestment
+    const totalTaxPaid =
+      investmentAmount * 0.1 + (totalPoolEarnings + totalReferralEarnings + totalDownlineEarnings) * 0.1
+    const totalEarnings = totalPoolEarnings + totalReferralEarnings + totalDownlineEarnings
+    const afterTaxEarnings = totalEarnings * 0.9
+    const roi = (afterTaxEarnings / initialInvestment) * 100
+    const dailyAverage = afterTaxEarnings / days
+    const effectiveApr = (afterTaxEarnings / initialInvestment) * (365 / days) * 100
 
     return {
       initialInvestment,
-      finalValue: totalValue + referralEarnings,
-      poolEarnings,
-      referralEarnings,
+      afterTaxInitial,
+      finalValue: totalValue,
+      totalPoolEarnings,
+      totalReferralEarnings,
+      totalDownlineEarnings,
       totalEarnings,
+      afterTaxEarnings,
+      totalTaxPaid,
       roi,
       dailyAverage,
       dailyValues,
-      apr: pool.dailyRate * 365, // Annual percentage rate
+      dailyRewards,
+      apr: REWARD_RATES.dailyBase * 365, // Annual percentage rate (base)
+      effectiveApr, // Effective APR including all rewards
     }
-  }, [investmentAmount, pool.dailyRate, timeframe, isCompounding, referralCount, referralInvestment])
+  }, [
+    investmentAmount,
+    selectedPool,
+    timeframe,
+    isCompounding,
+    referralCount,
+    referralInvestment,
+    downlineCount,
+    downlineInvestment,
+  ])
 
   if (!mounted) return null
 
   return (
     <TiltCard intensity={5} className="w-full">
       <ContentCard className="p-6">
-        {" "}
-        {/* Use consistent ContentCard with custom padding */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="card-title flex items-center">
-            {" "}
-            {/* Use consistent card-title class */}
             <Calculator className="mr-2 h-5 w-5 text-purple-400" />
             Investment Calculator
           </h3>
@@ -195,8 +260,10 @@ export function InvestmentCalculator() {
               </Tabs>
               <p className="text-xs text-gray-400">{pool.description}</p>
               <div className="flex justify-between text-xs">
-                <span className="text-purple-400">Daily Rate: {pool.dailyRate}%</span>
-                <span className="text-purple-400">Min Deposit: {pool.minDeposit} 5PT</span>
+                <span className="text-purple-400">Daily Base Rate: {REWARD_RATES.dailyBase}%</span>
+                <span className="text-purple-400">
+                  Min Deposit: {pool.minDeposit} 5PT (~${(pool.minDeposit * 0.00175).toFixed(2)})
+                </span>
               </div>
             </div>
 
@@ -204,7 +271,9 @@ export function InvestmentCalculator() {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <label className="text-sm text-gray-400">Investment Amount (5PT)</label>
-                <span className="text-sm font-medium">{investmentAmount} 5PT</span>
+                <span className="text-sm font-medium">
+                  {investmentAmount} 5PT (~${(investmentAmount * 0.00175).toFixed(2)})
+                </span>
               </div>
               <Slider
                 value={[investmentAmount]}
@@ -247,7 +316,7 @@ export function InvestmentCalculator() {
             <div className="flex items-center justify-between bg-black/30 p-3 rounded-lg">
               <div>
                 <label className="text-sm font-medium">Compound Returns</label>
-                <p className="text-xs text-gray-400">Reinvest earnings daily for exponential growth</p>
+                <p className="text-xs text-gray-400">Auto-reinvest 50% of daily rewards</p>
               </div>
               <Switch
                 checked={isCompounding}
@@ -258,39 +327,133 @@ export function InvestmentCalculator() {
 
             {/* Referral Settings */}
             <div className="space-y-3 bg-black/30 p-3 rounded-lg">
-              <label className="text-sm font-medium">Referral Earnings</label>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs text-gray-400">Number of Referrals</Label>
-                  <Slider
-                    value={[referralCount]}
-                    min={0}
-                    max={20}
-                    step={1}
-                    onValueChange={(value) => setReferralCount(value[0])}
-                  />
-                  <div className="flex justify-between text-xs">
-                    <span>0</span>
-                    <span className="text-purple-400">{referralCount}</span>
-                    <span>20</span>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Referral Network</label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-gray-400" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs max-w-xs">
+                        Direct referrals earn you {REWARD_RATES.directReferral}% daily on their deposits. Downline
+                        referrals (levels 2-10) earn you {REWARD_RATES.downlineBonus}% daily on their deposits.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                {/* Direct Referrals */}
+                <div className="bg-black/20 p-2 rounded">
+                  <div className="flex justify-between items-center mb-2">
+                    <Label className="text-xs text-gray-400">
+                      Direct Referrals ({REWARD_RATES.directReferral}% daily)
+                    </Label>
+                    <span className="text-xs font-medium text-purple-400">{referralCount}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <Slider
+                      value={[referralCount]}
+                      min={0}
+                      max={20}
+                      step={1}
+                      onValueChange={(value) => setReferralCount(value[0])}
+                    />
+                    <div className="flex justify-between text-xs">
+                      <span>0</span>
+                      <span className="text-purple-400">
+                        {formatWithDecimals(referralCount * referralInvestment * (REWARD_RATES.directReferral / 100))}{" "}
+                        5PT/day
+                      </span>
+                      <span>20</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Label className="text-xs text-gray-400">Avg. Investment</Label>
+                      <span className="text-xs font-medium text-purple-400">{referralInvestment} 5PT</span>
+                    </div>
+                    <Slider
+                      value={[referralInvestment]}
+                      min={100}
+                      max={5000}
+                      step={100}
+                      onValueChange={(value) => setReferralInvestment(value[0])}
+                    />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs text-gray-400">Avg. Referral Investment</Label>
-                  <Slider
-                    value={[referralInvestment]}
-                    min={100}
-                    max={5000}
-                    step={100}
-                    onValueChange={(value) => setReferralInvestment(value[0])}
-                  />
-                  <div className="flex justify-between text-xs">
-                    <span>100</span>
-                    <span className="text-purple-400">{referralInvestment}</span>
-                    <span>5000</span>
+
+                {/* Downline Referrals */}
+                <div className="bg-black/20 p-2 rounded">
+                  <div className="flex justify-between items-center mb-2">
+                    <Label className="text-xs text-gray-400">
+                      Downline Referrals ({REWARD_RATES.downlineBonus}% daily)
+                    </Label>
+                    <span className="text-xs font-medium text-purple-400">{downlineCount}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <Slider
+                      value={[downlineCount]}
+                      min={0}
+                      max={50}
+                      step={5}
+                      onValueChange={(value) => setDownlineCount(value[0])}
+                    />
+                    <div className="flex justify-between text-xs">
+                      <span>0</span>
+                      <span className="text-purple-400">
+                        {formatWithDecimals(downlineCount * downlineInvestment * (REWARD_RATES.downlineBonus / 100))}{" "}
+                        5PT/day
+                      </span>
+                      <span>50</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Label className="text-xs text-gray-400">Avg. Investment</Label>
+                      <span className="text-xs font-medium text-purple-400">{downlineInvestment} 5PT</span>
+                    </div>
+                    <Slider
+                      value={[downlineInvestment]}
+                      min={100}
+                      max={2000}
+                      step={100}
+                      onValueChange={(value) => setDownlineInvestment(value[0])}
+                    />
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Tax Information */}
+            <div className="bg-black/30 p-3 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">Tax Information</label>
+                <Badge variant="outline" className="bg-purple-900/30 text-purple-400 border-purple-500/50">
+                  Fixed Rates
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-black/20 p-2 rounded">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-400">Deposit Tax:</span>
+                    <span className="text-xs font-medium text-purple-400">{TAX_RATES.deposit}%</span>
+                  </div>
+                  <div className="mt-2 h-1 bg-black/30 rounded overflow-hidden">
+                    <div className="h-full bg-purple-500" style={{ width: `${TAX_RATES.deposit}%` }}></div>
+                  </div>
+                </div>
+                <div className="bg-black/20 p-2 rounded">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-400">Claim Tax:</span>
+                    <span className="text-xs font-medium text-purple-400">{TAX_RATES.claim}%</span>
+                  </div>
+                  <div className="mt-2 h-1 bg-black/30 rounded overflow-hidden">
+                    <div className="h-full bg-purple-500" style={{ width: `${TAX_RATES.claim}%` }}></div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                Taxes are applied to deposits and claims. 50% of post-tax rewards are auto-reinvested when compounding
+                is enabled.
+              </p>
             </div>
           </div>
 
@@ -303,10 +466,17 @@ export function InvestmentCalculator() {
                   <TrendingUp className="h-4 w-4 text-purple-400" />
                   <p className="text-sm text-gray-400">Total Return</p>
                 </div>
-                <p className="text-2xl font-bold text-gradient">{formatCrypto(calculationResults.finalValue, "5PT")}</p>
-                <p className="text-xs text-green-400">
-                  +{formatCrypto(calculationResults.totalEarnings, "5PT")} profit
+                <p className="text-2xl font-bold text-gradient">
+                  {formatCrypto(calculationResults.finalValue, "5PT", 3)}
                 </p>
+                <div className="flex flex-col">
+                  <p className="text-xs text-green-400">
+                    +{formatCrypto(calculationResults.afterTaxEarnings, "5PT", 3)} profit
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    After {TAX_RATES.deposit}% deposit & {TAX_RATES.claim}% claim taxes
+                  </p>
+                </div>
               </div>
 
               <div className="bg-black/30 rounded-lg p-4">
@@ -315,13 +485,115 @@ export function InvestmentCalculator() {
                   <p className="text-sm text-gray-400">ROI</p>
                 </div>
                 <p className="text-2xl font-bold text-gradient">{formatPercent(calculationResults.roi)}</p>
-                <p className="text-xs text-green-400">APR: {formatPercent(calculationResults.apr)}</p>
+                <div className="flex flex-col">
+                  <p className="text-xs text-green-400">
+                    Effective APR: {formatPercent(calculationResults.effectiveApr)}
+                  </p>
+                  <p className="text-xs text-gray-400">Base APR: {formatPercent(calculationResults.apr)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Daily Rewards Breakdown */}
+            <div className="bg-black/30 rounded-lg p-4">
+              <h4 className="text-sm font-medium mb-3">Daily Rewards Breakdown</h4>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <p className="text-sm">Base Rewards ({REWARD_RATES.dailyBase}%)</p>
+                  </div>
+                  <p className="font-medium text-purple-400">
+                    {formatWithDecimals(calculationResults.afterTaxInitial * (REWARD_RATES.dailyBase / 100))} 5PT/day
+                  </p>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <p className="text-sm">Pool Rewards</p>
+                  </div>
+                  <p className="font-medium text-blue-400">
+                    {formatWithDecimals(
+                      selectedPool === "starter"
+                        ? calculationResults.afterTaxInitial * (REWARD_RATES.poolBonuses.pools1to5 / 100)
+                        : selectedPool === "growth"
+                          ? calculationResults.afterTaxInitial * ((REWARD_RATES.poolBonuses.pools1to5 * 3) / 100)
+                          : calculationResults.afterTaxInitial *
+                            ((REWARD_RATES.poolBonuses.pools1to5 * 5 + REWARD_RATES.poolBonuses.pools6to7 * 2) / 100),
+                    )}{" "}
+                    5PT/day
+                  </p>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
+                    <p className="text-sm">Referral Rewards ({REWARD_RATES.directReferral}%)</p>
+                  </div>
+                  <p className="font-medium text-indigo-400">
+                    {formatWithDecimals(referralCount * referralInvestment * (REWARD_RATES.directReferral / 100))}{" "}
+                    5PT/day
+                  </p>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-violet-500"></div>
+                    <p className="text-sm">Downline Rewards ({REWARD_RATES.downlineBonus}%)</p>
+                  </div>
+                  <p className="font-medium text-violet-400">
+                    {formatWithDecimals(downlineCount * downlineInvestment * (REWARD_RATES.downlineBonus / 100))}{" "}
+                    5PT/day
+                  </p>
+                </div>
+
+                <div className="border-t border-gray-800 pt-2 mt-2">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-medium">Total Daily (Pre-Tax)</p>
+                    <p className="font-bold text-green-400">
+                      {formatWithDecimals(
+                        calculationResults.afterTaxInitial * (REWARD_RATES.dailyBase / 100) +
+                          (selectedPool === "starter"
+                            ? calculationResults.afterTaxInitial * (REWARD_RATES.poolBonuses.pools1to5 / 100)
+                            : selectedPool === "growth"
+                              ? calculationResults.afterTaxInitial * ((REWARD_RATES.poolBonuses.pools1to5 * 3) / 100)
+                              : calculationResults.afterTaxInitial *
+                                ((REWARD_RATES.poolBonuses.pools1to5 * 5 + REWARD_RATES.poolBonuses.pools6to7 * 2) /
+                                  100)) +
+                          referralCount * referralInvestment * (REWARD_RATES.directReferral / 100) +
+                          downlineCount * downlineInvestment * (REWARD_RATES.downlineBonus / 100),
+                      )}{" "}
+                      5PT/day
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-sm font-medium">After {TAX_RATES.claim}% Tax</p>
+                    <p className="font-bold text-green-400">
+                      {formatWithDecimals(
+                        (calculationResults.afterTaxInitial * (REWARD_RATES.dailyBase / 100) +
+                          (selectedPool === "starter"
+                            ? calculationResults.afterTaxInitial * (REWARD_RATES.poolBonuses.pools1to5 / 100)
+                            : selectedPool === "growth"
+                              ? calculationResults.afterTaxInitial * ((REWARD_RATES.poolBonuses.pools1to5 * 3) / 100)
+                              : calculationResults.afterTaxInitial *
+                                ((REWARD_RATES.poolBonuses.pools1to5 * 5 + REWARD_RATES.poolBonuses.pools6to7 * 2) /
+                                  100)) +
+                          referralCount * referralInvestment * (REWARD_RATES.directReferral / 100) +
+                          downlineCount * downlineInvestment * (REWARD_RATES.downlineBonus / 100)) *
+                          0.9,
+                      )}{" "}
+                      5PT/day
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Earnings Breakdown */}
             <div className="bg-black/30 rounded-lg p-4">
-              <h4 className="text-sm font-medium mb-3">Earnings Breakdown</h4>
+              <h4 className="text-sm font-medium mb-3">Total Earnings Breakdown</h4>
 
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -329,7 +601,9 @@ export function InvestmentCalculator() {
                     <div className="w-3 h-3 rounded-full bg-purple-500"></div>
                     <p className="text-sm">Pool Earnings</p>
                   </div>
-                  <p className="font-medium text-purple-400">{formatCrypto(calculationResults.poolEarnings, "5PT")}</p>
+                  <p className="font-medium text-purple-400">
+                    {formatCrypto(calculationResults.totalPoolEarnings, "5PT", 3)}
+                  </p>
                 </div>
 
                 <div className="flex justify-between items-center">
@@ -338,14 +612,28 @@ export function InvestmentCalculator() {
                     <p className="text-sm">Referral Earnings</p>
                   </div>
                   <p className="font-medium text-indigo-400">
-                    {formatCrypto(calculationResults.referralEarnings, "5PT")}
+                    {formatCrypto(
+                      calculationResults.totalReferralEarnings + calculationResults.totalDownlineEarnings,
+                      "5PT",
+                      3,
+                    )}
                   </p>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <p className="text-sm">Total Tax Paid</p>
+                  </div>
+                  <p className="font-medium text-red-400">{formatCrypto(calculationResults.totalTaxPaid, "5PT", 3)}</p>
                 </div>
 
                 <div className="border-t border-gray-800 pt-2 mt-2">
                   <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium">Total Profit</p>
-                    <p className="font-bold text-green-400">{formatCrypto(calculationResults.totalEarnings, "5PT")}</p>
+                    <p className="text-sm font-medium">Total Profit (After Tax)</p>
+                    <p className="font-bold text-green-400">
+                      {formatCrypto(calculationResults.afterTaxEarnings, "5PT", 3)}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -357,7 +645,9 @@ export function InvestmentCalculator() {
                 <Calendar className="h-4 w-4 text-purple-400" />
                 <p className="text-sm text-gray-400">Daily Average Earnings</p>
               </div>
-              <p className="text-xl font-bold text-gradient">{formatCrypto(calculationResults.dailyAverage, "5PT")}</p>
+              <p className="text-xl font-bold text-gradient">
+                {formatCrypto(calculationResults.dailyAverage, "5PT", 3)}
+              </p>
               <p className="text-xs text-gray-400">Based on {timeframe} days investment period</p>
             </div>
 
@@ -392,10 +682,10 @@ export function InvestmentCalculator() {
 
                   {/* Start and end values */}
                   <div className="absolute top-0 left-0 text-xs text-purple-400">
-                    {formatNumber(calculationResults.initialInvestment)}
+                    {formatWithDecimals(calculationResults.afterTaxInitial)} 5PT
                   </div>
                   <div className="absolute top-0 right-0 text-xs text-purple-400">
-                    {formatNumber(calculationResults.finalValue)}
+                    {formatWithDecimals(calculationResults.finalValue)} 5PT
                   </div>
                 </div>
               </div>
