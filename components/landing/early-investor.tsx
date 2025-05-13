@@ -5,7 +5,6 @@ import Link from "next/link"
 import { Rocket, TrendingUp, Award } from "lucide-react"
 import { CyberButton } from "@/components/ui/cyber-button"
 import { SectionContainer } from "@/components/ui/section-container"
-import { ContentCard } from "@/components/ui/content-card"
 
 export function EarlyInvestor() {
   return (
@@ -14,7 +13,14 @@ export function EarlyInvestor() {
       title="EARLY INVESTOR"
       subtitle="Join the Five Pillars Token investment platform at launch and position yourself for maximum rewards."
     >
-      <ContentCard className="md:p-12">
+      {/* IMPORTANT: Use direct div instead of ContentCard to match other sections */}
+      <motion.div
+        className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+      >
         {/* Benefits grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Early Access */}
@@ -76,7 +82,7 @@ export function EarlyInvestor() {
             </CyberButton>
           </Link>
         </div>
-      </ContentCard>
+      </motion.div>
     </SectionContainer>
   )
 }

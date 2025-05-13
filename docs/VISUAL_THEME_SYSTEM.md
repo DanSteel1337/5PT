@@ -39,6 +39,20 @@ The `ContentCard` component provides a standardized card container for content w
 </ContentCard>
 \`\`\`
 
+> **Important**: In some cases, using the ContentCard component directly may cause visual inconsistencies. If a section appears darker than others, try using the direct styling approach instead:
+>
+> \`\`\`jsx
+> <motion.div
+>   className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 overflow-hidden"
+>   initial={{ opacity: 0, y: 20 }}
+>   whileInView={{ opacity: 1, y: 0 }}
+>   viewport={{ once: true }}
+>   transition={{ duration: 0.8 }}
+> >
+>   {/* Content */}
+> </motion.div>
+> \`\`\`
+
 ## Tailwind Component Classes
 
 The following component classes are available for use throughout the application:
@@ -91,16 +105,27 @@ All sections use consistent animation patterns:
 3. Maintain consistent opacity values for backgrounds
 4. Use the predefined component classes for typography
 5. Follow the established animation patterns
+6. **Avoid custom padding on ContentCard components**
+7. **If visual inconsistencies persist, use direct styling instead of ContentCard**
 
-By adhering to this visual theme system, we ensure a consistent and cohesive user experience throughout the application.
+## Common Pitfalls to Avoid
+
+1. **Custom Padding**: Adding custom padding classes to ContentCard components can affect their appearance and cause inconsistency
+2. **Multiple Background Layers**: Adding additional background elements can stack opacity and make sections appear darker
+3. **Custom Backdrop Filters**: Using different backdrop-filter values can cause visual inconsistency
+4. **Nested Cards**: Nesting ContentCard components can multiply opacity effects and cause sections to appear darker
+5. **Component Nesting**: In some cases, the way components are nested can affect their visual appearance
 
 ## Troubleshooting
 
-If sections appear darker than others, check for:
+If sections appear darker than others, try these solutions:
 
-1. Multiple stacked background layers with their own opacity settings
-2. Inconsistent backdrop filter values
-3. Additional wrappers with their own background properties
-4. CSS specificity conflicts
+1. Check for multiple stacked background layers with their own opacity settings
+2. Ensure consistent backdrop filter values
+3. Remove additional wrappers with their own background properties
+4. Check for CSS specificity conflicts
+5. Remove custom padding classes on ContentCard components
+6. **Try using direct styling instead of the ContentCard component**
+7. **Ensure the component structure matches other sections exactly**
 
 Always use the standardized components and classes to avoid these issues.
