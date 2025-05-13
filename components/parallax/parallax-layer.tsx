@@ -1,65 +1,50 @@
 "use client"
 
-import { type ReactNode, useState, useEffect } from "react"
-import { motion, useTransform } from "framer-motion"
-import { useParallax } from "@/hooks/use-parallax"
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
 
 interface ParallaxLayerProps {
-  children: ReactNode
+  children: React.ReactNode
   speed?: number
-  direction?: "up" | "down" | "left" | "right"
-  className?: string
+  direction?: "up" | "down"
   offset?: number
+  className?: string
 }
 
 export function ParallaxLayer({
   children,
   speed = 0.5,
   direction = "up",
-  className = "",
   offset = 0,
+  className = "",
 }: ParallaxLayerProps) {
   const [mounted, setMounted] = useState(false)
-  const { scrollY } = useParallax()
+  const [ref, setRef] = useState<HTMLDivElement | null>(null)
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  })
+
+  // Calculate the y transform based on direction and speed
+  const y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    direction === "up" ? [offset + 100 * speed, offset + -100 * speed] : [offset + -100 * speed, offset + 100 * speed],
+  )
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Calculate transform values based on direction
-  const getTransformValues = () => {
-    switch (direction) {
-      case "up":
-        return [offset, -100 * speed + offset]
-      case "down":
-        return [offset, 100 * speed + offset]
-      case "left":
-        return [offset, -100 * speed + offset]
-      case "right":
-        return [offset, 100 * speed + offset]
-      default:
-        return [offset, -100 * speed + offset]
-    }
+  if (!mounted) {
+    return <div className={className}>{children}</div>
   }
 
-  // Create transform values
-  const shouldAnimateY = direction === "up" || direction === "down"
-  const shouldAnimateX = direction === "left" || direction === "right"
-
-  const y = useTransform(scrollY, [0, 1000], shouldAnimateY ? getTransformValues() : [0, 0])
-
-  const x = useTransform(scrollY, [0, 1000], shouldAnimateX ? getTransformValues() : [0, 0])
-
-  if (!mounted) return <>{children}</>
-
   return (
-    <motion.div
-      className={className}
-      style={{
-        x,
-        y,
-      }}
-    >
+    <motion.div ref={setRef} className={className} style={{ y }}>
       {children}
     </motion.div>
   )

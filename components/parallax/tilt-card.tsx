@@ -1,103 +1,77 @@
 "use client"
 
 import type React from "react"
-import { type ReactNode, useRef, useState, useEffect } from "react"
-import { motion } from "framer-motion"
+
+import { useState, useEffect, useRef } from "react"
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
 
 interface TiltCardProps {
-  children: ReactNode
+  children: React.ReactNode
   className?: string
   intensity?: number
-  perspective?: number
-  glareOpacity?: number
-  glareColor?: string
-  disabled?: boolean
 }
 
-export function TiltCard({
-  children,
-  className = "",
-  intensity = 10,
-  perspective = 1000,
-  glareOpacity = 0.2,
-  glareColor = "rgba(255, 255, 255, 0.5)",
-  disabled = false,
-}: TiltCardProps) {
-  const [rotateX, setRotateX] = useState(0)
-  const [rotateY, setRotateY] = useState(0)
-  const [glarePosition, setGlarePosition] = useState({ x: 0, y: 0 })
-  const cardRef = useRef<HTMLDivElement>(null)
+export function TiltCard({ children, className = "", intensity = 15 }: TiltCardProps) {
   const [mounted, setMounted] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Motion values for the card's rotation
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  // Spring animations for smoother movement
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [intensity, -intensity]), {
+    damping: 50,
+    stiffness: 400,
+  })
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-intensity, intensity]), {
+    damping: 50,
+    stiffness: 400,
+  })
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return
+
+    const rect = ref.current.getBoundingClientRect()
+    const width = rect.width
+    const height = rect.height
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    // Calculate the position of the mouse relative to the card (0 to 1)
+    const xPct = mouseX / width - 0.5
+    const yPct = mouseY / height - 0.5
+
+    x.set(xPct)
+    y.set(yPct)
+  }
+
+  const handleMouseLeave = () => {
+    x.set(0)
+    y.set(0)
+  }
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (disabled || !cardRef.current) return
-
-    const rect = cardRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    const mouseX = e.clientX
-    const mouseY = e.clientY
-
-    // Calculate rotation based on mouse position
-    const rotateY = ((mouseX - centerX) / (rect.width / 2)) * intensity
-    const rotateX = ((centerY - mouseY) / (rect.height / 2)) * intensity
-
-    // Calculate glare position
-    const glareX = ((mouseX - rect.left) / rect.width) * 100
-    const glareY = ((mouseY - rect.top) / rect.height) * 100
-
-    setRotateX(rotateX)
-    setRotateY(rotateY)
-    setGlarePosition({ x: glareX, y: glareY })
+  if (!mounted) {
+    return <div className={className}>{children}</div>
   }
-
-  const handleMouseLeave = () => {
-    if (disabled) return
-    setRotateX(0)
-    setRotateY(0)
-  }
-
-  if (!mounted)
-    return (
-      <div ref={cardRef} className={className}>
-        {children}
-      </div>
-    )
 
   return (
     <motion.div
-      ref={cardRef}
-      className={`relative overflow-hidden ${className}`}
+      ref={ref}
+      className={`relative ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
-        perspective: `${perspective}px`,
+        rotateX,
+        rotateY,
         transformStyle: "preserve-3d",
       }}
-      animate={{
-        rotateX: rotateX,
-        rotateY: rotateY,
-      }}
-      transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.5 }}
     >
-      {children}
-
-      {/* Glare effect */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, ${glareColor}, transparent 70%)`,
-          opacity: glareOpacity,
-          mixBlendMode: "overlay",
-        }}
-        animate={{
-          opacity: disabled ? 0 : glareOpacity,
-        }}
-      />
+      <div style={{ transform: "translateZ(0)" }}>{children}</div>
     </motion.div>
   )
 }

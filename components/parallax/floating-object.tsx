@@ -1,27 +1,24 @@
 "use client"
 
-import type { ReactNode } from "react"
-import { motion } from "framer-motion"
+import type React from "react"
+
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 
 interface FloatingObjectProps {
-  children: ReactNode
-  className?: string
-  xFactor?: number
-  yFactor?: number
-  rotateFactor?: number
+  children: React.ReactNode
+  amplitude?: number
   duration?: number
   delay?: number
+  className?: string
 }
 
 export function FloatingObject({
   children,
-  className = "",
-  xFactor = 10,
-  yFactor = 15,
-  rotateFactor = 5,
-  duration = 6,
+  amplitude = 10,
+  duration = 4,
   delay = 0,
+  className = "",
 }: FloatingObjectProps) {
   const [mounted, setMounted] = useState(false)
 
@@ -29,15 +26,15 @@ export function FloatingObject({
     setMounted(true)
   }, [])
 
-  if (!mounted) return <div className={className}>{children}</div>
+  if (!mounted) {
+    return <div className={className}>{children}</div>
+  }
 
   return (
     <motion.div
-      className={`relative ${className}`}
+      className={className}
       animate={{
-        y: [0, -yFactor, 0],
-        x: [0, xFactor, 0],
-        rotate: [0, rotateFactor, 0],
+        y: [0, -amplitude, 0],
       }}
       transition={{
         duration,

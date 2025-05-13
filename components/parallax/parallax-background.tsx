@@ -16,44 +16,44 @@ export function ParallaxBackground() {
   const y1 = useTransform(scrollY, [0, 1000], [0, -150])
   const y2 = useTransform(scrollY, [0, 1000], [0, -100])
   const y3 = useTransform(scrollY, [0, 1000], [0, -50])
-  const opacity = useTransform(scrollY, [0, 300, 600], [1, 0.5, 0])
+  const opacity = useTransform(scrollY, [0, 300, 600], [0.7, 0.4, 0]) // Reduced initial opacity
 
   if (!mounted) return null
 
   return (
     <>
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black"></div>
+      {/* Background gradient - reduced opacity */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black z-10"></div>
 
-      {/* Parallax stars */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Parallax stars - reduced opacity and added z-index */}
+      <div className="absolute inset-0 overflow-hidden z-20">
         {/* Far stars (slow movement) */}
         <motion.div
-          className="absolute inset-0 bg-[url('/images/stars-small.png')] bg-repeat opacity-50"
+          className="absolute inset-0 bg-[url('/images/stars-small.png')] bg-repeat opacity-30"
           style={{ y: y1 }}
         />
 
         {/* Medium stars (medium movement) */}
         <motion.div
-          className="absolute inset-0 bg-[url('/images/stars-medium.png')] bg-repeat opacity-60"
+          className="absolute inset-0 bg-[url('/images/stars-medium.png')] bg-repeat opacity-40"
           style={{ y: y2 }}
         />
 
         {/* Close stars (fast movement) */}
         <motion.div
-          className="absolute inset-0 bg-[url('/images/stars-large.png')] bg-repeat opacity-70"
+          className="absolute inset-0 bg-[url('/images/stars-large.png')] bg-repeat opacity-50"
           style={{ y: y3 }}
         />
       </div>
 
-      {/* Gradient overlay that fades as you scroll */}
+      {/* Gradient overlay that fades as you scroll - reduced opacity */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-transparent to-transparent"
+        className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-transparent to-transparent z-30"
         style={{ opacity }}
       />
 
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[url('/images/grid.png')] bg-repeat opacity-10"></div>
+      {/* Grid overlay - reduced opacity */}
+      <div className="absolute inset-0 bg-[url('/images/grid.png')] bg-repeat opacity-5 z-20"></div>
     </>
   )
 }
