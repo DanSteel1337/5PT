@@ -7,21 +7,13 @@ import { CyberButton } from "@/components/ui/cyber-button"
 import { CyberCard } from "@/components/ui/cyber-card"
 import { ClientOnly } from "@/components/ClientOnly"
 import { cn } from "@/lib/utils"
-import { POOL_CRITERIA, CONTRACT_CONSTANTS, TOKENOMICS, CONTRACT_ADDRESSES } from "@/lib/contracts"
+import { CONTRACT_CONSTANTS, CONTRACT_ADDRESSES } from "@/lib/contracts"
 
 // FAQ Item type
 type FAQItem = {
   question: string
   answer: string
 }
-
-// Dummy CONTRACT_ADDRESSES object for demonstration purposes.
-// In a real application, this would likely be imported from a config file or environment variables.
-// const CONTRACT_ADDRESSES = {
-//   mainnet: {
-//     investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc",
-//   },
-// }
 
 export function ConversionSection() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
@@ -36,7 +28,7 @@ export function ConversionSection() {
     },
     {
       question: "How does the deflationary mechanism work?",
-      answer: `Every deposit has a ${CONTRACT_CONSTANTS.DEPOSIT_TAX_PERCENT}% tax that is partially burned, reducing the total supply. Additionally, when rewards are claimed, a ${CONTRACT_CONSTANTS.CLAIM_TAX_PERCENT}% tax is applied, further reducing supply. This creates a deflationary pressure that can benefit early investors as token value potentially increases over time.`,
+      answer: `Every deposit is fully burned (100%), permanently removing tokens from circulation. Additionally, when rewards are claimed, a ${CONTRACT_CONSTANTS.CLAIM_TAX_PERCENT}% tax is applied. This aggressive burning mechanism creates strong deflationary pressure that can benefit early investors as token value potentially increases over time.`,
     },
     {
       question: "How do I qualify for investment pools?",
@@ -135,9 +127,9 @@ export function ConversionSection() {
                       <h4 className="font-semibold">Deflationary Tokenomics</h4>
                     </div>
                     <p className="text-sm text-gray-300">
-                      Every deposit incurs a {CONTRACT_CONSTANTS.DEPOSIT_TAX_PERCENT}% tax, and every reward claim
-                      incurs a {CONTRACT_CONSTANTS.CLAIM_TAX_PERCENT}% tax. A portion of these taxes is burned, reducing
-                      the total supply over time.
+                      Every deposit is fully burned (100%), creating a powerful deflationary effect. Additionally, every
+                      reward claim incurs a {CONTRACT_CONSTANTS.CLAIM_TAX_PERCENT}% tax. These mechanisms continuously
+                      reduce the total supply over time.
                     </p>
                   </div>
 
@@ -147,8 +139,8 @@ export function ConversionSection() {
                       <h4 className="font-semibold">Pool Qualification Advantage</h4>
                     </div>
                     <p className="text-sm text-gray-300">
-                      Pool 1 requires {POOL_CRITERIA[0].personalInvestment / 10 ** 18} tokens personally invested. Early
-                      adopters can acquire these tokens at lower prices, making qualification significantly easier.
+                      Pool 1 requires 550,000 tokens personally invested. Early adopters can acquire these tokens at
+                      lower prices, making qualification significantly easier.
                     </p>
                   </div>
                 </div>
@@ -217,32 +209,12 @@ export function ConversionSection() {
 
                   <div className="text-sm text-gray-300">
                     <p className="mb-2">
-                      <strong>Initial Supply:</strong> {TOKENOMICS.totalSupply / 10 ** 18} tokens
+                      <strong>Initial Supply:</strong> 10,000,000,000 tokens
                     </p>
                     <p>
-                      <strong>Burning Mechanism:</strong> Every deposit and reward claim contributes to token burning,
-                      creating a deflationary pressure that can benefit early investors.
+                      <strong>Burning Mechanism:</strong> Every deposit is fully burned, creating a powerful
+                      deflationary effect that can benefit early investors.
                     </p>
-                  </div>
-                </div>
-
-                {/* Pool qualification table */}
-                <div className="mb-8">
-                  <h4 className="text-lg font-semibold mb-3">First Pool Requirements</h4>
-                  <div className="bg-black/30 border border-purple-500/30 rounded-lg p-4">
-                    <div className="grid grid-cols-2 gap-y-2 text-sm">
-                      <div className="text-gray-400">Personal Investment:</div>
-                      <div>{POOL_CRITERIA[0].personalInvestment / 10 ** 18} 5PT</div>
-
-                      <div className="text-gray-400">Direct Referral Volume:</div>
-                      <div>{POOL_CRITERIA[0].directInvestment / 10 ** 18} 5PT</div>
-
-                      <div className="text-gray-400">Direct Referrals:</div>
-                      <div>{POOL_CRITERIA[0].directRefs}</div>
-
-                      <div className="text-gray-400">Daily Reward Share:</div>
-                      <div>{POOL_CRITERIA[0].share / 10000}%</div>
-                    </div>
                   </div>
                 </div>
 

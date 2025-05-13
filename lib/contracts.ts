@@ -169,7 +169,7 @@ export const CONTRACT_CONSTANTS = {
 
 // Adding tokenomics data from documentation
 export const TOKENOMICS = {
-  totalSupply: 100_000_000_000 * 10 ** 18, // 100B tokens
+  totalSupply: 10_000_000_000 * 10 ** 18, // 10B tokens
   airdropCampaign: {
     allocation: 29714285714,
     percentage: 29.7,
