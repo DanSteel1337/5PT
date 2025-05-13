@@ -6,7 +6,6 @@ import Image from "next/image"
 import { ParallaxSection } from "@/components/parallax/parallax-section"
 import { ParallaxLayer } from "@/components/parallax/parallax-layer"
 import { TiltCard } from "@/components/parallax/tilt-card"
-import { FloatingObject } from "@/components/parallax/floating-object"
 
 export function Tokenomics() {
   const [mounted, setMounted] = useState(false)
@@ -33,16 +32,19 @@ export function Tokenomics() {
     { name: "Community Rewards", percentage: 5 },
   ]
 
-  const tokenFeatures = [
-    { title: "AUTO-LIQUIDITY", description: "2% of every transaction is automatically added to the liquidity pool." },
-    { title: "REWARD DISTRIBUTION", description: "3% of transactions are redistributed to all token holders." },
+  const rewardMechanisms = [
+    { title: "DAILY BONUS", description: "Earn 0.35% daily on your invested capital with no team tokens." },
     {
-      title: "DEFLATIONARY MECHANISM",
-      description: "1% of all transactions are burned, reducing the total supply over time.",
+      title: "REFERRAL BONUS",
+      description: "Gain an additional 0.05% daily bonus on deposits made by direct referrals.",
     },
     {
-      title: "INVESTMENT POOL FUNDING",
-      description: "4% of transactions go to the investment pools, ensuring sustainable rewards.",
+      title: "DOWNLINE BONUS",
+      description: "Receive 0.0135% per level (up to levels 2–10) from your extended network.",
+    },
+    {
+      title: "POOL BONUS",
+      description: "Nine pools filled daily with a percentage of the total deposit volume.",
     },
   ]
 
@@ -119,12 +121,11 @@ export function Tokenomics() {
                   transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, delay: 1 }}
                 ></motion.div>
 
-                {/* Logo with rotation based on scroll */}
+                {/* Logo with rotation based on scroll - Fixed orientation by removing style rotation */}
                 <motion.div
                   className="absolute inset-8 rounded-full bg-black/50 flex items-center justify-center"
                   style={{
                     filter: "drop-shadow(0 0 20px rgba(139, 92, 246, 0.7))",
-                    rotate,
                   }}
                 >
                   <Image
@@ -179,6 +180,8 @@ export function Tokenomics() {
                   <TokenDetail label="Symbol" value="5PT" />
                   <TokenDetail label="Total Supply" value="1,000,000,000" />
                   <TokenDetail label="Blockchain" value="Binance Smart Chain" />
+                  <TokenDetail label="Contract" value="0x8FafdFB035C9426a50D842873D5d401C933bE09F" />
+                  <TokenDetail label="Investment Manager" value="0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc" />
                 </div>
               </motion.div>
             </TiltCard>
@@ -194,15 +197,19 @@ export function Tokenomics() {
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
                 <h3 className="text-xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                  TOKEN DISTRIBUTION
+                  GLOBAL YIELD SYSTEM
                 </h3>
 
+                <p className="text-gray-300 mb-6">
+                  The Five Pillars Token implements a comprehensive global yield system with multiple reward components:
+                </p>
+
                 <div className="space-y-6">
-                  {tokenDistribution.map((item, index) => (
-                    <TokenDistributionItem
+                  {rewardMechanisms.map((item, index) => (
+                    <RewardMechanismItem
                       key={index}
-                      name={item.name}
-                      percentage={item.percentage}
+                      title={item.title}
+                      description={item.description}
                       delay={index * 0.1}
                     />
                   ))}
@@ -210,34 +217,33 @@ export function Tokenomics() {
               </motion.div>
             </TiltCard>
 
-            <div className="grid grid-cols-2 gap-4">
-              {tokenFeatures.map((feature, index) => (
-                <FloatingObject
-                  key={index}
-                  xFactor={5}
-                  yFactor={5}
-                  rotateFactor={2}
-                  duration={6 + index}
-                  delay={index * 0.5}
-                >
-                  <motion.div
-                    className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-4 group hover:border-purple-500/50 transition-colors"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                    whileHover={{ y: -5, boxShadow: "0 10px 30px -10px rgba(139, 92, 246, 0.5)" }}
-                  >
-                    <h4 className="text-sm font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                      {feature.title}
-                    </h4>
-                    <p className="text-gray-400 text-xs group-hover:text-gray-300 transition-colors">
-                      {feature.description}
-                    </p>
-                  </motion.div>
-                </FloatingObject>
-              ))}
-            </div>
+            <TiltCard>
+              <motion.div
+                className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 mt-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                <h4 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
+                  POOL DISTRIBUTION
+                </h4>
+                <div className="space-y-4">
+                  <div className="bg-black/50 p-3 rounded">
+                    <p className="text-gray-400 text-xs mb-1">Pools 1-5</p>
+                    <p className="font-medium text-purple-400">0.035% Daily Share Each</p>
+                  </div>
+                  <div className="bg-black/50 p-3 rounded">
+                    <p className="text-gray-400 text-xs mb-1">Pools 6-9</p>
+                    <p className="font-medium text-purple-400">0.02% Daily Share Each</p>
+                  </div>
+                  <div className="bg-black/50 p-3 rounded">
+                    <p className="text-gray-400 text-xs mb-1">Pools 8-9 Access</p>
+                    <p className="font-medium text-purple-400">Whitelist Only</p>
+                  </div>
+                </div>
+              </motion.div>
+            </TiltCard>
           </ParallaxLayer>
         </div>
       </div>
@@ -249,32 +255,22 @@ function TokenDetail({ label, value }) {
   return (
     <motion.div className="bg-black/50 p-3 rounded group hover:bg-black/70 transition-colors" whileHover={{ y: -2 }}>
       <p className="text-gray-400 text-xs mb-1">{label}</p>
-      <p className="font-medium group-hover:text-purple-400 transition-colors">{value}</p>
+      <p className="font-medium group-hover:text-purple-400 transition-colors text-sm truncate">{value}</p>
     </motion.div>
   )
 }
 
-function TokenDistributionItem({ name, percentage, delay = 0 }) {
+function RewardMechanismItem({ title, description, delay = 0 }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
+      className="bg-black/30 p-4 rounded-lg"
     >
-      <div className="flex justify-between mb-2">
-        <p className="text-gray-300">{name}</p>
-        <p className="text-purple-400 font-bold">{percentage}%</p>
-      </div>
-      <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-        <motion.div
-          className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
-          initial={{ width: 0 }}
-          whileInView={{ width: `${percentage}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: delay + 0.3 }}
-        ></motion.div>
-      </div>
+      <h4 className="text-purple-400 font-bold mb-2">{title}</h4>
+      <p className="text-gray-300 text-sm">{description}</p>
     </motion.div>
   )
 }

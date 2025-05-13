@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { TrendingUp, Shield, Users, Award, Zap, ChevronRight } from "lucide-react"
+import { TrendingUp, Shield, Users, Award, ChevronRight, Layers } from "lucide-react"
 import { ParallaxSection } from "@/components/parallax/parallax-section"
 import { ParallaxLayer } from "@/components/parallax/parallax-layer"
 import { TiltCard } from "@/components/parallax/tilt-card"
@@ -18,34 +18,34 @@ export function Features() {
 
   const features = [
     {
-      icon: <TrendingUp className="h-8 w-8" />,
-      title: "HIGH YIELD INVESTMENTS",
-      description: "Earn up to 15% daily returns through our optimized yield farming strategies.",
-      points: ["Daily rewards distribution", "Compound interest mechanism"],
+      icon: <Layers className="h-8 w-8" />,
+      title: "GLOBAL YIELD SYSTEM",
+      description: "Earn daily rewards through our comprehensive multi-component yield system.",
+      points: ["0.35% daily bonus on invested capital", "No team tokens - designed for investors"],
     },
     {
-      icon: <Shield className="h-8 w-8" />,
-      title: "SECURITY & TRANSPARENCY",
-      description: "Audited smart contracts with full transparency on the BSC network.",
-      points: ["Verified contract code", "On-chain verification"],
+      icon: <TrendingUp className="h-8 w-8" />,
+      title: "MULTI-TIER POOLS",
+      description: "Access 9 different investment pools with varying qualification criteria and rewards.",
+      points: ["Pools 1-5: 0.035% daily pool share each", "Pools 6-9: 0.02% daily pool share each"],
     },
     {
       icon: <Users className="h-8 w-8" />,
-      title: "REFERRAL PROGRAM",
+      title: "REFERRAL BONUSES",
       description: "Earn additional income by referring new investors to the platform.",
-      points: ["5% direct referral bonus", "Multi-level commission structure"],
+      points: ["0.05% daily bonus on direct referral deposits", "0.0135% daily bonus per level (levels 2-10)"],
     },
     {
       icon: <Award className="h-8 w-8" />,
-      title: "RANK SYSTEM",
-      description: "Progress through ranks to unlock additional benefits and higher rewards.",
-      points: ["10 achievement ranks", "Exclusive pool access"],
+      title: "POOL QUALIFICATION",
+      description: "Unlock higher pools by meeting investment and referral criteria.",
+      points: ["Personal investment thresholds", "Direct partner requirements", "Total turnover volume targets"],
     },
     {
-      icon: <Zap className="h-8 w-8" />,
-      title: "INVESTMENT POOLS",
-      description: "Choose from multiple investment pools with different risk profiles.",
-      points: ["Starter pool (5% daily)", "Premium pool (15% daily)"],
+      icon: <Shield className="h-8 w-8" />,
+      title: "EXCLUSIVE WHITELIST",
+      description: "Special access to Pools 8 & 9 for early supporters and strategic partners.",
+      points: ["Whitelist-only access with 0.02% daily share", "Rewards for platform contributors"],
     },
   ]
 
@@ -71,7 +71,7 @@ export function Features() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                REVOLUTIONARY
+                INVESTMENT
               </span>{" "}
               <span className="text-white">FEATURES</span>
             </motion.h2>
@@ -83,6 +83,16 @@ export function Features() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             ></motion.div>
+
+            <motion.p
+              className="text-xl text-gray-300 max-w-3xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              The Five Pillars Token implements a comprehensive investment platform with multiple reward mechanisms
+            </motion.p>
           </motion.div>
         </ParallaxSection>
 

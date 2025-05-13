@@ -4,54 +4,41 @@ import { useState, useEffect } from "react"
 import { Navbar } from "@/components/Navbar"
 import { Hero } from "@/components/landing/hero"
 import { Features } from "@/components/landing/features"
+import { PoolQualification } from "@/components/landing/pool-qualification"
 import { Tokenomics } from "@/components/landing/tokenomics"
+import { OnboardingGuide } from "@/components/landing/onboarding-guide"
 import { CTA } from "@/components/landing/cta"
 import { Footer } from "@/components/layout/footer"
 import { ScrollIndicator } from "@/components/ui/scroll-indicator"
-import { SocialProof } from "@/components/landing/social-proof"
-import { OnboardingGuide } from "@/components/landing/onboarding-guide"
-import { CalculatorSection } from "@/components/landing/calculator-section"
-import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { PageLoading } from "@/components/ui/page-loading"
 
 export default function ClientPage() {
-  const [mounted, setMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setMounted(true)
-    console.log("ClientPage mounted")
+    // Simulate loading for smoother transition
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
   }, [])
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-pulse w-16 h-16 rounded-full bg-purple-500/20"></div>
-      </div>
-    )
+  if (isLoading) {
+    return <PageLoading />
   }
 
   return (
-    <main className="relative min-h-screen bg-black text-white overflow-x-hidden">
-      <ErrorBoundary fallback={<div>Something went wrong with the page</div>}>
-        <Navbar />
-        {/* Removed ClientOnly wrapper to ensure Hero is always rendered */}
-        <Hero />
-        <Features />
-        <SocialProof />
-        <Tokenomics />
-        <CalculatorSection />
-        <OnboardingGuide />
-        <CTA />
-        <Footer />
-        <ScrollIndicator />
-      </ErrorBoundary>
+    <main className="min-h-screen bg-black text-white overflow-hidden">
+      <Navbar />
+      <Hero />
+      <Features />
+      <PoolQualification />
+      <Tokenomics />
+      <OnboardingGuide />
+      <CTA />
+      <Footer />
+      <ScrollIndicator />
     </main>
-  )
-}
-
-function HeroLoadingFallback() {
-  return (
-    <section className="relative min-h-screen flex items-center justify-center">
-      <div className="animate-pulse w-32 h-32 rounded-full bg-purple-500/20"></div>
-    </section>
   )
 }

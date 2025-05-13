@@ -42,6 +42,15 @@ const INVESTMENT_POOLS = [
     rankRequired: 5,
     description: "Highest returns for committed investors. VIP benefits included.",
   },
+  {
+    id: "exclusive",
+    name: "Whitelist Pool",
+    dailyRate: 0.02,
+    minDeposit: 5000,
+    lockPeriod: 90,
+    rankRequired: 8,
+    description: "Exclusive pool for whitelisted addresses with special benefits.",
+  },
 ]
 
 // Timeframe options

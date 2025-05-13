@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowRight, Zap, Shield, TrendingUp } from "lucide-react"
+import { ArrowRight, Zap, Shield, TrendingUp, Award } from "lucide-react"
 import { motion } from "framer-motion"
 import { ParallaxBackground } from "@/components/parallax/parallax-background"
 import { TiltCard } from "@/components/parallax/tilt-card"
@@ -13,7 +13,6 @@ export function Hero() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Set mounted state to true when component mounts
     setMounted(true)
     console.log("Hero component mounted")
 
@@ -22,9 +21,7 @@ export function Hero() {
     }
   }, [])
 
-  // Don't render until client-side
   if (!mounted) {
-    // Return a placeholder with similar dimensions to avoid layout shift
     return (
       <section className="relative min-h-screen bg-black flex items-center justify-center">
         <div className="animate-pulse w-16 h-16 rounded-full bg-purple-500/20"></div>
@@ -37,9 +34,8 @@ export function Hero() {
       {/* Parallax Background */}
       <ParallaxBackground />
 
-      {/* Content - Increased z-index to ensure visibility */}
+      {/* Content */}
       <div className="container mx-auto px-4 relative z-40 pt-32 pb-20">
-        {/* Removed ParallaxLayer for main content to ensure it's always visible */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,11 +53,10 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-              NEXT GENERATION
+              REVOLUTIONARY
             </span>
             <br />
-            {/* Added stronger text color and text shadow for better visibility */}
-            <span className="text-white text-shadow-lg">DeFi PROTOCOL</span>
+            <span className="text-white text-shadow-lg">YIELD PROTOCOL</span>
           </motion.h1>
 
           <motion.div
@@ -72,13 +67,23 @@ export function Hero() {
           ></motion.div>
 
           <motion.p
-            className="text-xl text-white max-w-3xl mb-12" // Changed from text-gray-300 to text-white
+            className="text-xl text-white max-w-3xl mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Earn up to <span className="text-purple-400 font-bold">15% daily returns</span> with our revolutionary BSC
-            investment platform powered by AI-optimized smart contracts.
+            The Five Pillars Token (5PT) introduces a groundbreaking investment platform with a global yield system
+            offering <span className="text-purple-400 font-bold">daily rewards</span> across multiple investment pools.
+          </motion.p>
+
+          <motion.p
+            className="text-lg text-purple-300 max-w-2xl mb-12 font-semibold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+          >
+            Be among the first to access our multi-tier investment ecosystem with daily bonuses and exclusive pool
+            incentives.
           </motion.p>
 
           <motion.div
@@ -102,13 +107,13 @@ export function Hero() {
 
             <Link href="/#features">
               <button className="px-8 py-4 bg-transparent border border-purple-500/50 rounded-lg text-purple-400 font-bold hover:bg-purple-500/10 transition-colors">
-                Learn More
+                Explore Features
               </button>
             </Link>
           </motion.div>
         </motion.div>
 
-        {/* Stats section - Using regular div instead of ParallaxLayer */}
+        {/* Key Benefits */}
         <motion.div
           className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20"
           initial={{ opacity: 0, y: 40 }}
@@ -116,37 +121,37 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 1 }}
         >
           <TiltCard>
-            <StatsCard
-              value="15%"
-              label="Max Daily Yield"
+            <BenefitCard
+              value="0.35%"
+              label="Daily Base Bonus"
               icon={<Zap className="h-6 w-6 text-purple-400" />}
               delay={0}
             />
           </TiltCard>
 
           <TiltCard>
-            <StatsCard
-              value="3,102%"
-              label="Annual APY"
+            <BenefitCard
+              value="9 Pools"
+              label="Investment Options"
               icon={<TrendingUp className="h-6 w-6 text-purple-400" />}
               delay={0.1}
             />
           </TiltCard>
 
           <TiltCard>
-            <StatsCard
-              value="5%"
-              label="Referral Bonus"
+            <BenefitCard
+              value="Multi-Tier"
+              label="Referral System"
               icon={<Shield className="h-6 w-6 text-purple-400" />}
               delay={0.2}
             />
           </TiltCard>
 
           <TiltCard>
-            <StatsCard
-              value="100%"
-              label="Decentralized"
-              icon={<Shield className="h-6 w-6 text-purple-400" />}
+            <BenefitCard
+              value="Exclusive"
+              label="Whitelist Pools"
+              icon={<Award className="h-6 w-6 text-purple-400" />}
               delay={0.3}
             />
           </TiltCard>
@@ -160,7 +165,7 @@ export function Hero() {
   )
 }
 
-function StatsCard({ value, label, icon, delay = 0 }) {
+function BenefitCard({ value, label, icon, delay = 0 }) {
   return (
     <motion.div
       className="relative bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 overflow-hidden group"
@@ -190,7 +195,7 @@ function StatsCard({ value, label, icon, delay = 0 }) {
       </div>
 
       <motion.p
-        className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 mb-1"
+        className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 mb-1"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: delay + 0.2 }}

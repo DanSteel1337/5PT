@@ -126,11 +126,10 @@ export function CTA() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
                   >
-                    <span className="text-white">READY TO </span>
+                    <span className="text-white">BE AN </span>
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                      MAXIMIZE
+                      EARLY INVESTOR
                     </span>
-                    <span className="text-white"> YOUR CRYPTO?</span>
                   </motion.h2>
 
                   <motion.div
@@ -142,15 +141,35 @@ export function CTA() {
                   ></motion.div>
 
                   <motion.p
-                    className="text-xl text-gray-300 mb-12"
+                    className="text-xl text-gray-300 mb-6"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.4 }}
                   >
-                    Join the 5PT Investment Platform and start earning up to{" "}
-                    <span className="text-purple-400 font-bold">15% daily returns</span>.
+                    Join the Five Pillars Token investment platform at launch and position yourself for maximum rewards.
                   </motion.p>
+
+                  <motion.div
+                    className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                  >
+                    <div className="bg-black/30 p-4 rounded-lg">
+                      <h3 className="text-purple-400 font-bold mb-1">Early Access</h3>
+                      <p className="text-gray-300 text-sm">Be first to access all 9 investment pools</p>
+                    </div>
+                    <div className="bg-black/30 p-4 rounded-lg">
+                      <h3 className="text-purple-400 font-bold mb-1">Referral Advantage</h3>
+                      <p className="text-gray-300 text-sm">Build your network from day one</p>
+                    </div>
+                    <div className="bg-black/30 p-4 rounded-lg">
+                      <h3 className="text-purple-400 font-bold mb-1">Whitelist Potential</h3>
+                      <p className="text-gray-300 text-sm">Opportunity for exclusive pool access</p>
+                    </div>
+                  </motion.div>
 
                   <motion.div
                     className="flex flex-col sm:flex-row gap-4 justify-center"
