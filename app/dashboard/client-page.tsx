@@ -5,6 +5,7 @@ import dynamic from "next/dynamic"
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton"
 import { ClientOnly } from "@/components/ClientOnly"
 import { Web3DebugPanel } from "@/utils/web3-debug"
+import { RainbowKitDebug } from "@/components/web3/RainbowKitDebug"
 
 // Dynamically import the FuturisticLogo component
 const FuturisticLogo = dynamic(() => import("@/components/FuturisticLogo"), {
@@ -36,12 +37,14 @@ export default function ClientDashboardPage() {
         </ClientOnly>
       </Suspense>
 
-      {/* Only show debug panel in development */}
-      {showDebug && (
-        <ClientOnly>
-          <Web3DebugPanel />
-        </ClientOnly>
-      )}
+      {/* Debug panels */}
+      <ClientOnly>
+        {/* Web3 Debug Panel */}
+        {showDebug && <Web3DebugPanel />}
+
+        {/* RainbowKit Debug Panel - always shown in development and preview */}
+        <RainbowKitDebug />
+      </ClientOnly>
     </main>
   )
 }

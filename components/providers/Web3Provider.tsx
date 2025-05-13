@@ -6,6 +6,7 @@ import { WagmiProvider } from "wagmi"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import { config } from "@/lib/wagmi-config"
 import { customRainbowKitTheme } from "@/lib/rainbowkit-theme"
+import { RainbowKitStylesProvider } from "./RainbowKitStylesProvider"
 
 /**
  * ⚠️ IMPORTANT: RainbowKit Styling Guidelines ⚠️
@@ -15,6 +16,7 @@ import { customRainbowKitTheme } from "@/lib/rainbowkit-theme"
  *
  * 2. ALWAYS import RainbowKit styles ONLY in:
  *    ✅ app/layout.tsx (or pages/_app.tsx for Pages Router)
+ *    OR use the RainbowKitStylesProvider as a workaround for Vercel v0 preview
  *
  * 3. If you see "Failed to load @rainbow-me/rainbowkit/styles.css" errors:
  *    - Remove any direct imports in client components
@@ -34,6 +36,12 @@ import { customRainbowKitTheme } from "@/lib/rainbowkit-theme"
  * 3. Must maintain correct provider nesting order:
  *    WagmiProvider > QueryClientProvider > RainbowKitProvider
  * 4. Must not import RainbowKit styles directly
+ *
+ * VERCEL V0 PREVIEW WORKAROUND:
+ * We're using RainbowKitStylesProvider to handle CSS loading issues in the Vercel v0 preview environment.
+ * This provider will:
+ * - Dynamically import RainbowKit styles in normal environments
+ * - Apply critical inline styles in the Vercel v0 preview environment
  */
 export function Web3Provider({ children }: { children: ReactNode }) {
   // Create a client
@@ -81,19 +89,22 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   }
 
   // CRITICAL: Maintain correct provider nesting order
+  // Added RainbowKitStylesProvider to handle CSS loading issues in Vercel v0 preview
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          theme={customRainbowKitTheme}
-          modalSize="compact"
-          appInfo={{
-            appName: "5PT Investment Manager",
-            learnMoreUrl: "https://5pt.finance/about",
-          }}
-        >
-          {children}
-        </RainbowKitProvider>
+        <RainbowKitStylesProvider>
+          <RainbowKitProvider
+            theme={customRainbowKitTheme}
+            modalSize="compact"
+            appInfo={{
+              appName: "5PT Investment Manager",
+              learnMoreUrl: "https://5pt.finance/about",
+            }}
+          >
+            {children}
+          </RainbowKitProvider>
+        </RainbowKitStylesProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )
