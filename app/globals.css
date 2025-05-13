@@ -2,97 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* RainbowKit Base Styles */
-@layer base {
-  [data-rk] {
-    --rk-blurs-modalOverlay: blur(0px);
-    --rk-fonts-body:
-      ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --rk-radii-actionButton: 9999px;
-    --rk-radii-connectButton: 12px;
-    --rk-radii-menuButton: 12px;
-    --rk-radii-modal: 24px;
-    --rk-radii-modalMobile: 28px;
-    --rk-colors-accentColor: hsl(var(--primary));
-    --rk-colors-accentColorForeground: hsl(var(--primary-foreground));
-    --rk-colors-actionButtonBorder: rgba(255, 255, 255, 0.04);
-    --rk-colors-actionButtonBorderMobile: rgba(255, 255, 255, 0.08);
-    --rk-colors-actionButtonSecondaryBackground: rgba(255, 255, 255, 0.08);
-    --rk-colors-closeButton: rgba(224, 232, 255, 0.6);
-    --rk-colors-closeButtonBackground: rgba(255, 255, 255, 0.08);
-    --rk-colors-connectButtonBackground: hsl(var(--background));
-    --rk-colors-connectButtonBackgroundError: hsl(var(--destructive));
-    --rk-colors-connectButtonInnerBackground: linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.075),
-      rgba(255, 255, 255, 0.15)
-    );
-    --rk-colors-connectButtonText: hsl(var(--foreground));
-    --rk-colors-connectButtonTextError: hsl(var(--destructive-foreground));
-    --rk-colors-connectionIndicator: #30e000;
-    --rk-colors-error: hsl(var(--destructive));
-    --rk-colors-generalBorder: rgba(255, 255, 255, 0.08);
-    --rk-colors-generalBorderDim: rgba(255, 255, 255, 0.04);
-    --rk-colors-menuItemBackground: rgba(239, 246, 255, 0.08);
-    --rk-colors-modalBackdrop: rgba(0, 0, 0, 0.5);
-    --rk-colors-modalBackground: hsl(var(--background));
-    --rk-colors-modalBorder: rgba(255, 255, 255, 0.08);
-    --rk-colors-modalText: hsl(var(--foreground));
-    --rk-colors-modalTextDim: rgba(224, 232, 255, 0.5);
-    --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.6);
-    --rk-colors-profileAction: rgba(224, 232, 255, 0.1);
-    --rk-colors-profileActionHover: rgba(224, 232, 255, 0.2);
-    --rk-colors-profileForeground: rgba(224, 232, 255, 0.05);
-    --rk-colors-selectedOptionBorder: rgba(224, 232, 255, 0.1);
-    --rk-colors-standby: #ffd641;
-    --rk-shadows-connectButton: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    --rk-shadows-dialog: 0px 8px 32px rgba(0, 0, 0, 0.32);
-    --rk-shadows-profileDetailsAction: 0px 2px 6px rgba(37, 41, 46, 0.04);
-    --rk-shadows-selectedOption: 0px 2px 6px rgba(0, 0, 0, 0.24);
-    --rk-shadows-selectedWallet: 0px 2px 6px rgba(0, 0, 0, 0.24);
-    --rk-shadows-walletLogo: 0px 2px 16px rgba(0, 0, 0, 0.16);
-  }
-}
-
 @layer base {
   :root {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-
-    /* Updated primary to purple */
-    --primary: 265 89% 70%;
-    --primary-foreground: 0 0% 98%;
-
-    /* Updated secondary to blue */
-    --secondary: 217 91% 60%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-
     --radius: 0.5rem;
-
-    /* Enhanced neon colors */
-    --neon-purple: 265 89% 78%;
-    --neon-blue: 217 91% 60%;
-    --neon-pink: 330 81% 60%;
-    --neon-cyan: 190 100% 50%;
   }
 }
 
@@ -102,76 +33,151 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.05) 0%, transparent 40%),
-      radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+    background-color: #000000;
+    background-image: radial-gradient(circle at 20% 30%, rgba(76, 29, 149, 0.15) 0%, rgba(0, 0, 0, 0) 30%),
+      radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.1) 0%, rgba(0, 0, 0, 0) 30%);
+    background-size: 100% 100%;
+    background-attachment: fixed;
   }
 }
 
-/* Enhanced Glassmorphism */
-.glass {
-  background: rgba(17, 17, 23, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 24px -8px rgba(76, 29, 149, 0.1);
+/* RainbowKit Styles */
+:root {
+  --rk-blurs-modalOverlay: blur(0px);
+  --rk-fonts-body: system-ui, sans-serif;
+  --rk-radii-actionButton: 6px;
+  --rk-radii-connectButton: 6px;
+  --rk-radii-menuButton: 6px;
+  --rk-radii-modal: 10px;
+  --rk-radii-modalMobile: 10px;
+  --rk-colors-accentColor: #8b5cf6;
+  --rk-colors-accentColorForeground: white;
+  --rk-colors-actionButtonBorder: rgba(255, 255, 255, 0.04);
+  --rk-colors-actionButtonBorderMobile: rgba(255, 255, 255, 0.08);
+  --rk-colors-actionButtonSecondaryBackground: rgba(255, 255, 255, 0.08);
+  --rk-colors-closeButton: rgba(224, 232, 255, 0.6);
+  --rk-colors-closeButtonBackground: rgba(255, 255, 255, 0.08);
+  --rk-colors-connectButtonBackground: #1a1b1f;
+  --rk-colors-connectButtonBackgroundError: #ff494a;
+  --rk-colors-connectButtonInnerBackground: linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.12));
+  --rk-colors-connectButtonText: #fff;
+  --rk-colors-connectButtonTextError: #fff;
+  --rk-colors-connectionIndicator: #30e000;
+  --rk-colors-error: #ff494a;
+  --rk-colors-generalBorder: rgba(255, 255, 255, 0.08);
+  --rk-colors-generalBorderDim: rgba(255, 255, 255, 0.04);
+  --rk-colors-menuItemBackground: rgba(224, 232, 255, 0.1);
+  --rk-colors-modalBackground: #1a1b1f;
+  --rk-colors-modalBorder: rgba(255, 255, 255, 0.08);
+  --rk-colors-modalText: #fff;
+  --rk-colors-modalTextDim: rgba(224, 232, 255, 0.5);
+  --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.6);
+  --rk-colors-profileAction: rgba(224, 232, 255, 0.1);
+  --rk-colors-profileActionHover: rgba(224, 232, 255, 0.2);
+  --rk-colors-profileForeground: rgba(224, 232, 255, 0.05);
+  --rk-colors-selectedOptionBorder: rgba(224, 232, 255, 0.1);
+  --rk-colors-standby: #ffd641;
+  --rk-shadows-connectButton: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  --rk-shadows-dialog: 0px 8px 32px rgba(0, 0, 0, 0.32);
+  --rk-shadows-profileDetailsAction: 0px 2px 6px rgba(37, 41, 46, 0.04);
+  --rk-shadows-selectedOption: 0px 2px 6px rgba(0, 0, 0, 0.24);
+  --rk-shadows-selectedWallet: 0px 2px 6px rgba(0, 0, 0, 0.24);
+  --rk-shadows-walletLogo: 0px 2px 16px rgba(0, 0, 0, 0.16);
 }
 
-.glass-card {
-  background: rgba(17, 17, 23, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.1);
-  box-shadow: 0 4px 24px -8px rgba(76, 29, 149, 0.15);
-  transition: all 0.3s ease;
+/* Additional RainbowKit Styles */
+.rk-modal-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--rk-blurs-modalOverlay);
 }
 
-.glass-card:hover {
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 8px 32px -8px rgba(76, 29, 149, 0.25);
+.rk-connect-button {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  font-family: var(--rk-fonts-body);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--rk-colors-connectButtonText);
+  background: var(--rk-colors-connectButtonBackground);
+  border-radius: var(--rk-radii-connectButton);
+  box-shadow: var(--rk-shadows-connectButton);
+  transition: 0.125s ease;
 }
 
-/* Neon text effects */
-.neon-text {
-  text-shadow: 0 0 5px rgba(139, 92, 246, 0.5), 0 0 15px rgba(139, 92, 246, 0.3);
+.rk-connect-button:hover {
+  transform: translateY(-1px);
 }
 
-.neon-text-blue {
-  text-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 15px rgba(59, 130, 246, 0.3);
+.rk-account-button {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  font-family: var(--rk-fonts-body);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--rk-colors-connectButtonText);
+  background: var(--rk-colors-connectButtonBackground);
+  border-radius: var(--rk-radii-connectButton);
+  box-shadow: var(--rk-shadows-connectButton);
+  transition: 0.125s ease;
 }
 
-.neon-text-cyan {
-  text-shadow: 0 0 5px rgba(34, 211, 238, 0.5), 0 0 15px rgba(34, 211, 238, 0.3);
+.rk-account-button:hover {
+  transform: translateY(-1px);
 }
 
-.neon-border {
-  box-shadow: 0 0 5px rgba(139, 92, 246, 0.5), 0 0 15px rgba(139, 92, 246, 0.3);
+/* Cyberpunk animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
-.neon-border-blue {
-  box-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 15px rgba(59, 130, 246, 0.3);
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 5px 0 rgba(139, 92, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(139, 92, 246, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 5px 0 rgba(139, 92, 246, 0.5);
+  }
 }
 
-/* Futuristic grid background */
-.grid-bg {
-  background-image: linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
+@keyframes pulse-slow {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
 }
 
-/* Animated gradient background */
-.animated-gradient {
-  background: linear-gradient(
-    -45deg,
-    rgba(76, 29, 149, 0.15),
-    rgba(59, 130, 246, 0.15),
-    rgba(139, 92, 246, 0.15),
-    rgba(34, 211, 238, 0.15)
-  );
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-}
-
-@keyframes gradient {
+@keyframes gradient-shift {
   0% {
     background-position: 0% 50%;
   }
@@ -183,221 +189,365 @@
   }
 }
 
-/* Glow animation */
-@keyframes glow {
-  0%,
+@keyframes text-flicker {
+  0% {
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.7);
+  }
+  10% {
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.9);
+  }
+  15% {
+    opacity: 0.9;
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+  }
+  25% {
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.9);
+  }
+  30% {
+    opacity: 0.9;
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+  }
   100% {
-    text-shadow: 0 0 5px rgba(139, 92, 246, 0.5), 0 0 15px rgba(139, 92, 246, 0.3);
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.7);
+  }
+}
+
+@keyframes neon-pulse {
+  0% {
+    box-shadow: 0 0 5px 0 rgba(139, 92, 246, 0.5), 0 0 10px 0 rgba(56, 189, 248, 0.3);
   }
   50% {
-    text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 30px rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 15px 0 rgba(139, 92, 246, 0.8), 0 0 20px 0 rgba(56, 189, 248, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 5px 0 rgba(139, 92, 246, 0.5), 0 0 10px 0 rgba(56, 189, 248, 0.3);
   }
 }
 
-.animate-glow {
-  animation: glow 2s ease-in-out infinite;
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
 }
 
-/* Pulse animation */
-@keyframes pulse-border {
-  0%,
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
   100% {
-    border-color: rgba(139, 92, 246, 0.2);
+    transform: translateY(100%);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes particle-flow {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
   }
   50% {
-    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-20px) translateX(10px);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) translateX(20px);
+    opacity: 0;
   }
 }
 
-.pulse-border {
-  animation: pulse-border 2s ease-in-out infinite;
+/* Custom classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
 
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
 }
 
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 4px;
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
+.animate-text-flicker {
+  animation: text-flicker 5s infinite;
 }
 
-/* Futuristic data card */
-.data-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius);
-  background: rgba(17, 17, 23, 0.7);
+.animate-neon-pulse {
+  animation: neon-pulse 3s infinite;
+}
+
+.animate-glitch {
+  animation: glitch 0.5s infinite;
+}
+
+.animate-rotate {
+  animation: rotate 20s linear infinite;
+}
+
+.animate-particle-flow {
+  animation: particle-flow 3s ease-out infinite;
+}
+
+.glass-card {
+  background: rgba(23, 23, 23, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.1);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
-.data-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(139, 92, 246, 0.7), rgba(59, 130, 246, 0.7));
-  z-index: 1;
+.glass-card-purple {
+  background: rgba(23, 23, 23, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
 }
 
-.data-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(139, 92, 246, 0.3);
-  box-shadow: 0 8px 32px -8px rgba(76, 29, 149, 0.3);
-}
-
-/* Futuristic button */
-.btn-futuristic {
-  background: linear-gradient(90deg, rgba(139, 92, 246, 0.8), rgba(59, 130, 246, 0.8));
-  border: none;
-  color: white;
+.cyber-card {
+  background: rgba(13, 13, 20, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
-  z-index: 1;
 }
 
-.btn-futuristic::before {
+.cyber-card::before {
   content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.8), rgba(139, 92, 246, 0.8));
-  transition: all 0.4s ease;
-  z-index: -1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), rgba(56, 189, 248, 0.8), transparent);
+  animation: scan-line 3s linear infinite;
 }
 
-.btn-futuristic:hover::before {
-  left: 0;
+.cyber-border {
+  position: relative;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
-.btn-futuristic:hover {
+.cyber-border::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  animation: glitch 10s infinite;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #c084fc, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-cyber {
+  background: linear-gradient(to right, #c084fc, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.border-gradient {
+  border-image: linear-gradient(to right, #c084fc, #818cf8) 1;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.7);
+}
+
+.glow-border {
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.7);
+}
+
+.cyber-grid {
+  background-image: linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.cyber-button {
+  position: relative;
+  background: linear-gradient(to right, #8b5cf6, #3b82f6);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+  transition: all 0.3s ease;
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
 }
 
-/* Cyberpunk divider */
-.cyber-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.5), transparent);
-  margin: 1.5rem 0;
+.cyber-button:hover {
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.8);
+  transform: translateY(-2px);
 }
 
-/* Holographic effect */
-.holographic {
+.cyber-button::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: linear-gradient(to right, #8b5cf6, #3b82f6);
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.cyber-input {
+  background: rgba(13, 13, 20, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: white;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.cyber-input:focus {
+  border-color: rgba(139, 92, 246, 0.8);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+.cyber-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(139, 92, 246, 0.5), rgba(56, 189, 248, 0.5), transparent);
+}
+
+.cyber-text-shadow {
+  text-shadow: 0 0 5px rgba(139, 92, 246, 0.5), 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.cyber-glow {
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+.cyber-panel {
+  background: rgba(13, 13, 20, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+  padding: 1.5rem;
+}
+
+.cyber-stat {
+  background: rgba(13, 13, 20, 0.7);
+  border-left: 3px solid #8b5cf6;
+  padding: 1rem;
   position: relative;
   overflow: hidden;
 }
 
-.holographic::after {
+.cyber-stat::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.1), transparent);
+}
+
+/* Futuristic UI elements */
+.futuristic-border {
+  position: relative;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  overflow: hidden;
+}
+
+.futuristic-border::before {
   content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0) 50%
-  );
-  transform: rotate(30deg);
-  animation: holographic 6s linear infinite;
+  background: conic-gradient(transparent, rgba(139, 92, 246, 0.3), transparent, transparent);
+  animation: rotate 4s linear infinite;
 }
 
-@keyframes holographic {
-  0% {
-    transform: rotate(30deg) translate(-30%, -30%);
-  }
-  100% {
-    transform: rotate(30deg) translate(30%, 30%);
-  }
+.futuristic-border::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background: rgba(13, 13, 20, 0.7);
+  border-radius: inherit;
 }
 
-/* RainbowKit Custom Styles - Updated for purple/blue theme */
-:root {
-  --rk-colors-accentColor: hsl(var(--primary));
-  --rk-colors-accentColorForeground: hsl(var(--primary-foreground));
-  --rk-colors-actionButtonBorder: hsl(var(--border));
-  --rk-colors-actionButtonBorderMobile: hsl(var(--border));
-  --rk-colors-actionButtonSecondaryBackground: hsl(var(--secondary));
-  --rk-colors-closeButton: hsl(var(--muted-foreground));
-  --rk-colors-closeButtonBackground: hsl(var(--muted));
-  --rk-colors-connectButtonBackground: hsl(var(--background));
-  --rk-colors-connectButtonBackgroundError: hsl(var(--destructive));
-  --rk-colors-connectButtonInnerBackground: hsl(var(--card));
-  --rk-colors-connectButtonText: hsl(var(--foreground));
-  --rk-colors-connectButtonTextError: hsl(var(--destructive-foreground));
-  --rk-colors-connectionIndicator: hsl(var(--primary));
-  --rk-colors-error: hsl(var(--destructive));
-  --rk-colors-generalBorder: hsl(var(--border));
-  --rk-colors-generalBorderDim: hsl(var(--border));
-  --rk-colors-menuItemBackground: hsl(var(--accent));
-  --rk-colors-modalBackdrop: rgba(0, 0, 0, 0.5);
-  --rk-colors-modalBackground: hsl(var(--background));
-  --rk-colors-modalBorder: hsl(var(--border));
-  --rk-colors-modalText: hsl(var(--foreground));
-  --rk-colors-modalTextDim: hsl(var(--muted-foreground));
-  --rk-colors-modalTextSecondary: hsl(var(--muted-foreground));
-  --rk-colors-profileAction: hsl(var(--muted));
-  --rk-colors-profileActionHover: hsl(var(--accent));
-  --rk-colors-profileForeground: hsl(var(--background));
-  --rk-colors-selectedOptionBorder: hsl(var(--primary));
-  --rk-colors-standby: hsl(var(--secondary));
-  --rk-radii-actionButton: var(--radius);
-  --rk-radii-connectButton: var(--radius);
-  --rk-radii-menuButton: var(--radius);
-  --rk-radii-modal: var(--radius);
-  --rk-radii-modalMobile: var(--radius);
-  --rk-fonts-body: inherit;
-  --rk-fonts-button: inherit;
+.futuristic-glow {
+  position: relative;
 }
 
-/* Add these styles at the end of the file to fix RainbowKit modal positioning */
-
-/* RainbowKit Modal Positioning Fix */
-[data-rk] {
-  --rk-position-modal-z-index: 2147483646 !important;
+.futuristic-glow::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.5), transparent 70%);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-/* Target the modal directly using attribute selectors */
-[data-rk] [role="dialog"] {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  z-index: var(--rk-position-modal-z-index) !important;
-  max-width: 420px !important;
-  width: calc(100% - 32px) !important;
-  margin: 0 !important;
+.futuristic-glow:hover::before {
+  opacity: 1;
 }
 
-[data-rk] [role="presentation"] {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: calc(var(--rk-position-modal-z-index) - 1) !important;
+.particle-container {
+  position: relative;
+  overflow: hidden;
 }
 
-/* Fix for mobile view */
-@media (max-width: 767px) {
-  [data-rk] [role="dialog"] {
-    max-height: 85vh !important;
-    overflow-y: auto !important;
-  }
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: rgba(139, 92, 246, 0.7);
+  border-radius: 50%;
+  pointer-events: none;
 }
