@@ -30,10 +30,10 @@ export function ConnectButton() {
     if (mountedRef.current) return
     mountedRef.current = true
 
-    // Short delay to ensure WalletProvider is fully initialized
+    // Longer delay to ensure WalletProvider is fully initialized
     const timer = setTimeout(() => {
       setMounted(true)
-    }, 100)
+    }, 500)
 
     // Reset error state when component mounts
     setIsError(false)
@@ -138,7 +138,7 @@ export function ConnectButton() {
                         size="sm"
                         className={cn(
                           "hidden md:flex items-center gap-2 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400",
-                          (isSwitchPending || isConfirming) && "opacity-70 cursor-not-allowed"
+                          (isSwitchPending || isConfirming) && "opacity-70 cursor-not-allowed",
                         )}
                         disabled={isSwitchPending || isConfirming}
                       >
@@ -166,11 +166,7 @@ export function ConnectButton() {
                             )}
                           </div>
                         )}
-                        {isSwitchPending || isConfirming ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          chain.name
-                        )}
+                        {isSwitchPending || isConfirming ? <Loader2 className="h-3 w-3 animate-spin" /> : chain.name}
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

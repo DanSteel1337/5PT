@@ -22,6 +22,13 @@ export function Providers({ children }: ProvidersProps) {
 
     // Add global error handler for provider errors
     const handleError = (event: ErrorEvent) => {
+      // Ignore WalletConnect initialization warnings
+      if (event.error?.message?.includes("WalletConnect Core is already initialized")) {
+        console.warn("Ignoring WalletConnect initialization warning:", event.error.message)
+        event.preventDefault()
+        return
+      }
+
       // Check if the error is related to WalletConnect
       if (
         event.error?.message?.includes("provider") ||
@@ -48,6 +55,13 @@ export function Providers({ children }: ProvidersProps) {
 
     // Handle unhandled promise rejections
     const handleRejection = (event: PromiseRejectionEvent) => {
+      // Ignore WalletConnect initialization warnings
+      if (event.reason?.message?.includes("WalletConnect Core is already initialized")) {
+        console.warn("Ignoring WalletConnect initialization warning:", event.reason.message)
+        event.preventDefault()
+        return
+      }
+
       if (
         event.reason?.message?.includes("provider") ||
         event.reason?.message?.includes("wallet") ||

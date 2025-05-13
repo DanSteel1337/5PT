@@ -368,3 +368,36 @@
   --rk-fonts-body: inherit;
   --rk-fonts-button: inherit;
 }
+
+/* Add these styles at the end of the file to fix RainbowKit modal positioning */
+
+/* RainbowKit Modal Positioning Fix */
+[data-rk] {
+  --rk-position-modal-z-index: 2147483646 !important;
+}
+
+/* Target the modal directly using attribute selectors */
+[data-rk] [role="dialog"] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: var(--rk-position-modal-z-index) !important;
+  max-width: 420px !important;
+  width: calc(100% - 32px) !important;
+  margin: 0 !important;
+}
+
+[data-rk] [role="presentation"] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: calc(var(--rk-position-modal-z-index) - 1) !important;
+}
+
+/* Fix for mobile view */
+@media (max-width: 767px) {
+  [data-rk] [role="dialog"] {
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+  }
+}

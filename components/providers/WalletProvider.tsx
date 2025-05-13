@@ -27,9 +27,13 @@ const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 // Validate project ID
 if (!walletConnectProjectId) {
   console.warn(
-    "WalletConnect ProjectID is missing. Please set NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID environment variable."
+    "WalletConnect ProjectID is missing. Please set NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID environment variable.",
   )
 }
+
+// Create a global initialization flag to prevent multiple initializations
+// This is outside the component to ensure it persists across renders
+let isWalletConnectInitialized = false
 
 interface WalletProviderProps {
   children: ReactNode
@@ -37,30 +41,39 @@ interface WalletProviderProps {
 
 export function WalletProvider({ children }: WalletProviderProps) {
   const [mounted, setMounted] = useState(false)
-  const initializationRef = useRef(false)
   const configRef = useRef<any>(null)
 
   // Initialize config only once with the correct URL
   useEffect(() => {
-    if (initializationRef.current) return
-    initializationRef.current = true
+    // Skip initialization if already done
+    if (isWalletConnectInitialized || configRef.current) return
+
+    // Mark as initialized immediately to prevent race conditions
+    isWalletConnectInitialized = true
 
     // Get the actual page URL for metadata
     const pageUrl = typeof window !== "undefined" ? window.location.origin : "https://five-pillars.vercel.app"
 
-    // Create config
-    configRef.current = getDefaultConfig({
-      appName: "Five Pillars Investment Platform",
-      projectId: walletConnectProjectId || "", // Use empty string as fallback
-      chains: [bsc, bscTestnet],
-      transports: {
-        [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
-        [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
-      },
-      ssr: false, // Disable SSR to prevent double initialization
-    })
+    try {
+      // Create config
+      configRef.current = getDefaultConfig({
+        appName: "Five Pillars Investment Platform",
+        projectId: walletConnectProjectId || "", // Use empty string as fallback
+        chains: [bsc, bscTestnet],
+        transports: {
+          [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
+          [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
+        },
+        ssr: false, // Disable SSR to prevent double initialization
+      })
 
-    setMounted(true)
+      // Set mounted state after successful initialization
+      setMounted(true)
+    } catch (error) {
+      console.error("Failed to initialize WalletConnect:", error)
+      // Reset initialization flag if it fails
+      isWalletConnectInitialized = false
+    }
 
     // Cleanup function to prevent memory leaks
     return () => {

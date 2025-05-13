@@ -26,10 +26,21 @@ export function AppShell({ children }: AppShellProps) {
   useEffect(() => {
     if (mountedRef.current) return
     mountedRef.current = true
-    setMounted(true)
+
+    // Delay mounting to ensure proper initialization
+    const timer = setTimeout(() => {
+      setMounted(true)
+    }, 100)
 
     // Add global error handler for wallet connection errors
     const handleError = (event: ErrorEvent) => {
+      // Ignore WalletConnect initialization warnings
+      if (event.error?.message?.includes("WalletConnect Core is already initialized")) {
+        console.warn("Ignoring WalletConnect initialization warning:", event.error.message)
+        event.preventDefault()
+        return
+      }
+
       // Check if the error is related to WalletConnect
       if (
         event.error?.message?.includes("walletconnect") ||
@@ -47,6 +58,13 @@ export function AppShell({ children }: AppShellProps) {
     }
 
     const handleRejection = (event: PromiseRejectionEvent) => {
+      // Ignore WalletConnect initialization warnings
+      if (event.reason?.message?.includes("WalletConnect Core is already initialized")) {
+        console.warn("Ignoring WalletConnect initialization warning:", event.reason.message)
+        event.preventDefault()
+        return
+      }
+
       if (event.reason && typeof event.reason === "object") {
         const error = event.reason as Error
         if (
@@ -66,6 +84,7 @@ export function AppShell({ children }: AppShellProps) {
     window.addEventListener("unhandledrejection", handleRejection)
 
     return () => {
+      clearTimeout(timer)
       window.removeEventListener("error", handleError)
       window.removeEventListener("unhandledrejection", handleRejection)
     }

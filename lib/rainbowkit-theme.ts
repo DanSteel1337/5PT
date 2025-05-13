@@ -1,7 +1,7 @@
 // lib/rainbowkit-theme.ts
 "use client"
 
-import { darkTheme, Theme } from "@rainbow-me/rainbowkit"
+import { darkTheme, type Theme } from "@rainbow-me/rainbowkit"
 import merge from "lodash.merge"
 
 // Create a custom theme based on the dark theme with purple/blue accents

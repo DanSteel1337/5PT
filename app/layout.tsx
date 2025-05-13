@@ -1,5 +1,6 @@
 import type React from "react"
 import "./globals.css"
+import "./fix-rainbowkit.css" // Add this line to import the fixes
 import { Providers } from "@/components/providers/Providers"
 import { AppShell } from "@/components/layout/AppShell"
 import type { Metadata } from "next"
