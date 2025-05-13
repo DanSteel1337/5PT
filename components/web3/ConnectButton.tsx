@@ -33,7 +33,7 @@ export function ConnectButton() {
     // Longer delay to ensure WalletProvider is fully initialized
     const timer = setTimeout(() => {
       setMounted(true)
-    }, 500)
+    }, 800) // Increased delay to ensure proper initialization
 
     // Reset error state when component mounts
     setIsError(false)

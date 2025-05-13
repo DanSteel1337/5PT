@@ -51,9 +51,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     // Mark as initialized immediately to prevent race conditions
     isWalletConnectInitialized = true
 
-    // Get the actual page URL for metadata
-    const pageUrl = typeof window !== "undefined" ? window.location.origin : "https://five-pillars.vercel.app"
-
     try {
       // Create config
       configRef.current = getDefaultConfig({

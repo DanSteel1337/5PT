@@ -1,0 +1,29 @@
+<!-- This file is just for reference, not actually used in the app -->
+<style>
+  /* These styles can be added directly to globals.css if needed */
+  
+  /* Force the RainbowKit modal to be a proper overlay */
+  [data-rk] [role="dialog"] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 2147483646 !important;
+  }
+  
+  /* Force the backdrop to cover the entire screen */
+  [data-rk] [role="presentation"] {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147483645 !important;
+  }
+  
+  /* Ensure the modal container is properly positioned */
+  [data-rk] .iekbcc0.ju367v73 {
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+</style>
