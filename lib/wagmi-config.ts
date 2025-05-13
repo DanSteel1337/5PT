@@ -24,9 +24,7 @@ export const config = getDefaultConfig({
   projectId: projectId || "", // Provide empty string as fallback to prevent undefined errors
   chains,
   transports: {
-    [bsc.id]: http(),
-    [bscTestnet.id]: http(),
+    [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
+    [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
   },
-  // Remove ssr: false from here as it's not needed in the config
-  // The WagmiProvider component will handle client-side rendering
 })

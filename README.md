@@ -1,30 +1,46 @@
-# 5PT
+# 5PT Investment DApp
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+## Web3 Integration Guidelines
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/dansteel1337-gmailcoms-projects/v0-5-pt)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/yqO2h3x6KJD)
+### Critical Requirements
 
-## Overview
+1. **Client-Side Only**: All Web3 functionality MUST be client-side only.
+   - Always use 'use client' directive
+   - Always implement mounting checks
+   - Never use Web3 hooks in server components
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+2. **CSS Imports**: 
+   - NEVER import RainbowKit styles directly in client components
+   - ALWAYS use globals.css for RainbowKit styling
+   - DO NOT modify the CSS selectors targeting Radix UI Dialog components
 
-## Deployment
+3. **Provider Structure**:
+   - ALWAYS maintain correct provider nesting:
+     - WagmiProvider > QueryClientProvider > RainbowKitProvider
+   - ALWAYS wrap providers in a Suspense boundary
 
-Your project is live at:
+4. **Component Structure**:
+   - ALWAYS use mounting checks in Web3 components
+   - ALWAYS handle errors gracefully
+   - ALWAYS use relative positioning and z-index for proper modal positioning
 
-**[https://vercel.com/dansteel1337-gmailcoms-projects/v0-5-pt](https://vercel.com/dansteel1337-gmailcoms-projects/v0-5-pt)**
+### Common Issues & Solutions
 
-## Build your app
+See `docs/RAINBOWKIT_INTEGRATION.md` for detailed troubleshooting.
 
-Continue building your app on:
+### Development Guidelines
 
-**[https://v0.dev/chat/projects/yqO2h3x6KJD](https://v0.dev/chat/projects/yqO2h3x6KJD)**
+1. When modifying Web3 components:
+   - Ensure all logic remains client-side
+   - Test on multiple browsers and devices
+   - Verify modal positioning and styling
 
-## How It Works
+2. When updating styles:
+   - Modify CSS variables in globals.css
+   - Do not remove or modify critical CSS selectors
+   - Test modal positioning after style changes
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+3. When adding new Web3 functionality:
+   - Create client components with proper mounting checks
+   - Follow the established pattern for error handling
+   - Test thoroughly before committing

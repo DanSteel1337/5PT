@@ -2,8 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * ⚠️ IMPORTANT: RainbowKit Styling Guidelines ⚠️
+ *
+ * 1. RainbowKit styles MUST be imported in app/layout.tsx, NOT here
+ * 2. These CSS variables customize RainbowKit's appearance
+ * 3. DO NOT use !important flags that might override RainbowKit's styles
+ * 4. DO NOT modify the [data-rk] and [role="dialog"] selectors without testing
+ */
+
 @layer base {
   :root {
+    /* Base theme variables */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -24,6 +34,52 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --radius: 0.5rem;
+
+    /* RainbowKit specific variables - DO NOT REMOVE */
+    --rk-blurs-modalOverlay: blur(4px);
+    --rk-fonts-body: system-ui, sans-serif;
+    --rk-radii-actionButton: 6px;
+    --rk-radii-connectButton: 6px;
+    --rk-radii-menuButton: 6px;
+    --rk-radii-modal: 10px;
+    --rk-radii-modalMobile: 10px;
+    --rk-colors-accentColor: #8b5cf6;
+    --rk-colors-accentColorForeground: white;
+    --rk-colors-actionButtonBorder: rgba(139, 92, 246, 0.3);
+    --rk-colors-actionButtonBorderMobile: rgba(139, 92, 246, 0.3);
+    --rk-colors-actionButtonSecondaryBackground: rgba(139, 92, 246, 0.1);
+    --rk-colors-closeButton: rgba(255, 255, 255, 0.8);
+    --rk-colors-closeButtonBackground: rgba(139, 92, 246, 0.2);
+    --rk-colors-connectButtonBackground: #0d0d14;
+    --rk-colors-connectButtonBackgroundError: #ff494a;
+    --rk-colors-connectButtonInnerBackground: linear-gradient(
+      to right,
+      rgba(139, 92, 246, 0.2),
+      rgba(59, 130, 246, 0.2)
+    );
+    --rk-colors-connectButtonText: #fff;
+    --rk-colors-connectButtonTextError: #fff;
+    --rk-colors-connectionIndicator: #30e000;
+    --rk-colors-error: #ff494a;
+    --rk-colors-generalBorder: rgba(139, 92, 246, 0.3);
+    --rk-colors-generalBorderDim: rgba(139, 92, 246, 0.2);
+    --rk-colors-menuItemBackground: rgba(139, 92, 246, 0.1);
+    --rk-colors-modalBackground: #0d0d14;
+    --rk-colors-modalBorder: rgba(139, 92, 246, 0.3);
+    --rk-colors-modalText: #fff;
+    --rk-colors-modalTextDim: rgba(255, 255, 255, 0.3);
+    --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.6);
+    --rk-colors-profileAction: rgba(139, 92, 246, 0.1);
+    --rk-colors-profileActionHover: rgba(139, 92, 246, 0.2);
+    --rk-colors-profileForeground: rgba(139, 92, 246, 0.05);
+    --rk-colors-selectedOptionBorder: rgba(139, 92, 246, 0.3);
+    --rk-colors-standby: #ffd641;
+    --rk-shadows-connectButton: 0px 4px 12px rgba(139, 92, 246, 0.4);
+    --rk-shadows-dialog: 0px 8px 32px rgba(139, 92, 246, 0.4);
+    --rk-shadows-profileDetailsAction: 0px 2px 6px rgba(37, 41, 46, 0.04);
+    --rk-shadows-selectedOption: 0px 2px 6px rgba(139, 92, 246, 0.24);
+    --rk-shadows-selectedWallet: 0px 2px 6px rgba(139, 92, 246, 0.24);
+    --rk-shadows-walletLogo: 0px 2px 16px rgba(139, 92, 246, 0.16);
   }
 }
 
@@ -31,8 +87,10 @@
   * {
     @apply border-border;
   }
+  /* IMPORTANT: position:relative on body is required for RainbowKit modal positioning */
   body {
     @apply bg-background text-foreground;
+    position: relative; /* DO NOT REMOVE - Required for RainbowKit modal */
     background-color: #000000;
     background-image: radial-gradient(circle at 20% 30%, rgba(76, 29, 149, 0.15) 0%, rgba(0, 0, 0, 0) 30%),
       radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.1) 0%, rgba(0, 0, 0, 0) 30%);
@@ -41,103 +99,81 @@
   }
 }
 
-/* RainbowKit Styles */
-:root {
-  --rk-blurs-modalOverlay: blur(0px);
-  --rk-fonts-body: system-ui, sans-serif;
-  --rk-radii-actionButton: 6px;
-  --rk-radii-connectButton: 6px;
-  --rk-radii-menuButton: 6px;
-  --rk-radii-modal: 10px;
-  --rk-radii-modalMobile: 10px;
-  --rk-colors-accentColor: #8b5cf6;
-  --rk-colors-accentColorForeground: white;
-  --rk-colors-actionButtonBorder: rgba(255, 255, 255, 0.04);
-  --rk-colors-actionButtonBorderMobile: rgba(255, 255, 255, 0.08);
-  --rk-colors-actionButtonSecondaryBackground: rgba(255, 255, 255, 0.08);
-  --rk-colors-closeButton: rgba(224, 232, 255, 0.6);
-  --rk-colors-closeButtonBackground: rgba(255, 255, 255, 0.08);
-  --rk-colors-connectButtonBackground: #1a1b1f;
-  --rk-colors-connectButtonBackgroundError: #ff494a;
-  --rk-colors-connectButtonInnerBackground: linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.12));
-  --rk-colors-connectButtonText: #fff;
-  --rk-colors-connectButtonTextError: #fff;
-  --rk-colors-connectionIndicator: #30e000;
-  --rk-colors-error: #ff494a;
-  --rk-colors-generalBorder: rgba(255, 255, 255, 0.08);
-  --rk-colors-generalBorderDim: rgba(255, 255, 255, 0.04);
-  --rk-colors-menuItemBackground: rgba(224, 232, 255, 0.1);
-  --rk-colors-modalBackground: #1a1b1f;
-  --rk-colors-modalBorder: rgba(255, 255, 255, 0.08);
-  --rk-colors-modalText: #fff;
-  --rk-colors-modalTextDim: rgba(224, 232, 255, 0.5);
-  --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.6);
-  --rk-colors-profileAction: rgba(224, 232, 255, 0.1);
-  --rk-colors-profileActionHover: rgba(224, 232, 255, 0.2);
-  --rk-colors-profileForeground: rgba(224, 232, 255, 0.05);
-  --rk-colors-selectedOptionBorder: rgba(224, 232, 255, 0.1);
-  --rk-colors-standby: #ffd641;
-  --rk-shadows-connectButton: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  --rk-shadows-dialog: 0px 8px 32px rgba(0, 0, 0, 0.32);
-  --rk-shadows-profileDetailsAction: 0px 2px 6px rgba(37, 41, 46, 0.04);
-  --rk-shadows-selectedOption: 0px 2px 6px rgba(0, 0, 0, 0.24);
-  --rk-shadows-selectedWallet: 0px 2px 6px rgba(0, 0, 0, 0.24);
-  --rk-shadows-walletLogo: 0px 2px 16px rgba(0, 0, 0, 0.16);
+/**
+ * ⚠️ CRITICAL: RainbowKit Modal Positioning ⚠️
+ * These selectors target Radix UI Dialog components used by RainbowKit
+ * DO NOT REMOVE or MODIFY these selectors or the modal will break
+ *
+ * If the modal appears in the wrong position:
+ * 1. Ensure body has position:relative
+ * 2. Ensure these selectors are present
+ * 3. Ensure no parent containers have overflow:hidden
+ */
+
+/* Fix for Radix UI Dialog components used by RainbowKit */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important; /* Ensure popper content is above everything */
 }
 
-/* Additional RainbowKit Styles */
-.rk-modal-container {
+/* Target Radix Dialog components used by RainbowKit */
+[role="dialog"] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  max-width: 420px !important;
+  width: 100% !important;
+}
+
+/* Dialog overlay */
+[data-radix-dialog-overlay] {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 9998 !important;
+}
+
+/* RainbowKit specific styles */
+[data-rk] {
+  --rk-overlay-backdrop-filter: blur(4px);
+  --rk-overlay-background-color: rgba(0, 0, 0, 0.6);
+  --rk-overlay-z-index: 9999;
+}
+
+/* Ensure the modal is centered */
+[data-rk] [role="dialog"] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  max-width: 420px !important;
+  width: 100% !important;
+  border-radius: var(--rk-radii-modal) !important;
+  border: 1px solid var(--rk-colors-modalBorder) !important;
+  background-color: var(--rk-colors-modalBackground) !important;
+  box-shadow: var(--rk-shadows-dialog) !important;
+  z-index: var(--rk-overlay-z-index) !important;
+}
+
+/* Ensure the overlay covers the entire screen */
+[data-rk] [role="dialog"]::before {
+  content: "";
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 50;
+  inset: 0;
+  background-color: var(--rk-overlay-background-color);
+  backdrop-filter: var(--rk-overlay-backdrop-filter);
+  z-index: -1;
+}
+
+/* Fix for RainbowKit modal positioning */
+#radix-\:r0 {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: var(--rk-blurs-modalOverlay);
-}
-
-.rk-connect-button {
-  display: flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 14px;
-  font-family: var(--rk-fonts-body);
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--rk-colors-connectButtonText);
-  background: var(--rk-colors-connectButtonBackground);
-  border-radius: var(--rk-radii-connectButton);
-  box-shadow: var(--rk-shadows-connectButton);
-  transition: 0.125s ease;
-}
-
-.rk-connect-button:hover {
-  transform: translateY(-1px);
-}
-
-.rk-account-button {
-  display: flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 14px;
-  font-family: var(--rk-fonts-body);
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--rk-colors-connectButtonText);
-  background: var(--rk-colors-connectButtonBackground);
-  border-radius: var(--rk-radii-connectButton);
-  box-shadow: var(--rk-shadows-connectButton);
-  transition: 0.125s ease;
-}
-
-.rk-account-button:hover {
-  transform: translateY(-1px);
 }
 
 /* Cyberpunk animations */

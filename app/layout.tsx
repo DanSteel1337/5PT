@@ -2,6 +2,9 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+// ✅ CRITICAL: Import RainbowKit styles at the root level
+// This ensures proper styling of the RainbowKit modal and components
+import "@rainbow-me/rainbowkit/styles.css"
 import { Suspense } from "react"
 
 // Import the Providers component directly, but render it with Suspense
@@ -30,6 +33,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* 
+        IMPORTANT: 
+        1. suppressHydrationWarning is required to prevent hydration errors with RainbowKit
+        2. The body must have position:relative for proper modal positioning
+        3. RainbowKit styles MUST be imported in this file, not in client components
+      */}
       <body className={inter.className}>
         <Suspense fallback={<div className="min-h-screen bg-black"></div>}>
           <Providers>{children}</Providers>
