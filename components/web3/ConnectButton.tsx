@@ -1,50 +1,74 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { ConnectButton as RainbowConnectButton } from "@rainbow-me/rainbowkit"
 import { Button } from "@/components/ui/button"
 import { useAccount, useSwitchChain } from "wagmi"
-import { Loader2, ChevronDown } from "lucide-react"
+import { Loader2, ChevronDown, AlertCircle } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { bsc, bscTestnet } from "wagmi/chains"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 export function ConnectButton() {
   const [mounted, setMounted] = useState(false)
+  const mountedRef = useRef(false)
   const { isConnected } = useAccount()
-  const { switchChain } = useSwitchChain()
+  const { switchChain, isPending: isSwitchPending } = useSwitchChain()
   const [isError, setIsError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // Only render after client-side hydration
   useEffect(() => {
-    setMounted(true)
+    if (mountedRef.current) return
+    mountedRef.current = true
+
+    // Short delay to ensure WalletProvider is fully initialized
+    const timer = setTimeout(() => {
+      setMounted(true)
+    }, 100)
 
     // Reset error state when component mounts
     setIsError(false)
+    setErrorMessage(null)
+
+    return () => clearTimeout(timer)
   }, [])
 
   // Handle network switch with error handling
-  const handleNetworkSwitch = (chainId: number) => {
+  const handleNetworkSwitch = async (chainId: number) => {
     try {
-      switchChain({ chainId })
+      setIsError(false)
+      setErrorMessage(null)
+      await switchChain({ chainId })
     } catch (error) {
       console.error("Failed to switch network:", error)
       setIsError(true)
+      setErrorMessage(error instanceof Error ? error.message : "Failed to switch network")
     }
   }
 
   if (!mounted) {
-    return (
-      <Button variant="outline" size="default" disabled className="opacity-70">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Loading...
-      </Button>
-    )
+    return <div className="h-10 w-[140px] bg-muted/30 rounded-md animate-pulse"></div>
   }
 
   if (isError) {
     return (
-      <Button variant="destructive" size="default" onClick={() => setIsError(false)} className="opacity-90">
-        Wallet Error
+      <Button
+        variant="destructive"
+        size="default"
+        onClick={() => setIsError(false)}
+        className="relative overflow-hidden group"
+        title={errorMessage || "Wallet Error"}
+      >
+        <AlertCircle className="mr-2 h-4 w-4" />
+        <span>Wallet Error</span>
+        <motion.div
+          className="absolute inset-0 bg-destructive/20"
+          initial={{ x: "-100%" }}
+          animate={{ x: "100%" }}
+          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+        />
       </Button>
     )
   }
@@ -69,12 +93,20 @@ export function ConnectButton() {
             {(() => {
               if (!connected) {
                 return (
-                  <Button
-                    onClick={openConnectModal}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
-                  >
-                    Connect Wallet
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      onClick={openConnectModal}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium relative overflow-hidden"
+                    >
+                      <span className="relative z-10">Connect Wallet</span>
+                      <motion.div
+                        className="absolute inset-0 bg-white/10"
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "100%" }}
+                        transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                      />
+                    </Button>
+                  </motion.div>
                 )
               }
 
@@ -85,7 +117,11 @@ export function ConnectButton() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="hidden md:flex items-center gap-2 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400"
+                        className={cn(
+                          "hidden md:flex items-center gap-2 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400",
+                          isSwitchPending && "opacity-70 cursor-not-allowed",
+                        )}
+                        disabled={isSwitchPending}
                       >
                         {chain.hasIcon && (
                           <div
@@ -95,6 +131,7 @@ export function ConnectButton() {
                               height: 16,
                               borderRadius: 999,
                               overflow: "hidden",
+                              flexShrink: 0,
                             }}
                           >
                             {chain.iconUrl && (
@@ -102,11 +139,15 @@ export function ConnectButton() {
                                 alt={chain.name ?? "Chain icon"}
                                 src={chain.iconUrl || "/placeholder.svg"}
                                 style={{ width: 16, height: 16 }}
+                                onError={(e) => {
+                                  // Fallback for missing icons
+                                  e.currentTarget.src = "/images/5pt-logo.png"
+                                }}
                               />
                             )}
                           </div>
                         )}
-                        {chain.name}
+                        {isSwitchPending ? <Loader2 className="h-3 w-3 animate-spin" /> : chain.name}
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -118,15 +159,25 @@ export function ConnectButton() {
                     </DropdownMenuContent>
                   </DropdownMenu>
 
-                  <Button
-                    onClick={openAccountModal}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium"
-                  >
-                    {account.displayName}
-                    {account.displayBalance && (
-                      <span className="hidden md:inline-block ml-2 opacity-80">{account.displayBalance}</span>
-                    )}
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      onClick={openAccountModal}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium relative overflow-hidden"
+                    >
+                      <span className="relative z-10">
+                        {account.displayName}
+                        {account.displayBalance && (
+                          <span className="hidden md:inline-block ml-2 opacity-80">{account.displayBalance}</span>
+                        )}
+                      </span>
+                      <motion.div
+                        className="absolute inset-0 bg-white/10"
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "100%" }}
+                        transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                      />
+                    </Button>
+                  </motion.div>
                 </div>
               )
             })()}

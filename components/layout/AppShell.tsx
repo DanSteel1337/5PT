@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Header } from "@/components/layout/Header"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { Footer } from "@/components/layout/Footer"
@@ -20,30 +20,59 @@ export function AppShell({ children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [walletError, setWalletError] = useState<Error | null>(null)
+  const mountedRef = useRef(false)
 
   // Only render after client-side hydration
   useEffect(() => {
+    if (mountedRef.current) return
+    mountedRef.current = true
     setMounted(true)
 
     // Add global error handler for wallet connection errors
     const handleError = (event: ErrorEvent) => {
+      // Check if the error is related to WalletConnect
       if (
         event.error?.message?.includes("walletconnect") ||
         event.error?.message?.includes("wallet") ||
-        event.error?.stack?.includes("@walletconnect")
+        event.error?.stack?.includes("@walletconnect") ||
+        event.error?.message?.includes("WalletConnect")
       ) {
+        console.warn("Wallet connection error:", event.error)
         setWalletError(event.error)
         // Prevent the error from bubbling up
         event.preventDefault()
+        return true
+      }
+      return false
+    }
+
+    const handleRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason && typeof event.reason === "object") {
+        const error = event.reason as Error
+        if (
+          error.message?.includes("walletconnect") ||
+          error.message?.includes("wallet") ||
+          error.stack?.includes("@walletconnect") ||
+          error.message?.includes("WalletConnect")
+        ) {
+          console.warn("Unhandled wallet connection error:", error)
+          setWalletError(error)
+          event.preventDefault()
+        }
       }
     }
 
     window.addEventListener("error", handleError)
+    window.addEventListener("unhandledrejection", handleRejection)
 
     return () => {
       window.removeEventListener("error", handleError)
+      window.removeEventListener("unhandledrejection", handleRejection)
     }
   }, [])
+
+  // Reset wallet error
+  const resetWalletError = () => setWalletError(null)
 
   if (!mounted) {
     return (
@@ -66,7 +95,16 @@ export function AppShell({ children }: AppShellProps) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Wallet Connection Error</AlertTitle>
                 <AlertDescription>
-                  There was an issue with the wallet connection. Please refresh the page and try again.
+                  <div>There was an issue with the wallet connection. Please refresh the page and try again.</div>
+                  {walletError.message && (
+                    <div className="mt-2 text-xs opacity-80 break-words">Error: {walletError.message}</div>
+                  )}
+                  <button
+                    onClick={resetWalletError}
+                    className="mt-4 px-4 py-2 bg-background/20 hover:bg-background/30 rounded-md text-sm"
+                  >
+                    Dismiss
+                  </button>
                 </AlertDescription>
               </Alert>
             </div>
