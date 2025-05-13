@@ -1,3 +1,4 @@
+// hooks/useInvestmentManager.ts
 "use client"
 
 import { useReadContract, useWriteContract, useAccount, useChainId } from "wagmi"
@@ -6,6 +7,11 @@ import { INVESTMENT_MANAGER_ABI } from "@/contracts/abis/InvestmentManager"
 import { useMemo, useState } from "react"
 import { type PoolInfo, TransactionStatus, type TransactionState } from "@/types/contracts"
 import { formatUnits, parseUnits } from "viem"
+import { 
+  ContractFunctionExecutionError,
+  UserRejectedRequestError,
+  InsufficientFundsError 
+} from 'viem'
 
 // Custom hook for investment manager contract interactions
 export function useInvestmentManager() {
@@ -48,7 +54,7 @@ export function useInvestmentManager() {
     })
   }
 
-  // Invest in a pool
+  // Invest in a pool with enhanced error handling
   function useInvestInPool() {
     const { writeContract, data, error, isPending, isSuccess, isError } = useWriteContract()
     const [state, setState] = useState<TransactionState>({
@@ -68,10 +74,31 @@ export function useInvestmentManager() {
           args: [poolId, amountInWei],
         })
       } catch (error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Unknown error"),
-        })
+        console.error("Investment error:", error)
+        
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Unknown error"),
+          })
+        }
       }
     }
 
@@ -82,17 +109,36 @@ export function useInvestmentManager() {
       } else if (isSuccess && data) {
         setState({ status: TransactionStatus.SUCCESS, hash: data })
       } else if (isError && error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Transaction failed"),
-        })
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Transaction failed"),
+          })
+        }
       }
     }, [isPending, isSuccess, isError, data, error])
 
     return { invest, ...state }
   }
 
-  // Withdraw from a pool
+  // Withdraw from a pool with enhanced error handling
   function useWithdrawFromPool() {
     const { writeContract, data, error, isPending, isSuccess, isError } = useWriteContract()
     const [state, setState] = useState<TransactionState>({
@@ -110,10 +156,31 @@ export function useInvestmentManager() {
           args: [poolId],
         })
       } catch (error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Unknown error"),
-        })
+        console.error("Withdrawal error:", error)
+        
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Unknown error"),
+          })
+        }
       }
     }
 
@@ -124,17 +191,36 @@ export function useInvestmentManager() {
       } else if (isSuccess && data) {
         setState({ status: TransactionStatus.SUCCESS, hash: data })
       } else if (isError && error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Transaction failed"),
-        })
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Transaction failed"),
+          })
+        }
       }
     }, [isPending, isSuccess, isError, data, error])
 
     return { withdraw, ...state }
   }
 
-  // Claim rewards
+  // Claim rewards with enhanced error handling
   function useClaimRewards() {
     const { writeContract, data, error, isPending, isSuccess, isError } = useWriteContract()
     const [state, setState] = useState<TransactionState>({
@@ -151,10 +237,31 @@ export function useInvestmentManager() {
           functionName: "claimRewards",
         })
       } catch (error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Unknown error"),
-        })
+        console.error("Claim error:", error)
+        
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Unknown error"),
+          })
+        }
       }
     }
 
@@ -165,10 +272,29 @@ export function useInvestmentManager() {
       } else if (isSuccess && data) {
         setState({ status: TransactionStatus.SUCCESS, hash: data })
       } else if (isError && error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Transaction failed"),
-        })
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Transaction failed"),
+          })
+        }
       }
     }, [isPending, isSuccess, isError, data, error])
 

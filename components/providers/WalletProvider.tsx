@@ -1,3 +1,4 @@
+// components/providers/WalletProvider.tsx
 "use client"
 
 import { getDefaultConfig } from "@rainbow-me/rainbowkit"
@@ -26,11 +27,9 @@ const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 // Validate project ID
 if (!walletConnectProjectId) {
   console.warn(
-    "WalletConnect ProjectID is missing. Please set NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID environment variable.",
+    "WalletConnect ProjectID is missing. Please set NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID environment variable."
   )
 }
-
-// DO NOT create config here - we'll create it inside the component with the correct URL
 
 interface WalletProviderProps {
   children: ReactNode
@@ -49,7 +48,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
     // Get the actual page URL for metadata
     const pageUrl = typeof window !== "undefined" ? window.location.origin : "https://five-pillars.vercel.app"
 
-    // Create config with the correct URL
+    // Create config
     configRef.current = getDefaultConfig({
       appName: "Five Pillars Investment Platform",
       projectId: walletConnectProjectId || "", // Use empty string as fallback
@@ -59,24 +58,16 @@ export function WalletProvider({ children }: WalletProviderProps) {
         [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
       },
       ssr: false, // Disable SSR to prevent double initialization
-      walletConnectMetadata: {
-        name: "Five Pillars Investment Platform",
-        description: "Invest in the Five Pillars ecosystem and earn rewards",
-        url: pageUrl,
-        icons: [`${pageUrl}/images/5pt-logo.png`],
-      },
     })
 
     setMounted(true)
 
-    // Cleanup function
+    // Cleanup function to prevent memory leaks
     return () => {
-      // Attempt to clean up WalletConnect resources
       try {
-        // @ts-ignore - Access internal WalletConnect instance if available
-        if (window.WalletConnect && window.WalletConnect.Core) {
-          // @ts-ignore
-          window.WalletConnect.Core = null
+        // Attempt to clean up WalletConnect resources
+        if (window.WalletConnectModal) {
+          window.WalletConnectModal = null as any
         }
       } catch (e) {
         console.warn("WalletConnect cleanup failed:", e)
@@ -111,5 +102,12 @@ export function WalletProvider({ children }: WalletProviderProps) {
 declare module "wagmi" {
   interface Register {
     config: any // Using any since config is now dynamic
+  }
+}
+
+// Declaration for WalletConnect cleanup
+declare global {
+  interface Window {
+    WalletConnectModal?: any
   }
 }

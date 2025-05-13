@@ -1,3 +1,4 @@
+// components/rewards/RewardsClaimer.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -34,7 +35,12 @@ export function RewardsClaimer() {
   // Refresh data after successful claim
   useEffect(() => {
     if (isConfirmed) {
-      refetch()
+      // Add a small delay to ensure the blockchain has time to update
+      const timer = setTimeout(() => {
+        refetch()
+      }, 2000)
+
+      return () => clearTimeout(timer)
     }
   }, [isConfirmed, refetch])
 
@@ -66,7 +72,7 @@ export function RewardsClaimer() {
   // Format rewards data
   const pendingRewards = investorInfo.pendingRewards
   const formattedRewards = formatUnits(pendingRewards, tokenInfo?.decimals || 18)
-  const hasRewards = pendingRewards > parseUnits("0", tokenInfo?.decimals || 18)
+  const hasRewards = pendingRewards > BigInt(0)
   const minClaimAmount = parseUnits("0.01", tokenInfo?.decimals || 18)
   const canClaim = pendingRewards >= minClaimAmount
 
@@ -108,7 +114,7 @@ export function RewardsClaimer() {
           )}
         </motion.div>
 
-        {status === TransactionStatus.SUCCESS && (
+        {status === TransactionStatus.SUCCESS && isConfirmed && (
           <Alert className="mt-4 bg-green-500/10 border-green-500/30 text-green-500">
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>Rewards claimed successfully!</AlertDescription>
@@ -122,7 +128,7 @@ export function RewardsClaimer() {
           </Alert>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-3">
         <Button
           onClick={handleClaim}
           disabled={!canClaim || status === TransactionStatus.PENDING || isConfirming}
@@ -141,6 +147,17 @@ export function RewardsClaimer() {
             "Claim Rewards"
           )}
         </Button>
+
+        {hash && (
+          <a
+            href={`https://bscscan.com/tx/${hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-center text-sm text-purple-400 hover:underline"
+          >
+            View transaction on BscScan
+          </a>
+        )}
       </CardFooter>
     </Card>
   )

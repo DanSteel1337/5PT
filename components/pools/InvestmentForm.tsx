@@ -1,7 +1,8 @@
+// components/pools/InvestmentForm.tsx
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAccount, useChainId } from "wagmi"
+import { useAccount, useChainId, useWaitForTransactionReceipt } from "wagmi"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -45,6 +46,15 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
   const { approve, status: approveStatus, hash: approveHash, error: approveError } = useApproveToken()
   const { invest, status: investStatus, hash: investHash, error: investError } = useInvestInPool()
 
+  // Transaction receipt tracking for both transactions
+  const { isLoading: isApproveConfirming, isSuccess: isApproveConfirmed } = useWaitForTransactionReceipt({
+    hash: approveHash,
+  })
+
+  const { isLoading: isInvestConfirming, isSuccess: isInvestConfirmed } = useWaitForTransactionReceipt({
+    hash: investHash,
+  })
+
   const formattedPool = formatPoolData(pool)
 
   // Initialize form
@@ -59,6 +69,24 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Effect to check if approval was successful and proceed with investment
+  useEffect(() => {
+    const proceedWithInvestment = async () => {
+      if (isApproveConfirmed && approveStatus === TransactionStatus.SUCCESS) {
+        const amount = form.getValues("amount")
+        if (amount) {
+          try {
+            await invest(pool.id, amount)
+          } catch (error) {
+            console.error("Investment error after approval:", error)
+          }
+        }
+      }
+    }
+
+    proceedWithInvestment()
+  }, [isApproveConfirmed, approveStatus, form, invest, pool.id])
 
   if (!mounted) return null
 
@@ -94,7 +122,7 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
   const getButtonState = () => {
     const amount = form.getValues("amount")
 
-    if (approveStatus === TransactionStatus.PENDING) {
+    if (approveStatus === TransactionStatus.PENDING || isApproveConfirming) {
       return {
         text: "Approving...",
         disabled: true,
@@ -102,7 +130,7 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
       }
     }
 
-    if (investStatus === TransactionStatus.PENDING) {
+    if (investStatus === TransactionStatus.PENDING || isInvestConfirming) {
       return {
         text: "Investing...",
         disabled: true,
@@ -161,12 +189,15 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
               )}
             />
 
-            {(approveStatus === TransactionStatus.SUCCESS || investStatus === TransactionStatus.SUCCESS) && (
+            {(approveStatus === TransactionStatus.SUCCESS || isApproveConfirmed) && !investHash && (
               <Alert className="bg-green-500/10 border-green-500/30 text-green-500">
-                <AlertDescription>
-                  {approveStatus === TransactionStatus.SUCCESS && "Token approval successful!"}
-                  {investStatus === TransactionStatus.SUCCESS && "Investment successful!"}
-                </AlertDescription>
+                <AlertDescription>Token approval successful! Continuing with investment...</AlertDescription>
+              </Alert>
+            )}
+
+            {(investStatus === TransactionStatus.SUCCESS || isInvestConfirmed) && (
+              <Alert className="bg-green-500/10 border-green-500/30 text-green-500">
+                <AlertDescription>Investment successful! Your funds have been invested.</AlertDescription>
               </Alert>
             )}
 
@@ -204,6 +235,34 @@ export function InvestmentForm({ pool }: InvestmentFormProps) {
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
           Early withdrawal may incur penalties
         </p>
+
+        {(approveHash || investHash) && (
+          <div className="w-full mt-3 pt-3 border-t border-purple-500/10">
+            <p className="font-medium text-xs mb-1">Transaction Details:</p>
+            {approveHash && (
+              <a
+                href={`https://bscscan.com/tx/${approveHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-purple-400 hover:underline flex items-center gap-1"
+              >
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                View Approval on BscScan
+              </a>
+            )}
+            {investHash && (
+              <a
+                href={`https://bscscan.com/tx/${investHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-purple-400 hover:underline flex items-center gap-1"
+              >
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                View Investment on BscScan
+              </a>
+            )}
+          </div>
+        )}
       </CardFooter>
     </Card>
   )

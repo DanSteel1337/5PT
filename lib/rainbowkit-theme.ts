@@ -1,10 +1,11 @@
+// lib/rainbowkit-theme.ts
 "use client"
 
-import { darkTheme, type Theme } from "@rainbow-me/rainbowkit"
+import { darkTheme, Theme } from "@rainbow-me/rainbowkit"
+import merge from "lodash.merge"
 
 // Create a custom theme based on the dark theme with purple/blue accents
-export const customTheme: Theme = {
-  ...darkTheme(),
+export const customTheme = merge(darkTheme(), {
   blurs: {
     modalOverlay: "blur(8px)",
   },
@@ -56,4 +57,4 @@ export const customTheme: Theme = {
   fonts: {
     body: "Inter, sans-serif",
   },
-}
+} as Theme)

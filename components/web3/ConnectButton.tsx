@@ -1,22 +1,29 @@
+// components/web3/ConnectButton.tsx
 "use client"
 
 import { useState, useEffect, useRef } from "react"
 import { ConnectButton as RainbowConnectButton } from "@rainbow-me/rainbowkit"
 import { Button } from "@/components/ui/button"
-import { useAccount, useSwitchChain } from "wagmi"
+import { useAccount, useSwitchChain, useWaitForTransactionReceipt } from "wagmi"
 import { Loader2, ChevronDown, AlertCircle } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { bsc, bscTestnet } from "wagmi/chains"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { UserRejectedRequestError } from "viem"
 
 export function ConnectButton() {
   const [mounted, setMounted] = useState(false)
   const mountedRef = useRef(false)
   const { isConnected } = useAccount()
-  const { switchChain, isPending: isSwitchPending } = useSwitchChain()
+  const { switchChain, isPending: isSwitchPending, error: switchError, data: switchData } = useSwitchChain()
   const [isError, setIsError] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Track transaction when switching chains
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash: switchData?.transactionHash,
+  })
 
   // Only render after client-side hydration
   useEffect(() => {
@@ -34,6 +41,18 @@ export function ConnectButton() {
 
     return () => clearTimeout(timer)
   }, [])
+
+  // Update error state when switch error changes
+  useEffect(() => {
+    if (switchError) {
+      setIsError(true)
+      if (switchError instanceof UserRejectedRequestError) {
+        setErrorMessage("User rejected request")
+      } else {
+        setErrorMessage(switchError.message || "Failed to switch network")
+      }
+    }
+  }, [switchError])
 
   // Handle network switch with error handling
   const handleNetworkSwitch = async (chainId: number) => {
@@ -119,9 +138,9 @@ export function ConnectButton() {
                         size="sm"
                         className={cn(
                           "hidden md:flex items-center gap-2 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400",
-                          isSwitchPending && "opacity-70 cursor-not-allowed",
+                          (isSwitchPending || isConfirming) && "opacity-70 cursor-not-allowed"
                         )}
-                        disabled={isSwitchPending}
+                        disabled={isSwitchPending || isConfirming}
                       >
                         {chain.hasIcon && (
                           <div
@@ -147,7 +166,11 @@ export function ConnectButton() {
                             )}
                           </div>
                         )}
-                        {isSwitchPending ? <Loader2 className="h-3 w-3 animate-spin" /> : chain.name}
+                        {isSwitchPending || isConfirming ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          chain.name
+                        )}
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

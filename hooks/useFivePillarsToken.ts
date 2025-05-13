@@ -1,11 +1,17 @@
+// hooks/useFivePillarsToken.ts
 "use client"
 
-import { useReadContract, useWriteContract, useAccount, useChainId } from "wagmi"
+import { useReadContract, useReadContracts, useWriteContract, useAccount, useChainId } from "wagmi"
 import { getContractAddress } from "@/contracts/addresses"
 import { FIVE_PILLARS_TOKEN_ABI } from "@/contracts/abis/FivePillarsToken"
 import { useMemo, useState } from "react"
 import { type TokenInfo, TransactionStatus, type TransactionState } from "@/types/contracts"
 import { formatUnits, parseUnits } from "viem"
+import { 
+  ContractFunctionExecutionError,
+  UserRejectedRequestError,
+  InsufficientFundsError 
+} from 'viem'
 
 // Custom hook for Five Pillars token contract interactions
 export function useFivePillarsToken() {
@@ -26,38 +32,44 @@ export function useFivePillarsToken() {
     })
   }
 
-  // Get token info (name, symbol, decimals)
+  // Get token info (name, symbol, decimals) using batch read
   function useTokenInfo() {
-    const { data: name } = useReadContract({
-      address: tokenAddress,
-      abi: FIVE_PILLARS_TOKEN_ABI,
-      functionName: "name",
-    })
-
-    const { data: symbol } = useReadContract({
-      address: tokenAddress,
-      abi: FIVE_PILLARS_TOKEN_ABI,
-      functionName: "symbol",
-    })
-
-    const { data: decimals } = useReadContract({
-      address: tokenAddress,
-      abi: FIVE_PILLARS_TOKEN_ABI,
-      functionName: "decimals",
+    const { data, isLoading, isError } = useReadContracts({
+      contracts: [
+        {
+          address: tokenAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "name",
+        },
+        {
+          address: tokenAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "symbol",
+        },
+        {
+          address: tokenAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "decimals",
+        }
+      ],
     })
 
     const tokenInfo: TokenInfo | undefined = useMemo(() => {
-      if (name && symbol && decimals !== undefined) {
+      if (data && data[0]?.result && data[1]?.result && data[2]?.result !== undefined) {
         return {
-          name,
-          symbol,
-          decimals,
+          name: data[0].result as string,
+          symbol: data[1].result as string,
+          decimals: Number(data[2].result),
         }
       }
       return undefined
-    }, [name, symbol, decimals])
+    }, [data])
 
-    return { data: tokenInfo }
+    return { 
+      data: tokenInfo, 
+      isLoading,
+      isError
+    }
   }
 
   // Check allowance
@@ -73,7 +85,7 @@ export function useFivePillarsToken() {
     })
   }
 
-  // Approve token spending
+  // Approve token spending with enhanced error handling
   function useApproveToken() {
     const { writeContract, data, error, isPending, isSuccess, isError } = useWriteContract()
     const [state, setState] = useState<TransactionState>({
@@ -93,10 +105,31 @@ export function useFivePillarsToken() {
           args: [spender, amountInWei],
         })
       } catch (error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Unknown error"),
-        })
+        console.error("Approval error:", error)
+        
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Unknown error"),
+          })
+        }
       }
     }
 
@@ -107,10 +140,29 @@ export function useFivePillarsToken() {
       } else if (isSuccess && data) {
         setState({ status: TransactionStatus.SUCCESS, hash: data })
       } else if (isError && error) {
-        setState({
-          status: TransactionStatus.ERROR,
-          error: error instanceof Error ? error : new Error("Transaction failed"),
-        })
+        if (error instanceof UserRejectedRequestError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Transaction rejected by user"),
+          })
+        } else if (error instanceof InsufficientFundsError) {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error("Insufficient funds for transaction"),
+          })
+        } else if (error instanceof ContractFunctionExecutionError) {
+          // Try to extract revert reason
+          const revertReason = error.message.match(/reverted with reason string '([^']+)'/)
+          setState({
+            status: TransactionStatus.ERROR,
+            error: new Error(revertReason ? revertReason[1] : "Contract execution failed"),
+          })
+        } else {
+          setState({
+            status: TransactionStatus.ERROR,
+            error: error instanceof Error ? error : new Error("Transaction failed"),
+          })
+        }
       }
     }, [isPending, isSuccess, isError, data, error])
 

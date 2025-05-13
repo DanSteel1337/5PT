@@ -1,3 +1,4 @@
+// components/pools/PoolList.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -33,18 +34,10 @@ export function PoolList() {
     )
   }
 
-  if (isError) {
+  if (isError || !pools) {
     return (
       <div className="text-center py-12">
         <p className="text-destructive">Error loading pools. Please try again later.</p>
-      </div>
-    )
-  }
-
-  if (!pools || pools.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">No investment pools available at the moment.</p>
       </div>
     )
   }
@@ -55,7 +48,7 @@ export function PoolList() {
       // Filter by search term
       const matchesSearch =
         pool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pool.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (pool.description && pool.description.toLowerCase().includes(searchTerm.toLowerCase()))
 
       // Filter by active status
       const matchesActive = activeOnly ? pool.isActive : true
