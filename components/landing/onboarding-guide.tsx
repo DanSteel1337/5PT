@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { ParallaxSection } from "@/components/parallax/parallax-section"
 import { CyberButton } from "@/components/ui/cyber-button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
@@ -14,7 +13,6 @@ import {
   TrendingUp,
   Users,
   ChevronRight,
-  Sparkles,
   Calculator,
   ArrowRight,
   Info,
@@ -22,6 +20,8 @@ import {
   Flame,
   Percent,
 } from "lucide-react"
+import { SectionContainer } from "@/components/ui/section-container"
+import { ContentCard } from "@/components/ui/content-card"
 
 // Pool data based on 5PT Investment Contract - moved to the top level
 const pools = [
@@ -312,598 +312,508 @@ export function OnboardingGuide() {
   const lastDayResult = results.dailyResults[results.dailyResults.length - 1]
 
   return (
-    <section id="getting-started" className="py-20 md:py-32 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/10 via-transparent to-transparent"></div>
+    <SectionContainer
+      id="getting-started"
+      title="HOW TO GET STARTED"
+      subtitle="Follow these simple steps to start earning with 5PT Finance"
+    >
+      {/* Steps */}
+      <div className="relative mb-24">
+        {/* Progress Line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-900/50 via-blue-900/50 to-purple-900/50 hidden md:block"></div>
 
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-purple-500/30"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, Math.random() * -100 - 50],
-              opacity: [0, 0.8, 0],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 5,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
+        {/* Steps */}
+        <div className="space-y-16 relative">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.number}
+              className={`relative ${index % 2 === 0 ? "md:pr-12 md:text-right md:ml-auto md:mr-0" : "md:pl-12"} md:w-1/2 w-full`}
+              initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              {/* Step Number Circle - Desktop */}
+              <div
+                className={`absolute top-0 hidden md:flex items-center justify-center w-14 h-14 rounded-full border-4 transition-all duration-300 ${
+                  activeStep === step.number
+                    ? `border-gradient-to-r ${step.color} bg-black text-white shadow-lg shadow-purple-500/20`
+                    : "border-gray-700 bg-black text-gray-400"
+                } ${index % 2 === 0 ? "-right-18" : "-left-18"}`}
+                style={{
+                  [index % 2 === 0 ? "right" : "left"]: "-3.5rem",
+                  background: activeStep === step.number ? `linear-gradient(to right, var(--tw-gradient-stops))` : "",
+                  "--tw-gradient-from": activeStep === step.number ? step.color.split(" ")[0].replace("from-", "") : "",
+                  "--tw-gradient-to": activeStep === step.number ? step.color.split(" ")[1].replace("to-", "") : "",
+                }}
+              >
+                <span className="text-lg font-bold">{step.number}</span>
+              </div>
+
+              {/* Content Card */}
+              <ContentCard
+                className={`transition-all duration-500 ${
+                  activeStep === step.number
+                    ? "border-purple-500/50 shadow-[0_0_25px_rgba(139,92,246,0.3)] scale-105"
+                    : "border-purple-500/20"
+                }`}
+                onClick={() => setActiveStep(step.number)}
+              >
+                {/* Mobile Step Number */}
+                <div className="flex items-center gap-3 md:hidden mb-4">
+                  <div
+                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                      activeStep === step.number
+                        ? "border-purple-500 bg-purple-900/50 text-white"
+                        : "border-gray-700 bg-black text-gray-400"
+                    }`}
+                  >
+                    <span className="text-sm font-bold">{step.number}</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white">{step.title}</h3>
+                </div>
+
+                {/* Desktop Title */}
+                <h3 className="text-xl font-bold text-white mb-3 hidden md:block">{step.title}</h3>
+
+                {/* Icon and Description */}
+                <div className={`flex items-start gap-4 ${index % 2 === 0 ? "md:flex-row-reverse" : ""}`}>
+                  <div
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                      activeStep === step.number
+                        ? "bg-gradient-to-r " + step.color + " text-white shadow-lg"
+                        : "bg-purple-900/30 text-purple-400"
+                    }`}
+                  >
+                    {step.icon}
+                  </div>
+                  <div>
+                    <p className="text-gray-300 mb-4 text-lg">{step.description}</p>
+
+                    {/* Expanded Details (only visible for active step) */}
+                    {activeStep === step.number && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4 space-y-3"
+                      >
+                        {step.details.map((detail, i) => (
+                          <div key={i} className="flex items-start gap-3">
+                            <div
+                              className={`w-6 h-6 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center flex-shrink-0 mt-0.5`}
+                            >
+                              <ChevronRight className="h-4 w-4 text-white" />
+                            </div>
+                            <p className="text-gray-300">{detail}</p>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </ContentCard>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <ParallaxSection intensity={0.3}>
+      {/* Investment Calculator */}
+      <motion.div
+        className="mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+      >
+        <div className="text-center mb-10">
           <motion.div
-            className="text-center mb-16"
+            className="inline-block mb-4 p-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <Calculator className="h-6 w-6 text-blue-400" />
+          </motion.div>
+
+          <motion.h2
+            className="text-4xl md:text-5xl font-bold mb-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <motion.div
-              className="inline-block mb-4 p-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Sparkles className="h-6 w-6 text-purple-400" />
-            </motion.div>
+            <span className="text-white">INVESTMENT </span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+              CALCULATOR
+            </span>
+          </motion.h2>
 
-            <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <span className="text-white">HOW TO </span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                GET STARTED
-              </span>
-            </motion.h2>
+          <motion.div
+            className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-8"
+            initial={{ width: 0 }}
+            whileInView={{ width: "6rem" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          ></motion.div>
 
-            <motion.div
-              className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto mb-8"
-              initial={{ width: 0 }}
-              whileInView={{ width: "6rem" }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            ></motion.div>
-
-            <motion.p
-              className="text-xl text-gray-300 max-w-3xl mx-auto mb-8"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              Follow these simple steps to start earning with 5PT Finance
-            </motion.p>
-          </motion.div>
-        </ParallaxSection>
-
-        {/* Steps */}
-        <div className="relative mb-24">
-          {/* Progress Line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-900/50 via-blue-900/50 to-purple-900/50 hidden md:block"></div>
-
-          {/* Steps */}
-          <div className="space-y-16 relative">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.number}
-                className={`relative ${index % 2 === 0 ? "md:pr-12 md:text-right md:ml-auto md:mr-0" : "md:pl-12"} md:w-1/2 w-full`}
-                initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                {/* Step Number Circle - Desktop */}
-                <div
-                  className={`absolute top-0 hidden md:flex items-center justify-center w-14 h-14 rounded-full border-4 transition-all duration-300 ${
-                    activeStep === step.number
-                      ? `border-gradient-to-r ${step.color} bg-black text-white shadow-lg shadow-purple-500/20`
-                      : "border-gray-700 bg-black text-gray-400"
-                  } ${index % 2 === 0 ? "-right-18" : "-left-18"}`}
-                  style={{
-                    [index % 2 === 0 ? "right" : "left"]: "-3.5rem",
-                    background: activeStep === step.number ? `linear-gradient(to right, var(--tw-gradient-stops))` : "",
-                    "--tw-gradient-from":
-                      activeStep === step.number ? step.color.split(" ")[0].replace("from-", "") : "",
-                    "--tw-gradient-to": activeStep === step.number ? step.color.split(" ")[1].replace("to-", "") : "",
-                  }}
-                >
-                  <span className="text-lg font-bold">{step.number}</span>
-                </div>
-
-                {/* Content Card */}
-                <div
-                  className={`bg-black/40 backdrop-blur-sm border rounded-xl p-6 transition-all duration-500 ${
-                    activeStep === step.number
-                      ? "border-purple-500/50 shadow-[0_0_25px_rgba(139,92,246,0.3)] scale-105"
-                      : "border-purple-500/20"
-                  }`}
-                  onClick={() => setActiveStep(step.number)}
-                >
-                  {/* Mobile Step Number */}
-                  <div className="flex items-center gap-3 md:hidden mb-4">
-                    <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                        activeStep === step.number
-                          ? "border-purple-500 bg-purple-900/50 text-white"
-                          : "border-gray-700 bg-black text-gray-400"
-                      }`}
-                    >
-                      <span className="text-sm font-bold">{step.number}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-white">{step.title}</h3>
-                  </div>
-
-                  {/* Desktop Title */}
-                  <h3 className="text-xl font-bold text-white mb-3 hidden md:block">{step.title}</h3>
-
-                  {/* Icon and Description */}
-                  <div className={`flex items-start gap-4 ${index % 2 === 0 ? "md:flex-row-reverse" : ""}`}>
-                    <div
-                      className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                        activeStep === step.number
-                          ? "bg-gradient-to-r " + step.color + " text-white shadow-lg"
-                          : "bg-purple-900/30 text-purple-400"
-                      }`}
-                    >
-                      {step.icon}
-                    </div>
-                    <div>
-                      <p className="text-gray-300 mb-4 text-lg">{step.description}</p>
-
-                      {/* Expanded Details (only visible for active step) */}
-                      {activeStep === step.number && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-4 space-y-3"
-                        >
-                          {step.details.map((detail, i) => (
-                            <div key={i} className="flex items-start gap-3">
-                              <div
-                                className={`w-6 h-6 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center flex-shrink-0 mt-0.5`}
-                              >
-                                <ChevronRight className="h-4 w-4 text-white" />
-                              </div>
-                              <p className="text-gray-300">{detail}</p>
-                            </div>
-                          ))}
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <motion.p
+            className="text-xl text-gray-300 max-w-3xl mx-auto"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            Calculate your potential earnings with 5PT Finance
+          </motion.p>
         </div>
 
-        {/* Investment Calculator */}
-        <motion.div
-          className="mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="text-center mb-10">
-            <motion.div
-              className="inline-block mb-4 p-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm"
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Calculator className="h-6 w-6 text-blue-400" />
-            </motion.div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Calculator Inputs */}
+          <ContentCard>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-white">Investment Parameters</h3>
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                {showSettings ? "Hide Settings" : "Advanced Settings"}
+              </button>
+            </div>
 
-            <motion.h2
-              className="text-4xl md:text-5xl font-bold mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <span className="text-white">INVESTMENT </span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-                CALCULATOR
-              </span>
-            </motion.h2>
+            {/* Advanced Settings Panel */}
+            {showSettings && (
+              <div className="mb-8 bg-black/40 rounded-lg p-4 border border-blue-500/10">
+                <h4 className="text-lg font-semibold text-blue-400 mb-4">Tax & Reinvestment Settings</h4>
 
-            <motion.div
-              className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-8"
-              initial={{ width: 0 }}
-              whileInView={{ width: "6rem" }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            ></motion.div>
+                {/* Deposit Tax */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-2">
+                    <label className="text-gray-300 text-sm">Deposit Tax (%)</label>
+                    <span className="text-blue-400 font-bold">{depositTax}%</span>
+                  </div>
+                  <Slider
+                    value={[depositTax]}
+                    min={0}
+                    max={10}
+                    step={1}
+                    onValueChange={(value) => setDepositTax(value[0])}
+                    className="mb-1"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>0%</span>
+                    <span>10%</span>
+                  </div>
+                </div>
 
-            <motion.p
-              className="text-xl text-gray-300 max-w-3xl mx-auto"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              Calculate your potential earnings with 5PT Finance
-            </motion.p>
-          </div>
+                {/* Claim Tax */}
+                <div className="mb-4">
+                  <div className="flex justify-between mb-2">
+                    <label className="text-gray-300 text-sm">Claim Tax (%)</label>
+                    <span className="text-blue-400 font-bold">{claimTax}%</span>
+                  </div>
+                  <Slider
+                    value={[claimTax]}
+                    min={0}
+                    max={10}
+                    step={1}
+                    onValueChange={(value) => setClaimTax(value[0])}
+                    className="mb-1"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>0%</span>
+                    <span>10%</span>
+                  </div>
+                </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Calculator Inputs */}
-            <motion.div
-              className="bg-black/40 backdrop-blur-sm border border-blue-500/20 rounded-xl p-8"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-white">Investment Parameters</h3>
-                <button
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  <Settings className="h-4 w-4" />
-                  {showSettings ? "Hide Settings" : "Advanced Settings"}
-                </button>
+                {/* Auto-Compound Toggle */}
+                <div className="flex items-center justify-between mb-4 p-2 rounded bg-black/20">
+                  <div>
+                    <label className="text-gray-300 text-sm">Auto-Compound</label>
+                    <p className="text-xs text-gray-500">Automatically reinvest all rewards</p>
+                  </div>
+                  <Switch checked={autoCompound} onCheckedChange={setAutoCompound} />
+                </div>
+
+                {/* Manual Reinvestment Settings (only shown if auto-compound is off) */}
+                {!autoCompound && (
+                  <>
+                    {/* Reinvest Percentage */}
+                    <div className="mb-4">
+                      <div className="flex justify-between mb-2">
+                        <label className="text-gray-300 text-sm">Reinvest Percentage (%)</label>
+                        <span className="text-blue-400 font-bold">{reinvestPercentage}%</span>
+                      </div>
+                      <Slider
+                        value={[reinvestPercentage]}
+                        min={0}
+                        max={100}
+                        step={5}
+                        onValueChange={(value) => setReinvestPercentage(value[0])}
+                        className="mb-1"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>0% (All Claimed)</span>
+                        <span>100% (All Reinvested)</span>
+                      </div>
+                    </div>
+
+                    {/* Claim Frequency */}
+                    <div className="mb-2">
+                      <div className="flex justify-between mb-2">
+                        <label className="text-gray-300 text-sm">Claim Frequency (Days)</label>
+                        <span className="text-blue-400 font-bold">Every {claimFrequency} days</span>
+                      </div>
+                      <Slider
+                        value={[claimFrequency]}
+                        min={1}
+                        max={30}
+                        step={1}
+                        onValueChange={(value) => setClaimFrequency(value[0])}
+                        className="mb-1"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Daily</span>
+                        <span>Monthly</span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
+            )}
 
-              {/* Advanced Settings Panel */}
-              {showSettings && (
-                <div className="mb-8 bg-black/40 rounded-lg p-4 border border-blue-500/10">
-                  <h4 className="text-lg font-semibold text-blue-400 mb-4">Tax & Reinvestment Settings</h4>
+            {/* Investment Amount */}
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                <label className="text-gray-300">Investment Amount (5PT)</label>
+                <span className="text-blue-400 font-bold">{investmentAmount.toLocaleString()} 5PT</span>
+              </div>
+              <Slider
+                value={[investmentAmount]}
+                min={100}
+                max={100000}
+                step={100}
+                onValueChange={(value) => setInvestmentAmount(value[0])}
+                className="mb-2"
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>100 5PT</span>
+                <span>100,000 5PT</span>
+              </div>
+              <div className="mt-2 flex items-start gap-2 text-sm">
+                <Flame className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                <p className="text-gray-400">
+                  Your tokens are permanently burned when invested, reducing the total supply
+                </p>
+              </div>
+            </div>
 
-                  {/* Deposit Tax */}
-                  <div className="mb-4">
-                    <div className="flex justify-between mb-2">
-                      <label className="text-gray-300 text-sm">Deposit Tax (%)</label>
-                      <span className="text-blue-400 font-bold">{depositTax}%</span>
-                    </div>
-                    <Slider
-                      value={[depositTax]}
-                      min={0}
-                      max={10}
-                      step={1}
-                      onValueChange={(value) => setDepositTax(value[0])}
-                      className="mb-1"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>0%</span>
-                      <span>10%</span>
-                    </div>
+            {/* Referrals */}
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                <label className="text-gray-300">Number of Direct Referrals</label>
+                <span className="text-blue-400 font-bold">{referrals}</span>
+              </div>
+              <Slider
+                value={[referrals]}
+                min={0}
+                max={30}
+                step={1}
+                onValueChange={(value) => setReferrals(value[0])}
+                className="mb-2"
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>0</span>
+                <span>30</span>
+              </div>
+            </div>
+
+            {/* Referral Volume */}
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                <label className="text-gray-300">Total Referral Volume (5PT)</label>
+                <span className="text-blue-400 font-bold">{referralVolume.toLocaleString()} 5PT</span>
+              </div>
+              <Slider
+                value={[referralVolume]}
+                min={0}
+                max={200000}
+                step={1000}
+                onValueChange={(value) => setReferralVolume(value[0])}
+                className="mb-2"
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>0 5PT</span>
+                <span>200,000 5PT</span>
+              </div>
+            </div>
+
+            {/* Simulation Period */}
+            <div className="mb-4">
+              <div className="flex justify-between mb-2">
+                <label className="text-gray-300">Simulation Period (Days)</label>
+                <span className="text-blue-400 font-bold">{simulationDays} days</span>
+              </div>
+              <Slider
+                value={[simulationDays]}
+                min={1}
+                max={365}
+                step={1}
+                onValueChange={(value) => setSimulationDays(value[0])}
+                className="mb-2"
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>1 day</span>
+                <span>365 days</span>
+              </div>
+              <div className="mt-2 flex items-start gap-2 text-sm">
+                <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-gray-400">This is for simulation only. Your actual investment runs indefinitely.</p>
+              </div>
+            </div>
+          </ContentCard>
+
+          {/* Calculator Results */}
+          <ContentCard>
+            <h3 className="text-2xl font-bold text-white mb-6">Projected Returns</h3>
+
+            {/* Pool Eligibility */}
+            <div className="mb-6 bg-black/40 rounded-lg p-4 border border-purple-500/10">
+              <h4 className="text-lg font-semibold text-purple-400 mb-3">Pool Eligibility</h4>
+              <div className="grid grid-cols-3 gap-2">
+                {pools.map((pool) => (
+                  <div
+                    key={pool.id}
+                    className={`p-2 rounded-lg text-center text-sm ${
+                      eligiblePools.includes(pool.id)
+                        ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 border border-purple-500/50"
+                        : "bg-gray-800/30 text-gray-500"
+                    } ${pool.whitelistOnly ? "opacity-50" : ""}`}
+                  >
+                    <div className="font-bold">{pool.name}</div>
+                    {pool.whitelistOnly ? (
+                      <div className="text-xs">Whitelist Only</div>
+                    ) : (
+                      <div className="text-xs">{eligiblePools.includes(pool.id) ? "Eligible" : "Not Eligible"}</div>
+                    )}
                   </div>
-
-                  {/* Claim Tax */}
-                  <div className="mb-4">
-                    <div className="flex justify-between mb-2">
-                      <label className="text-gray-300 text-sm">Claim Tax (%)</label>
-                      <span className="text-blue-400 font-bold">{claimTax}%</span>
-                    </div>
-                    <Slider
-                      value={[claimTax]}
-                      min={0}
-                      max={10}
-                      step={1}
-                      onValueChange={(value) => setClaimTax(value[0])}
-                      className="mb-1"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>0%</span>
-                      <span>10%</span>
-                    </div>
-                  </div>
-
-                  {/* Auto-Compound Toggle */}
-                  <div className="flex items-center justify-between mb-4 p-2 rounded bg-black/20">
-                    <div>
-                      <label className="text-gray-300 text-sm">Auto-Compound</label>
-                      <p className="text-xs text-gray-500">Automatically reinvest all rewards</p>
-                    </div>
-                    <Switch checked={autoCompound} onCheckedChange={setAutoCompound} />
-                  </div>
-
-                  {/* Manual Reinvestment Settings (only shown if auto-compound is off) */}
-                  {!autoCompound && (
-                    <>
-                      {/* Reinvest Percentage */}
-                      <div className="mb-4">
-                        <div className="flex justify-between mb-2">
-                          <label className="text-gray-300 text-sm">Reinvest Percentage (%)</label>
-                          <span className="text-blue-400 font-bold">{reinvestPercentage}%</span>
-                        </div>
-                        <Slider
-                          value={[reinvestPercentage]}
-                          min={0}
-                          max={100}
-                          step={5}
-                          onValueChange={(value) => setReinvestPercentage(value[0])}
-                          className="mb-1"
-                        />
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>0% (All Claimed)</span>
-                          <span>100% (All Reinvested)</span>
-                        </div>
-                      </div>
-
-                      {/* Claim Frequency */}
-                      <div className="mb-2">
-                        <div className="flex justify-between mb-2">
-                          <label className="text-gray-300 text-sm">Claim Frequency (Days)</label>
-                          <span className="text-blue-400 font-bold">Every {claimFrequency} days</span>
-                        </div>
-                        <Slider
-                          value={[claimFrequency]}
-                          min={1}
-                          max={30}
-                          step={1}
-                          onValueChange={(value) => setClaimFrequency(value[0])}
-                          className="mb-1"
-                        />
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>Daily</span>
-                          <span>Monthly</span>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Investment Amount */}
-              <div className="mb-8">
-                <div className="flex justify-between mb-2">
-                  <label className="text-gray-300">Investment Amount (5PT)</label>
-                  <span className="text-blue-400 font-bold">{investmentAmount.toLocaleString()} 5PT</span>
-                </div>
-                <Slider
-                  value={[investmentAmount]}
-                  min={100}
-                  max={100000}
-                  step={100}
-                  onValueChange={(value) => setInvestmentAmount(value[0])}
-                  className="mb-2"
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>100 5PT</span>
-                  <span>100,000 5PT</span>
-                </div>
-                <div className="mt-2 flex items-start gap-2 text-sm">
-                  <Flame className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-400">
-                    Your tokens are permanently burned when invested, reducing the total supply
+                ))}
+              </div>
+              <div className="mt-3 text-xs text-gray-400">
+                {eligiblePools.length > 0 ? (
+                  <p>
+                    You qualify for {eligiblePools.length} pool{eligiblePools.length !== 1 ? "s" : ""}, earning rewards
+                    from each.
                   </p>
+                ) : (
+                  <p>Increase your investment or referrals to qualify for pools.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Daily Rewards */}
+              <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg p-6">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-gray-300">Daily Rewards (Day {simulationDays})</h4>
+                  <ArrowRight className="h-4 w-4 text-blue-400" />
+                </div>
+                <p className="text-3xl font-bold text-white">{lastDayResult?.dailyReward.toFixed(2)} 5PT</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                  <div className="text-gray-400">
+                    <span className="text-blue-400">•</span> Base (0.35%): {lastDayResult?.baseReward.toFixed(2)} 5PT
+                  </div>
+                  <div className="text-gray-400">
+                    <span className="text-purple-400">•</span> Pools: {lastDayResult?.poolRewards.toFixed(2)} 5PT
+                  </div>
                 </div>
               </div>
 
-              {/* Referrals */}
-              <div className="mb-8">
-                <div className="flex justify-between mb-2">
-                  <label className="text-gray-300">Number of Direct Referrals</label>
-                  <span className="text-blue-400 font-bold">{referrals}</span>
+              {/* Investment Growth */}
+              <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg p-6">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-gray-300">Investment Growth</h4>
+                  <ArrowRight className="h-4 w-4 text-purple-400" />
                 </div>
-                <Slider
-                  value={[referrals]}
-                  min={0}
-                  max={30}
-                  step={1}
-                  onValueChange={(value) => setReferrals(value[0])}
-                  className="mb-2"
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>0</span>
-                  <span>30</span>
+                <p className="text-3xl font-bold text-white">{results.currentInvestment.toFixed(2)} 5PT</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                  <div className="text-gray-400">
+                    <span className="text-blue-400">•</span> Initial: {results.afterTaxInvestment.toFixed(2)} 5PT
+                  </div>
+                  <div className="text-gray-400">
+                    <span className="text-green-400">•</span> Growth:{" "}
+                    {(results.currentInvestment - results.afterTaxInvestment).toFixed(2)} 5PT
+                  </div>
                 </div>
               </div>
 
-              {/* Referral Volume */}
-              <div className="mb-8">
-                <div className="flex justify-between mb-2">
-                  <label className="text-gray-300">Total Referral Volume (5PT)</label>
-                  <span className="text-blue-400 font-bold">{referralVolume.toLocaleString()} 5PT</span>
-                </div>
-                <Slider
-                  value={[referralVolume]}
-                  min={0}
-                  max={200000}
-                  step={1000}
-                  onValueChange={(value) => setReferralVolume(value[0])}
-                  className="mb-2"
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>0 5PT</span>
-                  <span>200,000 5PT</span>
-                </div>
-              </div>
-
-              {/* Simulation Period */}
-              <div className="mb-4">
-                <div className="flex justify-between mb-2">
-                  <label className="text-gray-300">Simulation Period (Days)</label>
-                  <span className="text-blue-400 font-bold">{simulationDays} days</span>
-                </div>
-                <Slider
-                  value={[simulationDays]}
-                  min={1}
-                  max={365}
-                  step={1}
-                  onValueChange={(value) => setSimulationDays(value[0])}
-                  className="mb-2"
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>1 day</span>
-                  <span>365 days</span>
-                </div>
-                <div className="mt-2 flex items-start gap-2 text-sm">
-                  <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-gray-400">
-                    This is for simulation only. Your actual investment runs indefinitely.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Calculator Results */}
-            <motion.div
-              className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8"
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <h3 className="text-2xl font-bold text-white mb-6">Projected Returns</h3>
-
-              {/* Pool Eligibility */}
-              <div className="mb-6 bg-black/40 rounded-lg p-4 border border-purple-500/10">
-                <h4 className="text-lg font-semibold text-purple-400 mb-3">Pool Eligibility</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {pools.map((pool) => (
-                    <div
-                      key={pool.id}
-                      className={`p-2 rounded-lg text-center text-sm ${
-                        eligiblePools.includes(pool.id)
-                          ? "bg-gradient-to-r from-purple-500/30 to-blue-500/30 border border-purple-500/50"
-                          : "bg-gray-800/30 text-gray-500"
-                      } ${pool.whitelistOnly ? "opacity-50" : ""}`}
-                    >
-                      <div className="font-bold">{pool.name}</div>
-                      {pool.whitelistOnly ? (
-                        <div className="text-xs">Whitelist Only</div>
-                      ) : (
-                        <div className="text-xs">{eligiblePools.includes(pool.id) ? "Eligible" : "Not Eligible"}</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 text-xs text-gray-400">
-                  {eligiblePools.length > 0 ? (
-                    <p>
-                      You qualify for {eligiblePools.length} pool{eligiblePools.length !== 1 ? "s" : ""}, earning
-                      rewards from each.
-                    </p>
-                  ) : (
-                    <p>Increase your investment or referrals to qualify for pools.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {/* Daily Rewards */}
-                <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-gray-300">Daily Rewards (Day {simulationDays})</h4>
-                    <ArrowRight className="h-4 w-4 text-blue-400" />
-                  </div>
-                  <p className="text-3xl font-bold text-white">{lastDayResult?.dailyReward.toFixed(2)} 5PT</p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                    <div className="text-gray-400">
-                      <span className="text-blue-400">•</span> Base (0.35%): {lastDayResult?.baseReward.toFixed(2)} 5PT
-                    </div>
-                    <div className="text-gray-400">
-                      <span className="text-purple-400">•</span> Pools: {lastDayResult?.poolRewards.toFixed(2)} 5PT
-                    </div>
-                  </div>
+              {/* Earnings Breakdown */}
+              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-gray-300">Earnings Breakdown ({simulationDays} days)</h4>
+                  <Percent className="h-4 w-4 text-green-400" />
                 </div>
 
-                {/* Investment Growth */}
-                <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-gray-300">Investment Growth</h4>
-                    <ArrowRight className="h-4 w-4 text-purple-400" />
-                  </div>
-                  <p className="text-3xl font-bold text-white">{results.currentInvestment.toFixed(2)} 5PT</p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                    <div className="text-gray-400">
-                      <span className="text-blue-400">•</span> Initial: {results.afterTaxInvestment.toFixed(2)} 5PT
-                    </div>
-                    <div className="text-gray-400">
-                      <span className="text-green-400">•</span> Growth:{" "}
-                      {(results.currentInvestment - results.afterTaxInvestment).toFixed(2)} 5PT
-                    </div>
-                  </div>
-                </div>
-
-                {/* Earnings Breakdown */}
-                <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-gray-300">Earnings Breakdown ({simulationDays} days)</h4>
-                    <Percent className="h-4 w-4 text-green-400" />
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Total Earnings:</span>
+                    <span className="text-green-400 font-bold">{results.totalEarnings.toFixed(2)} 5PT</span>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Reinvested:</span>
+                    <span className="text-blue-400">{results.totalReinvested.toFixed(2)} 5PT</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Claimed:</span>
+                    <span className="text-purple-400">{results.totalClaimed.toFixed(2)} 5PT</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Deposit Tax Paid:</span>
+                    <span className="text-red-400">{results.depositTaxPaid.toFixed(2)} 5PT</span>
+                  </div>
+
+                  <div className="border-t border-gray-700 pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Total Earnings:</span>
-                      <span className="text-green-400 font-bold">{results.totalEarnings.toFixed(2)} 5PT</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Reinvested:</span>
-                      <span className="text-blue-400">{results.totalReinvested.toFixed(2)} 5PT</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Claimed:</span>
-                      <span className="text-purple-400">{results.totalClaimed.toFixed(2)} 5PT</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Deposit Tax Paid:</span>
-                      <span className="text-red-400">{results.depositTaxPaid.toFixed(2)} 5PT</span>
-                    </div>
-
-                    <div className="border-t border-gray-700 pt-2 mt-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-300 font-semibold">ROI:</span>
-                        <span className="text-green-400 font-bold">{results.roi.toFixed(2)}%</span>
-                      </div>
+                      <span className="text-gray-300 font-semibold">ROI:</span>
+                      <span className="text-green-400 font-bold">{results.roi.toFixed(2)}%</span>
                     </div>
                   </div>
                 </div>
-
-                {/* Disclaimer */}
-                <div className="text-xs text-gray-500 italic mt-4">
-                  Note: Projected returns are estimates and not guaranteed. Actual results may vary based on network
-                  growth, total deposits, and pool participation. Your investment is permanently burned, reducing token
-                  supply.
-                </div>
               </div>
-            </motion.div>
-          </div>
-        </motion.div>
 
-        {/* CTA Button */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <Link href="/dashboard">
-            <CyberButton variant="primary" size="lg" className="animate-pulse">
-              Start Your Investment Journey
-            </CyberButton>
-          </Link>
-          <p className="text-gray-400 mt-4">Join now and be among the first investors</p>
-        </motion.div>
-      </div>
-    </section>
+              {/* Disclaimer */}
+              <div className="text-xs text-gray-500 italic mt-4">
+                Note: Projected returns are estimates and not guaranteed. Actual results may vary based on network
+                growth, total deposits, and pool participation. Your investment is permanently burned, reducing token
+                supply.
+              </div>
+            </div>
+          </ContentCard>
+        </div>
+      </motion.div>
+
+      {/* CTA Button */}
+      <motion.div
+        className="text-center"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+      >
+        <Link href="/dashboard">
+          <CyberButton variant="primary" size="lg" className="animate-pulse">
+            Start Your Investment Journey
+          </CyberButton>
+        </Link>
+        <p className="text-gray-400 mt-4">Join now and be among the first investors</p>
+      </motion.div>
+    </SectionContainer>
   )
 }
 

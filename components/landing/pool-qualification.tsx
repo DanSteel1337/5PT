@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { ParallaxSection } from "@/components/parallax/parallax-section"
 import { TiltCard } from "@/components/parallax/tilt-card"
 import { CheckCircle, Lock } from "lucide-react"
+import { SectionContainer } from "@/components/ui/section-container"
+import { ContentCard } from "@/components/ui/content-card"
 
 export function PoolQualification() {
   const [mounted, setMounted] = useState(false)
@@ -102,166 +103,115 @@ export function PoolQualification() {
   ]
 
   return (
-    <section id="pools" className="py-20 md:py-32 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/10 via-transparent to-transparent"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <ParallaxSection intensity={0.3}>
-          <motion.div
-            className="text-center mb-16"
+    <SectionContainer
+      id="pools"
+      title="POOL QUALIFICATION"
+      subtitle="Each pool has specific qualification requirements based on your investment and referral performance"
+    >
+      {/* Pool Selection Tabs */}
+      <div className="flex flex-wrap justify-center gap-2 mb-12">
+        {pools.map((pool) => (
+          <motion.button
+            key={pool.id}
+            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+              activePool === pool.id
+                ? "bg-purple-600 text-white"
+                : "bg-black/40 text-gray-400 hover:bg-black/60 hover:text-gray-300"
+            } ${pool.isExclusive ? "border border-purple-500/50" : ""}`}
+            onClick={() => setActivePool(pool.id)}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.5, delay: 0.1 * pool.id }}
           >
-            <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">POOL</span>{" "}
-              <span className="text-white">QUALIFICATION</span>
-            </motion.h2>
+            {pool.name}
+            {pool.isExclusive && <Lock className="inline-block ml-2 h-3 w-3" />}
+          </motion.button>
+        ))}
+      </div>
 
-            <motion.div
-              className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto mb-8"
-              initial={{ width: 0 }}
-              whileInView={{ width: "6rem" }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            ></motion.div>
-
-            <motion.p
-              className="text-xl text-gray-300 max-w-3xl mx-auto mb-12"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              Each pool has specific qualification requirements based on your investment and referral performance
-            </motion.p>
-          </motion.div>
-        </ParallaxSection>
-
-        {/* Pool Selection Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+      {/* Active Pool Details */}
+      <TiltCard>
+        <ContentCard className="max-w-3xl mx-auto">
           {pools.map((pool) => (
-            <motion.button
-              key={pool.id}
-              className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                activePool === pool.id
-                  ? "bg-purple-600 text-white"
-                  : "bg-black/40 text-gray-400 hover:bg-black/60 hover:text-gray-300"
-              } ${pool.isExclusive ? "border border-purple-500/50" : ""}`}
-              onClick={() => setActivePool(pool.id)}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 * pool.id }}
-            >
-              {pool.name}
-              {pool.isExclusive && <Lock className="inline-block ml-2 h-3 w-3" />}
-            </motion.button>
-          ))}
-        </div>
-
-        {/* Active Pool Details */}
-        <TiltCard>
-          <motion.div
-            className="bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {pools.map((pool) => (
-              <div key={pool.id} className={activePool === pool.id ? "block" : "hidden"}>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                    {pool.name} Qualification
-                  </h3>
-                  <div className="flex items-center">
-                    <span className="text-sm text-gray-400 mr-2">Daily Pool Share:</span>
-                    <span className="text-lg font-bold text-purple-400">{pool.poolShare}</span>
-                  </div>
-                </div>
-
-                {pool.isExclusive ? (
-                  <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 mb-6">
-                    <div className="flex items-center mb-4">
-                      <Lock className="h-6 w-6 text-purple-400 mr-3" />
-                      <h4 className="text-xl font-semibold text-white">Exclusive Whitelist Pool</h4>
-                    </div>
-                    <p className="text-gray-300 mb-4">
-                      This is a special pool reserved for early supporters, strategic partners, and significant
-                      contributors to the 5PT ecosystem.
-                    </p>
-                    <p className="text-purple-300 font-medium">
-                      Contact the team to inquire about whitelist opportunities.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <QualificationItem
-                      title="Personal Investment Required"
-                      value={pool.personalInvestment}
-                      delay={0.1}
-                    />
-                    <QualificationItem
-                      title="Direct Partners Required"
-                      value={pool.directPartners.toString()}
-                      delay={0.2}
-                    />
-                    <QualificationItem
-                      title="Total Direct Investment Required"
-                      value={pool.directInvestment}
-                      delay={0.3}
-                    />
-                  </div>
-                )}
-
-                <div className="mt-8 pt-6 border-t border-gray-800">
-                  <h4 className="text-lg font-semibold text-white mb-4">How to Qualify:</h4>
-                  <ul className="space-y-2">
-                    {!pool.isExclusive ? (
-                      <>
-                        <QualificationStep
-                          text={`Invest at least ${pool.personalInvestment} in the platform`}
-                          delay={0.1}
-                        />
-                        <QualificationStep
-                          text={`Refer at least ${pool.directPartners} direct partners to the platform`}
-                          delay={0.2}
-                        />
-                        <QualificationStep
-                          text={`Generate at least ${pool.directInvestment} in total direct referral volume`}
-                          delay={0.3}
-                        />
-                        <QualificationStep
-                          text="Maintain your qualification to continue receiving pool rewards"
-                          delay={0.4}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <QualificationStep text="Receive an invitation from the 5PT team" delay={0.1} />
-                        <QualificationStep text="Complete the whitelist verification process" delay={0.2} />
-                        <QualificationStep
-                          text="Maintain your whitelist status to continue receiving exclusive pool rewards"
-                          delay={0.3}
-                        />
-                      </>
-                    )}
-                  </ul>
+            <div key={pool.id} className={activePool === pool.id ? "block" : "hidden"}>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="card-title">{pool.name} Qualification</h3>
+                <div className="flex items-center">
+                  <span className="text-sm text-gray-400 mr-2">Daily Pool Share:</span>
+                  <span className="text-lg font-bold text-purple-400">{pool.poolShare}</span>
                 </div>
               </div>
-            ))}
-          </motion.div>
-        </TiltCard>
-      </div>
-    </section>
+
+              {pool.isExclusive ? (
+                <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 mb-6">
+                  <div className="flex items-center mb-4">
+                    <Lock className="h-6 w-6 text-purple-400 mr-3" />
+                    <h4 className="text-xl font-semibold text-white">Exclusive Whitelist Pool</h4>
+                  </div>
+                  <p className="text-gray-300 mb-4">
+                    This is a special pool reserved for early supporters, strategic partners, and significant
+                    contributors to the 5PT ecosystem.
+                  </p>
+                  <p className="text-purple-300 font-medium">
+                    Contact the team to inquire about whitelist opportunities.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <QualificationItem title="Personal Investment Required" value={pool.personalInvestment} delay={0.1} />
+                  <QualificationItem
+                    title="Direct Partners Required"
+                    value={pool.directPartners.toString()}
+                    delay={0.2}
+                  />
+                  <QualificationItem
+                    title="Total Direct Investment Required"
+                    value={pool.directInvestment}
+                    delay={0.3}
+                  />
+                </div>
+              )}
+
+              <div className="mt-8 pt-6 border-t border-gray-800">
+                <h4 className="text-lg font-semibold text-white mb-4">How to Qualify:</h4>
+                <ul className="space-y-2">
+                  {!pool.isExclusive ? (
+                    <>
+                      <QualificationStep
+                        text={`Invest at least ${pool.personalInvestment} in the platform`}
+                        delay={0.1}
+                      />
+                      <QualificationStep
+                        text={`Refer at least ${pool.directPartners} direct partners to the platform`}
+                        delay={0.2}
+                      />
+                      <QualificationStep
+                        text={`Generate at least ${pool.directInvestment} in total direct referral volume`}
+                        delay={0.3}
+                      />
+                      <QualificationStep
+                        text="Maintain your qualification to continue receiving pool rewards"
+                        delay={0.4}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <QualificationStep text="Receive an invitation from the 5PT team" delay={0.1} />
+                      <QualificationStep text="Complete the whitelist verification process" delay={0.2} />
+                      <QualificationStep
+                        text="Maintain your whitelist status to continue receiving exclusive pool rewards"
+                        delay={0.3}
+                      />
+                    </>
+                  )}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </ContentCard>
+      </TiltCard>
+    </SectionContainer>
   )
 }
 
