@@ -17,7 +17,7 @@ export const SectionContainer = forwardRef<HTMLElement, SectionContainerProps>(
     return (
       <section id={id} ref={ref} className={cn("py-20 md:py-32 relative overflow-hidden", className)}>
         {(title || subtitle) && (
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 px-4 md:px-6 lg:px-8">
             {title && (
               <motion.h2
                 className="text-4xl md:text-6xl font-bold mb-4"
@@ -56,7 +56,7 @@ export const SectionContainer = forwardRef<HTMLElement, SectionContainerProps>(
           </div>
         )}
 
-        {children}
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">{children}</div>
       </section>
     )
   },

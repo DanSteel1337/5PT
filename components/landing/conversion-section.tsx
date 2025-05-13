@@ -75,7 +75,7 @@ export function ConversionSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/20 to-black z-0"></div>
       <div className="cyber-grid absolute inset-0 opacity-20 z-0"></div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
         {/* Main heading with animation */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
