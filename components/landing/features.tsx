@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { TrendingUp, Shield, Users, Award, ChevronRight, Layers } from "lucide-react"
-import { ParallaxSection } from "@/components/parallax/parallax-section"
 import { ParallaxLayer } from "@/components/parallax/parallax-layer"
 import { TiltCard } from "@/components/parallax/tilt-card"
+import { SectionContainer } from "@/components/ui/section-container"
+import { ContentCard } from "@/components/ui/content-card"
 
 export function Features() {
   const [mounted, setMounted] = useState(false)
@@ -50,88 +51,37 @@ export function Features() {
   ]
 
   return (
-    <section id="features" className="py-20 md:py-32 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/10 via-transparent to-transparent"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <ParallaxSection intensity={0.3}>
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">
-                INVESTMENT
-              </span>{" "}
-              <span className="text-white">FEATURES</span>
-            </motion.h2>
-
-            <motion.div
-              className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto mb-8"
-              initial={{ width: 0 }}
-              whileInView={{ width: "6rem" }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            ></motion.div>
-
-            <motion.p
-              className="text-xl text-gray-300 max-w-3xl mx-auto"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              The Five Pillars Token implements a comprehensive investment platform with multiple reward mechanisms
-            </motion.p>
-          </motion.div>
-        </ParallaxSection>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {features.slice(0, 3).map((feature, index) => (
-            <ParallaxLayer key={index} speed={0.2 + index * 0.1} direction="up" offset={index * 10}>
-              <TiltCard>
-                <FeatureCard feature={feature} index={index} />
-              </TiltCard>
-            </ParallaxLayer>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 mt-8">
-          {features.slice(3).map((feature, index) => (
-            <ParallaxLayer key={index + 3} speed={0.2 + index * 0.1} direction="up" offset={(index + 3) * 10}>
-              <TiltCard>
-                <FeatureCard feature={feature} index={index + 3} />
-              </TiltCard>
-            </ParallaxLayer>
-          ))}
-        </div>
+    <SectionContainer
+      id="features"
+      title="INVESTMENT FEATURES"
+      subtitle="The Five Pillars Token implements a comprehensive investment platform with multiple reward mechanisms"
+    >
+      <div className="grid md:grid-cols-3 gap-8">
+        {features.slice(0, 3).map((feature, index) => (
+          <ParallaxLayer key={index} speed={0.2 + index * 0.1} direction="up" offset={index * 10}>
+            <TiltCard>
+              <FeatureCard feature={feature} index={index} />
+            </TiltCard>
+          </ParallaxLayer>
+        ))}
       </div>
-    </section>
+
+      <div className="grid md:grid-cols-2 gap-8 mt-8">
+        {features.slice(3).map((feature, index) => (
+          <ParallaxLayer key={index + 3} speed={0.2 + index * 0.1} direction="up" offset={(index + 3) * 10}>
+            <TiltCard>
+              <FeatureCard feature={feature} index={index + 3} />
+            </TiltCard>
+          </ParallaxLayer>
+        ))}
+      </div>
+    </SectionContainer>
   )
 }
 
 function FeatureCard({ feature, index }) {
   return (
-    <motion.div
-      className="relative bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 overflow-hidden group"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{
-        borderColor: "rgba(139, 92, 246, 0.5)",
-      }}
-    >
+    <ContentCard>
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors duration-500"></div>
@@ -165,7 +115,7 @@ function FeatureCard({ feature, index }) {
 
       {/* Content */}
       <motion.h3
-        className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400"
+        className="card-title"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -201,7 +151,7 @@ function FeatureCard({ feature, index }) {
 
       {/* Bottom border animation */}
       <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500/50 to-blue-500/50 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
-    </motion.div>
+    </ContentCard>
   )
 }
 

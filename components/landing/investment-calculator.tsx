@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
@@ -12,6 +11,7 @@ import { TiltCard } from "@/components/parallax/tilt-card"
 import { Calculator, TrendingUp, BarChart3, Calendar } from "lucide-react"
 import { formatCrypto, formatNumber, formatPercent } from "@/lib/utils"
 import Link from "next/link"
+import { ContentCard } from "@/components/ui/content-card"
 
 // Pool data from the smart contract
 const INVESTMENT_POOLS = [
@@ -132,7 +132,7 @@ export function InvestmentCalculator() {
 
     // Calculate final results
     const initialInvestment = investmentAmount
-    const poolEarnings = totalValue - initialInvestment
+    const poolEarnings = totalValue + referralEarnings - initialInvestment
     const totalEarnings = poolEarnings + referralEarnings
     const roi = (totalEarnings / initialInvestment) * 100
     const dailyAverage = totalEarnings / days
@@ -154,9 +154,13 @@ export function InvestmentCalculator() {
 
   return (
     <TiltCard intensity={5} className="w-full">
-      <Card className="glass-card-purple p-6 overflow-hidden">
+      <ContentCard className="p-6">
+        {" "}
+        {/* Use consistent ContentCard with custom padding */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gradient flex items-center">
+          <h3 className="card-title flex items-center">
+            {" "}
+            {/* Use consistent card-title class */}
             <Calculator className="mr-2 h-5 w-5 text-purple-400" />
             Investment Calculator
           </h3>
@@ -174,7 +178,6 @@ export function InvestmentCalculator() {
             />
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Calculator Inputs */}
           <div className="space-y-6">
@@ -406,7 +409,7 @@ export function InvestmentCalculator() {
             </Link>
           </div>
         </div>
-      </Card>
+      </ContentCard>
     </TiltCard>
   )
 }
