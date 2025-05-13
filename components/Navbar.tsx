@@ -20,19 +20,27 @@ export function Navbar() {
       setIsScrolled(window.scrollY > 10)
     }
 
-    try {
+    // Set mounted first to prevent any hydration issues
+    setMounted(true)
+
+    // Add event listener only on client side
+    if (typeof window !== "undefined") {
       window.addEventListener("scroll", handleScroll)
-      setMounted(true)
-    } catch (err) {
-      console.error("Error in navbar:", err)
+      // Initial check for scroll position
+      handleScroll()
     }
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
+      if (typeof window !== "undefined") {
+        window.removeEventListener("scroll", handleScroll)
+      }
     }
   }, [])
 
-  if (!mounted) return null
+  // Don't render anything until mounted to prevent hydration issues
+  if (!mounted) {
+    return null
+  }
 
   return (
     <motion.nav
@@ -44,7 +52,10 @@ export function Navbar() {
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Logo size={36} className="py-1" />
+        {/* FIX: Don't wrap Logo in Link if Logo already has href prop */}
+        <div className="z-10">
+          <Logo size={36} className="py-1" href="/" />
+        </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">

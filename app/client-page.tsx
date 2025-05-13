@@ -1,16 +1,21 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { ClientOnly } from "@/components/ClientOnly"
+import ErrorBoundary from "@/components/ErrorBoundary"
 
 // Dynamic imports for performance optimization
 const Navbar = dynamic(() => import("@/components/Navbar"), {
-  // Don't use ssr: false here, use ClientOnly wrapper instead
   loading: () => <div className="h-16 w-full bg-black/80"></div>,
 })
 
-const Hero = dynamic(() => import("@/components/landing/hero"))
+// Import Hero with error handling
+const Hero = dynamic(() => import("@/components/landing/hero"), {
+  loading: () => <HeroLoadingFallback />,
+  ssr: false,
+})
+
 const Features = dynamic(() => import("@/components/landing/features"))
 const CalculatorSection = dynamic(() => import("@/components/landing/calculator-section"))
 const SocialProof = dynamic(() => import("@/components/landing/social-proof"))
@@ -26,18 +31,39 @@ const LoadingFallback = () => (
   </div>
 )
 
+// Specific loading fallback for Hero section
+const HeroLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-black">
+    <div className="flex flex-col items-center">
+      <div className="w-24 h-24 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+      <div className="text-white text-xl">Loading 5PT Investment Platform...</div>
+    </div>
+  </div>
+)
+
 export default function ClientPage() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    console.log("ClientPage mounted")
+  }, [])
+
+  if (!mounted) {
+    return <LoadingFallback />
+  }
+
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
       <ClientOnly fallback={<div className="h-16 w-full bg-black/80"></div>}>
         <Navbar />
       </ClientOnly>
 
-      <Suspense fallback={<LoadingFallback />}>
-        <ClientOnly fallback={<LoadingFallback />}>
+      <ErrorBoundary fallback={<HeroLoadingFallback />}>
+        <ClientOnly fallback={<HeroLoadingFallback />}>
           <Hero />
         </ClientOnly>
-      </Suspense>
+      </ErrorBoundary>
 
       <Suspense fallback={<LoadingFallback />}>
         <ClientOnly fallback={<LoadingFallback />}>

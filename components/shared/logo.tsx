@@ -13,7 +13,7 @@ interface LogoProps {
   animated?: boolean
 }
 
-export function Logo({ size = 40, withText = true, className = "", href = "/", animated = true }: LogoProps) {
+export function Logo({ size = 40, withText = true, className = "", href = "", animated = true }: LogoProps) {
   const [mounted, setMounted] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ref = useRef(null)

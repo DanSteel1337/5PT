@@ -14,13 +14,29 @@ export function Hero() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // Set mounted state to true when component mounts
     setMounted(true)
+
+    // Log for debugging
+    console.log("Hero component mounted")
+
+    return () => {
+      console.log("Hero component unmounted")
+    }
   }, [])
 
-  if (!mounted) return null
+  // Don't render until client-side
+  if (!mounted) {
+    // Return a placeholder with similar dimensions to avoid layout shift
+    return (
+      <section className="relative min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-pulse w-16 h-16 rounded-full bg-purple-500/20"></div>
+      </section>
+    )
+  }
 
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section id="home" className="relative min-h-screen overflow-hidden">
       {/* Parallax Background */}
       <ParallaxBackground />
 
