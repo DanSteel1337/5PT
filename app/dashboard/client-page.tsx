@@ -4,7 +4,7 @@ import { Suspense } from "react"
 import dynamic from "next/dynamic"
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton"
 import { ClientOnly } from "@/components/ClientOnly"
-import { Web3DebugPanel } from "@/utils/web3-debug"
+// Removed import: import { Web3DebugPanel } from "@/utils/web3-debug"
 import { RainbowKitDebug } from "@/components/web3/RainbowKitDebug"
 
 // Dynamically import the FuturisticLogo component
@@ -39,8 +39,7 @@ export default function ClientDashboardPage() {
 
       {/* Debug panels */}
       <ClientOnly>
-        {/* Web3 Debug Panel */}
-        {showDebug && <Web3DebugPanel />}
+        {/* Removed Web3DebugPanel */}
 
         {/* RainbowKit Debug Panel - always shown in development and preview */}
         <RainbowKitDebug />
