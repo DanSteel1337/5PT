@@ -25,6 +25,13 @@ const ShareableStats = dynamic(
   },
 )
 
+const RealTimeEarnings = dynamic(
+  () => import("@/components/dashboard/RealTimeEarnings").then((mod) => mod.RealTimeEarnings),
+  {
+    loading: () => <Skeleton className="h-[300px] w-full" />,
+  },
+)
+
 const TokenomicsVisual = dynamic(
   () => import("@/components/dashboard/TokenomicsVisual").then((mod) => mod.TokenomicsVisual),
   {
@@ -124,8 +131,11 @@ function DashboardContentInternal() {
 
   return (
     <div className="space-y-6">
-      {/* Shareable Stats Card - New Component */}
+      {/* Shareable Stats Card */}
       <ShareableStats />
+
+      {/* Real-Time Earnings Counter - New Component */}
+      <RealTimeEarnings />
 
       {/* Overview Section */}
       <WalletOverview />

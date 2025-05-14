@@ -11,76 +11,27 @@
  * 4. DO NOT modify the [data-rk] and [role="dialog"] selectors without testing
  */
 
-@layer base {
-  :root {
-    /* Base theme variables - LIGHTENED for better visibility */
-    --background: 240 10% 5%; /* Slightly lighter */
-    --foreground: 0 0% 98%;
-    --card: 240 10% 7%; /* Lighter card background */
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 7%; /* Lighter popover background */
-    --popover-foreground: 0 0% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --radius: 0.5rem;
-
-    /* RainbowKit specific variables - DO NOT REMOVE */
-    --rk-blurs-modalOverlay: blur(4px);
-    --rk-fonts-body: system-ui, sans-serif;
-    --rk-radii-actionButton: 6px;
-    --rk-radii-connectButton: 6px;
-    --rk-radii-menuButton: 6px;
-    --rk-radii-modal: 10px;
-    --rk-radii-modalMobile: 10px;
-    --rk-colors-accentColor: #8b5cf6;
-    --rk-colors-accentColorForeground: white;
-    --rk-colors-actionButtonBorder: rgba(139, 92, 246, 0.3);
-    --rk-colors-actionButtonBorderMobile: rgba(139, 92, 246, 0.3);
-    --rk-colors-actionButtonSecondaryBackground: rgba(139, 92, 246, 0.1);
-    --rk-colors-closeButton: rgba(255, 255, 255, 0.8);
-    --rk-colors-closeButtonBackground: rgba(139, 92, 246, 0.2);
-    --rk-colors-connectButtonBackground: #0d0d14;
-    --rk-colors-connectButtonBackgroundError: #ff494a;
-    --rk-colors-connectButtonInnerBackground: linear-gradient(
-      to right,
-      rgba(139, 92, 246, 0.2),
-      rgba(59, 130, 246, 0.2)
-    );
-    --rk-colors-connectButtonText: #fff;
-    --rk-colors-connectButtonTextError: #fff;
-    --rk-colors-connectionIndicator: #30e000;
-    --rk-colors-error: #ff494a;
-    --rk-colors-generalBorder: rgba(139, 92, 246, 0.3);
-    --rk-colors-generalBorderDim: rgba(139, 92, 246, 0.2);
-    --rk-colors-menuItemBackground: rgba(139, 92, 246, 0.1);
-    --rk-colors-modalBackground: #0d0d14;
-    --rk-colors-modalBorder: rgba(139, 92, 246, 0.3);
-    --rk-colors-modalText: #fff;
-    --rk-colors-modalTextDim: rgba(255, 255, 255, 0.3);
-    --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.6);
-    --rk-colors-profileAction: rgba(139, 92, 246, 0.1);
-    --rk-colors-profileActionHover: rgba(139, 92, 246, 0.2);
-    --rk-colors-profileForeground: rgba(139, 92, 246, 0.05);
-    --rk-colors-selectedOptionBorder: rgba(139, 92, 246, 0.3);
-    --rk-colors-standby: #ffd641;
-    --rk-shadows-connectButton: 0px 4px 12px rgba(139, 92, 246, 0.4);
-    --rk-shadows-dialog: 0px 8px 32px rgba(139, 92, 246, 0.4);
-    --rk-shadows-profileDetailsAction: 0px 2px 6px rgba(37, 41, 46, 0.04);
-    --rk-shadows-selectedOption: 0px 2px 6px rgba(139, 92, 246, 0.24);
-    --rk-shadows-selectedWallet: 0px 2px 6px rgba(139, 92, 246, 0.24);
-    --rk-shadows-walletLogo: 0px 2px 16px rgba(139, 92, 246, 0.16);
-  }
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 270 100% 60%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 270 100% 60%;
+  --radius: 0.5rem;
 }
 
 @layer base {
@@ -211,18 +162,6 @@
   }
 }
 
-@keyframes pulse-glow {
-  0% {
-    box-shadow: 0 0 5px 0 rgba(139, 92, 246, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px 5px rgba(139, 92, 246, 0.7);
-  }
-  100% {
-    box-shadow: 0 0 5px 0 rgba(139, 92, 246, 0.5);
-  }
-}
-
 @keyframes pulse-slow {
   0% {
     opacity: 0.7;
@@ -345,6 +284,18 @@
   }
 }
 
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+  }
+}
+
 /* Custom classes */
 .animate-float {
   animation: float 6s ease-in-out infinite;
@@ -355,7 +306,7 @@
 }
 
 .animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-gradient {
@@ -385,17 +336,11 @@
 
 /* UPDATED: Lighter glass card with better visibility */
 .glass-card {
-  background: rgba(30, 30, 40, 0.6); /* Lighter background */
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
-  box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.3); /* Brighter shadow */
+  @apply bg-black/40 backdrop-blur-sm border border-gray-800/50 rounded-xl shadow-xl;
 }
 
 .glass-card-purple {
-  background: rgba(30, 30, 40, 0.6); /* Lighter background */
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); /* Brighter shadow */
+  @apply bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl shadow-xl;
 }
 
 /* UPDATED: Lighter cyber card with better visibility */
@@ -439,7 +384,11 @@
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400;
+}
+
+.text-gradient-green {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-300;
 }
 
 .text-cyber {

@@ -133,8 +133,8 @@ export function useInvestmentData() {
   const calculateProjectedYields = () => {
     const deposit = formatTokenAmount(userTotalDeposits)
 
-    // Use the actual reward rates from the contract
-    const dailyRate = REWARD_SYSTEM.dailyBonus // 0.3% daily
+    // Use the actual reward rates from the contract or fallback to default
+    const dailyRate = REWARD_SYSTEM?.dailyBonus || 0.008 // 0.8% daily as fallback
     const dailyYield = deposit * dailyRate
 
     return {
@@ -164,7 +164,7 @@ export function useInvestmentData() {
       projectedWeeklyYield: 0,
       projectedMonthlyYield: 0,
       projectedAnnualYield: 0,
-      dailyRatePercent: 0,
+      dailyRatePercent: 0.8, // Default daily rate percentage
     }
   }
 
@@ -183,6 +183,6 @@ export function useInvestmentData() {
     projectedWeeklyYield: projectedYields.weekly,
     projectedMonthlyYield: projectedYields.monthly,
     projectedAnnualYield: projectedYields.annual,
-    dailyRatePercent: REWARD_SYSTEM.dailyBonus * 100,
+    dailyRatePercent: (REWARD_SYSTEM?.dailyBonus || 0.008) * 100, // Convert to percentage
   }
 }

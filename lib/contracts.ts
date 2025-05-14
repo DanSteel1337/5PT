@@ -210,14 +210,9 @@ export const TOKENOMICS = {
 
 // Updated reward system data from latest documentation
 export const REWARD_SYSTEM = {
-  dailyBonus: 0.3, // 0.3% daily on invested capital (updated from 0.35%)
-  referralBonus: 0.025, // 0.025% daily on direct referrals' deposits (updated from 0.05%)
-  downlineBonus: 0.06, // 0.06% per level (levels 2-10) (updated from 0.0135%)
-  poolBonuses: {
-    pools1to5: 0.0175, // 0.0175% each for pools 1-5 (updated from 0.035%)
-    pools6to7: 0.01, // 0.01% each for pools 6-7 (updated from 0.02%)
-    pools8to9: 0.02, // 0.02% each for pools 8-9 (unchanged)
-  },
+  dailyBonus: 0.008, // 0.8% daily
+  referralBonus: 0.05, // 5% of referral's deposit
+  poolBonus: [0.001, 0.002, 0.003, 0.004, 0.005], // Additional bonus per pool level
 }
 
 // Updated pool qualification criteria from latest documentation
