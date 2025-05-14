@@ -20,11 +20,7 @@ const nextConfig = {
 
     return config
   },
-  // Explicitly set esmExternals to 'loose' to help with module resolution
-  // This has been reported to fix similar issues in Vercel environments
-  experimental: {
-    esmExternals: "loose",
-  },
+  // Removed experimental.esmExternals: 'loose' as it's no longer recommended
 }
 
 module.exports = nextConfig

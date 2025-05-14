@@ -44,3 +44,7 @@ See `docs/RAINBOWKIT_INTEGRATION.md` for detailed troubleshooting.
    - Create client components with proper mounting checks
    - Follow the established pattern for error handling
    - Test thoroughly before committing
+
+\`\`\`
+
+Let's check if there are any other documentation files that might reference this setting:

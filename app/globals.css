@@ -32,6 +32,21 @@
   --input: 240 3.7% 15.9%;
   --ring: 270 100% 60%;
   --radius: 0.5rem;
+
+  /* Chart colors */
+  --chart-1: 270 100% 60%;
+  --chart-2: 217 91% 60%;
+  --chart-3: 262 83% 58%;
+  --chart-4: 199 89% 48%;
+  --chart-5: 142 71% 45%;
+
+  /* Pool colors */
+  --blue-600: 217 91% 60%;
+  --blue-400: 213 94% 68%;
+  --purple-600: 262 83% 58%;
+  --purple-400: 263 85% 74%;
+  --indigo-600: 226 70% 55%;
+  --indigo-400: 231 94% 71%;
 }
 
 @layer base {
@@ -54,19 +69,13 @@
  * ⚠️ CRITICAL: RainbowKit Modal Positioning ⚠️
  * These selectors target Radix UI Dialog components used by RainbowKit
  * DO NOT REMOVE or MODIFY these selectors or the modal will break
- *
- * If the modal appears in the wrong position:
- * 1. Ensure body has position:relative
- * 2. Ensure these selectors are present
- * 3. Ensure no parent containers have overflow:hidden
  */
 
-/* Fix for Radix UI Dialog components used by RainbowKit */
+/* RainbowKit specific styles - preserved from original */
 [data-radix-popper-content-wrapper] {
-  z-index: 9999 !important; /* Ensure popper content is above everything */
+  z-index: 9999 !important;
 }
 
-/* Target Radix Dialog components used by RainbowKit */
 [role="dialog"] {
   position: fixed !important;
   top: 50% !important;
@@ -77,23 +86,20 @@
   width: 100% !important;
 }
 
-/* Dialog overlay - ONLY ACTIVE WHEN DIALOG IS OPEN */
 [data-radix-dialog-overlay] {
   position: fixed !important;
   inset: 0 !important;
   background-color: rgba(0, 0, 0, 0.5) !important;
   z-index: 9998 !important;
-  pointer-events: auto !important; /* Ensure it only captures events when visible */
+  pointer-events: auto !important;
 }
 
-/* RainbowKit specific styles */
 [data-rk] {
   --rk-overlay-backdrop-filter: blur(4px);
   --rk-overlay-background-color: rgba(0, 0, 0, 0.6);
   --rk-overlay-z-index: 9999;
 }
 
-/* Ensure the modal is centered */
 [data-rk] [role="dialog"] {
   position: fixed !important;
   top: 50% !important;
@@ -108,7 +114,6 @@
   z-index: var(--rk-overlay-z-index) !important;
 }
 
-/* Ensure the overlay covers the entire screen ONLY WHEN DIALOG IS OPEN */
 [data-rk] [role="dialog"]::before {
   content: "";
   position: fixed;
@@ -116,10 +121,9 @@
   background-color: var(--rk-overlay-background-color);
   backdrop-filter: var(--rk-overlay-backdrop-filter);
   z-index: -1;
-  pointer-events: none; /* Allow clicks to pass through when not needed */
+  pointer-events: none;
 }
 
-/* Fix for RainbowKit modal positioning */
 #radix-\:r0 {
   position: fixed;
   inset: 0;
@@ -127,14 +131,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none; /* Allow clicks to pass through when not needed */
+  pointer-events: none;
 }
 
 #radix-\:r0[data-state="open"] {
-  pointer-events: auto; /* Capture clicks only when open */
+  pointer-events: auto;
 }
 
-/* Add these animations for the token burning visualization */
+/* Enhanced animations */
 @keyframes float-to-center {
   0% {
     opacity: 1;
@@ -296,7 +300,25 @@
   }
 }
 
-/* Custom classes */
+@keyframes number-increment {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Custom animation classes */
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -334,7 +356,22 @@
   animation: particle-flow 3s ease-out infinite;
 }
 
-/* UPDATED: Lighter glass card with better visibility */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Utility classes */
+.bg-size-200 {
+  background-size: 200% 200%;
+}
+
 .glass-card {
   @apply bg-black/40 backdrop-blur-sm border border-gray-800/50 rounded-xl shadow-xl;
 }
@@ -343,12 +380,11 @@
   @apply bg-black/40 backdrop-blur-sm border border-purple-500/20 rounded-xl shadow-xl;
 }
 
-/* UPDATED: Lighter cyber card with better visibility */
 .cyber-card {
-  background: rgba(20, 20, 35, 0.6); /* Lighter background */
+  background: rgba(20, 20, 35, 0.6);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); /* Brighter shadow */
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
   position: relative;
   overflow: hidden;
 }
@@ -366,21 +402,8 @@
 
 .cyber-border {
   position: relative;
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); /* Brighter shadow */
-}
-
-.cyber-border::after {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
-  border: 1px solid rgba(56, 189, 248, 0.4); /* More visible border */
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); /* Brighter shadow */
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  animation: glitch 10s infinite;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
 }
 
 .text-gradient {
@@ -448,8 +471,8 @@
 }
 
 .cyber-input {
-  background: rgba(20, 20, 35, 0.7); /* Lighter background */
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
+  background: rgba(20, 20, 35, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.4);
   color: white;
   padding: 0.75rem 1rem;
   outline: none;
@@ -475,9 +498,9 @@
 }
 
 .cyber-panel {
-  background: rgba(20, 20, 35, 0.7); /* Lighter background */
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); /* Brighter shadow */
+  background: rgba(20, 20, 35, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
   clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
   padding: 1.5rem;
 }
@@ -498,72 +521,7 @@
   background: linear-gradient(to right, rgba(139, 92, 246, 0.15), transparent);
 }
 
-/* Futuristic UI elements */
-.futuristic-border {
-  position: relative;
-  border: 1px solid rgba(139, 92, 246, 0.4); /* More visible border */
-  overflow: hidden;
-}
-
-.futuristic-border::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(transparent, rgba(139, 92, 246, 0.4), transparent, transparent);
-  animation: rotate 4s linear infinite;
-}
-
-.futuristic-border::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  background: rgba(20, 20, 35, 0.7); /* Lighter background */
-  border-radius: inherit;
-}
-
-.futuristic-glow {
-  position: relative;
-}
-
-.futuristic-glow::before {
-  content: "";
-  position: absolute;
-  inset: -5px;
-  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.6), transparent 70%);
-  border-radius: inherit;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.futuristic-glow:hover::before {
-  opacity: 1;
-}
-
-.particle-container {
-  position: relative;
-  overflow: hidden;
-}
-
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background-color: rgba(139, 92, 246, 0.7);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-/* Add this to the end of your globals.css file */
-
-.text-shadow-lg {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(139, 92, 246, 0.5);
-}
-
-/* NEW: Enhanced visibility classes */
+/* Enhanced visibility classes */
 .enhanced-text {
   text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
   color: rgba(255, 255, 255, 0.95);
@@ -585,19 +543,7 @@
   box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
 }
 
-.light-overlay {
-  position: relative;
-}
-
-.light-overlay::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03), transparent 70%);
-  pointer-events: none;
-}
-
-/* Add these scrollbar styles to your existing globals.css */
+/* Scrollbar styles */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;

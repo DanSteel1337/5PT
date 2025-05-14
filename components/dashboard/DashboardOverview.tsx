@@ -1,9 +1,7 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect, useRef } from "react"
-import { motion, useAnimation, useInView } from "framer-motion"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { useInvestmentData } from "@/hooks/useInvestmentData"
 import { formatCrypto, formatNumber, formatPercent } from "@/lib/utils"
 import {
@@ -17,14 +15,25 @@ import {
   Zap,
   BarChart3,
   ArrowRight,
+  Sparkles,
+  Activity,
+  PieChart,
+  Layers,
+  RefreshCw,
+  ChevronUp,
+  ChevronDown,
+  Info,
 } from "lucide-react"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CyberButton } from "@/components/ui/cyber-button"
 import { Progress } from "@/components/ui/progress"
-import { RealTimeEarnings } from "./RealTimeEarnings"
 import { useAccount } from "wagmi"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
+import { GlowCard } from "@/components/ui/glow-card"
+import { AnimatedCounter } from "@/components/ui/animated-counter"
+import { ParticleEffect } from "@/components/ui/particle-effect"
+import { ValueStream } from "@/components/ui/value-stream"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function DashboardOverview() {
   const { address, isConnected } = useAccount()
@@ -44,16 +53,17 @@ export function DashboardOverview() {
   } = useInvestmentData()
 
   const [mounted, setMounted] = useState(false)
-  const controls = useAnimation()
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [earningsPerSecond, setEarningsPerSecond] = useState(0)
 
   useEffect(() => {
     setMounted(true)
-    if (isInView) {
-      controls.start("visible")
+
+    // Calculate earnings per second based on daily yield
+    if (projectedDailyYield) {
+      setEarningsPerSecond(projectedDailyYield / (24 * 60 * 60))
     }
-  }, [controls, isInView])
+  }, [projectedDailyYield])
 
   if (!mounted) return null
 
@@ -73,21 +83,35 @@ export function DashboardOverview() {
   // Format address for display
   const formattedAddress = address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : ""
 
+  // Toggle section visibility
+  const toggleSection = (section: string) => {
+    if (activeSection === section) {
+      setActiveSection(null)
+    } else {
+      setActiveSection(section)
+    }
+  }
+
   return (
-    <div className="space-y-6" ref={ref}>
-      {/* Welcome Section */}
+    <div className="space-y-8">
+      {/* Command Center Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+        className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8"
       >
         <div>
-          <h1 className="text-3xl font-bold text-gradient">Welcome to 5PT Finance</h1>
-          <p className="text-gray-400 mt-1">Your investment dashboard • Connected as {formattedAddress}</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-purple-400 bg-clip-text text-transparent animate-gradient bg-size-200">
+            Investment Command Center
+          </h1>
+          <p className="text-gray-400 mt-1 flex items-center">
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+            Connected as {formattedAddress} • Last update: just now
+          </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-purple-500/50 text-purple-100 hover:bg-purple-900/20">
+          <Button variant="outline" className="border-purple-500/50 text-purple-100 hover:bg-purple-900/20 h-10">
             <Clock className="mr-2 h-4 w-4" />
             Transaction History
           </Button>
@@ -98,303 +122,524 @@ export function DashboardOverview() {
         </div>
       </motion.div>
 
-      {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="glass-card-purple rounded-xl p-6 animate-pulse-glow"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-gray-400 mb-1">Total Balance</p>
-              <p className="text-3xl font-bold text-gradient">{formatCrypto(userTokenBalance, tokenSymbol)}</p>
+      {/* Main Command Center Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Earnings Core */}
+        <GlowCard className="lg:col-span-2 p-8 min-h-[400px]" intensity="high" glowColor="rgba(139, 92, 246, 0.6)">
+          <div className="relative h-full">
+            <ParticleEffect className="absolute inset-0 z-0" count={30} duration={3} spread={100} />
+
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center">
+                  <Sparkles className="mr-2 h-5 w-5 text-purple-400" />
+                  Earnings Dashboard
+                </h2>
+                <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-purple-300 hover:bg-purple-900/20">
+                  <RefreshCw className="mr-1 h-3 w-3" />
+                  Refresh
+                </Button>
+              </div>
+
+              <div className="flex-1 flex flex-col items-center justify-center text-center mb-8">
+                <p className="text-gray-400 mb-2">Total Earnings</p>
+                <div className="relative">
+                  <AnimatedCounter
+                    value={totalEarnings}
+                    formatFn={(val) => formatCrypto(val, tokenSymbol)}
+                    className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-purple-400 bg-clip-text text-transparent animate-gradient bg-size-200"
+                  />
+                  <div className="absolute -right-6 -top-6 text-green-400 font-medium text-sm bg-green-900/30 px-2 py-1 rounded-full flex items-center">
+                    <ChevronUp className="h-3 w-3 mr-1" />
+                    {formatPercent(roi)}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-gray-400">ROI:</span>
+                  <span className="text-green-400 font-medium">{formatPercent(roi)}</span>
+                </div>
+
+                <div className="w-full max-w-md mt-8">
+                  <div className="text-sm text-gray-400 mb-1 flex justify-between">
+                    <span>Earnings Breakdown</span>
+                    <span>Total: {formatCrypto(totalEarnings, tokenSymbol)}</span>
+                  </div>
+                  <div className="h-3 bg-gray-800/50 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-purple-600 to-purple-400"
+                      style={{ width: `${(userPoolRewards / totalEarnings) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-purple-500 mr-1"></div>
+                      <span>Pool Rewards: {formatCrypto(userPoolRewards, tokenSymbol)}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mr-1"></div>
+                      <span>Referral Bonuses: {formatCrypto(userReferralBonus, tokenSymbol)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="text-center text-sm text-gray-400 mb-2">Real-time Earnings Stream</div>
+                <ValueStream rate={earningsPerSecond} symbol={tokenSymbol} className="w-full" />
+                <div className="text-center text-xs text-gray-500">
+                  Earning approximately {formatCrypto(earningsPerSecond * 60, tokenSymbol)} per minute
+                </div>
+              </div>
+            </div>
+          </div>
+        </GlowCard>
+
+        {/* Right Column - Wallet & Rank */}
+        <div className="space-y-8">
+          {/* Wallet Balance */}
+          <GlowCard className="p-6 relative overflow-hidden">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-medium text-white flex items-center">
+                  <Wallet className="mr-2 h-4 w-4 text-purple-400" />
+                  Wallet Balance
+                </h3>
+                <p className="text-sm text-gray-400">Available funds</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-400 hover:text-white hover:bg-purple-900/20"
+                onClick={() => toggleSection("wallet")}
+              >
+                {activeSection === "wallet" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+
+            <div className="mb-4">
+              <AnimatedCounter
+                value={userTokenBalance}
+                formatFn={(val) => formatCrypto(val, tokenSymbol)}
+                className="text-3xl font-bold text-white"
+              />
               <p className="text-sm text-gray-400 mt-1">≈ ${formatNumber(userTokenBalance * 1.25)}</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-900/50 flex items-center justify-center">
-              <Wallet className="h-6 w-6 text-purple-400" />
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-purple-900/30">
-            <div className="flex justify-between items-center">
-              <p className="text-gray-400 text-sm">Available to Withdraw</p>
-              <p className="font-medium">{formatCrypto(userTokenBalance * 0.8, tokenSymbol)}</p>
-            </div>
-          </div>
-          <div className="mt-4">
-            <CyberButton variant="outline" size="sm" className="w-full">
-              <ArrowUpRight className="mr-2 h-4 w-4" />
-              Withdraw Funds
-            </CyberButton>
-          </div>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="glass-card-purple rounded-xl p-6"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-gray-400 mb-1">Total Investments</p>
-              <p className="text-3xl font-bold text-gradient">{formatCrypto(userTotalDeposits, tokenSymbol)}</p>
-              <p className="text-sm text-gray-400 mt-1">Across all pools</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-900/50 flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-purple-400" />
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-purple-900/30">
-            <div className="flex justify-between items-center">
-              <p className="text-gray-400 text-sm">Daily Yield ({formatPercent(dailyRatePercent)})</p>
-              <div className="flex items-center">
-                <p className="font-medium text-green-400">+{formatCrypto(projectedDailyYield, tokenSymbol)}</p>
-                <ArrowUpRight className="h-3 w-3 text-green-400 ml-1" />
-              </div>
-            </div>
-          </div>
-          <div className="mt-4">
-            <CyberButton variant="primary" size="sm" className="w-full">
-              <Zap className="mr-2 h-4 w-4" />
-              Invest More
-            </CyberButton>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="glass-card-purple rounded-xl p-6"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-gray-400 mb-1">Total Earnings</p>
-              <p className="text-3xl font-bold text-gradient">{formatCrypto(totalEarnings, tokenSymbol)}</p>
-              <p className="text-sm text-gray-400 mt-1">Pool + Referral rewards</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-900/50 flex items-center justify-center">
-              <Award className="h-6 w-6 text-purple-400" />
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-purple-900/30">
-            <div className="flex justify-between items-center">
-              <p className="text-gray-400 text-sm">ROI</p>
-              <div className="flex items-center">
-                <p className="font-medium text-green-400">{formatPercent(roi)}</p>
-                <ArrowUpRight className="h-3 w-3 text-green-400 ml-1" />
-              </div>
-            </div>
-          </div>
-          <div className="mt-4">
-            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
-                initial={{ width: "0%" }}
-                animate={{ width: `${Math.min(roi, 100)}%` }}
-                transition={{ duration: 1, delay: 0.5 }}
-              ></motion.div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Real-Time Earnings */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <RealTimeEarnings />
-      </motion.div>
-
-      {/* Investment Performance & Rank */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="md:col-span-2 glass-card-purple rounded-xl p-6"
-        >
-          <h3 className="text-xl font-bold mb-6 text-gradient flex items-center">
-            <BarChart3 className="mr-2 h-5 w-5" />
-            Investment Performance
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="bg-black/30 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-2">Return on Investment</p>
-              <p className="text-3xl font-bold text-gradient">{formatPercent(roi)}</p>
-              <div className="mt-2 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <AnimatePresence>
+              {activeSection === "wallet" && (
                 <motion.div
-                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${Math.min(roi, 100)}%` }}
-                  transition={{ duration: 1, delay: 0.6 }}
-                ></motion.div>
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-3 pt-2 border-t border-purple-900/30">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-400">Available to Withdraw</span>
+                      <span className="text-sm font-medium text-white">
+                        {formatCrypto(userTokenBalance * 0.8, tokenSymbol)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-400">Locked in Pools</span>
+                      <span className="text-sm font-medium text-white">
+                        {formatCrypto(userTotalDeposits, tokenSymbol)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-400">Pending Rewards</span>
+                      <span className="text-sm font-medium text-green-400">
+                        +{formatCrypto(projectedDailyYield / 24, tokenSymbol)}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <CyberButton variant="primary" size="sm">
+                <Zap className="mr-1 h-3 w-3" />
+                Deposit
+              </CyberButton>
+              <CyberButton variant="outline" size="sm">
+                <ArrowUpRight className="mr-1 h-3 w-3" />
+                Withdraw
+              </CyberButton>
+            </div>
+          </GlowCard>
+
+          {/* Investor Rank */}
+          <GlowCard className="p-6 relative overflow-hidden">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-medium text-white flex items-center">
+                  <Award className="mr-2 h-4 w-4 text-purple-400" />
+                  Investor Rank
+                </h3>
+                <p className="text-sm text-gray-400">Level {userRank}</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-gray-400 hover:text-white hover:bg-purple-900/20"
+                onClick={() => toggleSection("rank")}
+              >
+                {activeSection === "rank" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-center mb-4">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full bg-purple-900/30 border-2 border-purple-500 flex items-center justify-center">
+                  <span className="text-3xl font-bold text-white">{userRank}</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-indigo-900 border border-indigo-500 flex items-center justify-center">
+                  <Award className="h-3 w-3 text-indigo-300" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-black/30 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-2">Earnings Breakdown</p>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                <p className="text-sm">Pool Rewards: {formatPercent((userPoolRewards / totalEarnings) * 100)}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
-                <p className="text-sm">Referral Bonuses: {formatPercent((userReferralBonus / totalEarnings) * 100)}</p>
-              </div>
-              <div className="mt-2 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div className="text-center mb-4">
+              <p className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                {getRankTitle(userRank)}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">{getRankDescription(userRank)}</p>
+            </div>
+
+            <AnimatePresence>
+              {activeSection === "rank" && (
                 <motion.div
-                  className="h-full bg-purple-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${(userPoolRewards / totalEarnings) * 100}%` }}
-                  transition={{ duration: 1, delay: 0.7 }}
-                ></motion.div>
-              </div>
-            </div>
-          </div>
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-3 pt-2 border-t border-purple-900/30 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-400">Pool Access</span>
+                      <span className="text-xs font-medium text-white">Pools 1-{Math.min(userRank, 3)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-400">Bonus Multiplier</span>
+                      <span className="text-xs font-medium text-green-400">+{userRank * 5}%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-400">Referral Commission</span>
+                      <span className="text-xs font-medium text-blue-400">{4 + userRank * 0.5}%</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          <div className="space-y-4">
-            <h4 className="font-bold text-sm text-gray-300 mb-2">Projected Earnings</h4>
-
-            <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-              <p className="text-gray-300">Daily Yield ({formatPercent(dailyRatePercent)})</p>
-              <p className="font-medium text-green-400">+{formatCrypto(projectedDailyYield, tokenSymbol)}</p>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-              <p className="text-gray-300">Weekly Projection</p>
-              <p className="font-medium text-green-400">+{formatCrypto(projectedDailyYield * 7, tokenSymbol)}</p>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-              <p className="text-gray-300">Monthly Projection</p>
-              <p className="font-medium text-green-400">+{formatCrypto(projectedMonthlyYield, tokenSymbol)}</p>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-              <p className="text-gray-300">Annual Projection (APY: {formatPercent(apy)})</p>
-              <p className="font-medium text-green-400">+{formatCrypto(projectedAnnualYield, tokenSymbol)}</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="glass-card-purple rounded-xl p-6"
-        >
-          <h3 className="text-xl font-bold mb-4 text-gradient flex items-center">
-            <Award className="mr-2 h-5 w-5" />
-            Investor Rank
-          </h3>
-
-          <div className="flex flex-col items-center justify-center py-6">
-            <div className="relative">
-              <div className="w-32 h-32 rounded-full bg-purple-900/30 border-4 border-purple-500 flex items-center justify-center">
-                <span className="text-5xl font-bold text-gradient">{userRank}</span>
-              </div>
-              <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-indigo-900 border-2 border-indigo-500 flex items-center justify-center">
-                <Award className="h-5 w-5 text-indigo-300" />
-              </div>
-            </div>
-
-            <p className="mt-4 text-xl font-bold text-gradient">{getRankTitle(userRank)}</p>
-
-            <p className="text-gray-400 text-sm mt-2 text-center">{getRankDescription(userRank)}</p>
-
-            <div className="w-full mt-6">
-              <div className="flex justify-between text-xs text-gray-400 mb-2">
+            <div className="w-full">
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
                 <span>Current Rank</span>
                 <span>Next Rank</span>
               </div>
               <Progress value={getRankProgress(userRank)} className="h-2" />
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>Level {userRank}</span>
                 <span>Level {userRank + 1}</span>
               </div>
             </div>
+          </GlowCard>
 
-            <div className="mt-6 w-full">
-              <Button variant="outline" className="w-full border-purple-500/50 text-purple-100 hover:bg-purple-900/20">
-                View Rank Benefits
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
+          {/* Daily Stats */}
+          <GlowCard className="p-6 relative overflow-hidden">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-medium text-white flex items-center">
+                  <Activity className="mr-2 h-4 w-4 text-purple-400" />
+                  Daily Projections
+                </h3>
+                <p className="text-sm text-gray-400">Based on current rates</p>
+              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-400 hover:text-white hover:bg-purple-900/20"
+                    >
+                      <Info className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Projections based on current APY of {formatPercent(apy)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-          </div>
-        </motion.div>
+
+            <div className="space-y-3">
+              <div className="bg-black/30 rounded-lg p-3 flex justify-between items-center">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-lg bg-green-900/30 flex items-center justify-center mr-3">
+                    <TrendingUp className="h-4 w-4 text-green-400" />
+                  </div>
+                  <span className="text-sm text-gray-300">Daily Yield</span>
+                </div>
+                <span className="text-green-400 font-medium">+{formatCrypto(projectedDailyYield, tokenSymbol)}</span>
+              </div>
+
+              <div className="bg-black/30 rounded-lg p-3 flex justify-between items-center">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-lg bg-blue-900/30 flex items-center justify-center mr-3">
+                    <PieChart className="h-4 w-4 text-blue-400" />
+                  </div>
+                  <span className="text-sm text-gray-300">Weekly Projection</span>
+                </div>
+                <span className="text-blue-400 font-medium">+{formatCrypto(projectedDailyYield * 7, tokenSymbol)}</span>
+              </div>
+
+              <div className="bg-black/30 rounded-lg p-3 flex justify-between items-center">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 rounded-lg bg-purple-900/30 flex items-center justify-center mr-3">
+                    <Layers className="h-4 w-4 text-purple-400" />
+                  </div>
+                  <span className="text-sm text-gray-300">Monthly Projection</span>
+                </div>
+                <span className="text-purple-400 font-medium">+{formatCrypto(projectedMonthlyYield, tokenSymbol)}</span>
+              </div>
+            </div>
+          </GlowCard>
+        </div>
       </div>
 
-      {/* Platform Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.7 }}
-        className="glass-card-purple rounded-xl p-6"
-      >
-        <h3 className="text-xl font-bold mb-4 text-gradient">Platform Statistics</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Total Value Locked</p>
-            <p className="text-2xl font-bold text-white">${formatNumber(totalValueLocked * 1.25)}</p>
+      {/* Investment Pools Section */}
+      <GlowCard className="p-6 relative overflow-hidden">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-white flex items-center">
+              <Layers className="mr-2 h-5 w-5 text-purple-400" />
+              Investment Pools
+            </h2>
+            <p className="text-sm text-gray-400">Active investment opportunities</p>
           </div>
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Total Investors</p>
-            <p className="text-2xl font-bold text-white">{formatNumber(totalInvestors)}</p>
-          </div>
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Active Pools</p>
-            <p className="text-2xl font-bold text-white">7</p>
-          </div>
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Total Rewards Paid</p>
-            <p className="text-2xl font-bold text-white">${formatNumber(totalValueLocked * 0.3)}</p>
-          </div>
+          <CyberButton variant="outline" size="sm">
+            View All Pools
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </CyberButton>
         </div>
-      </motion.div>
 
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.8 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-      >
-        <QuickActionCard
-          title="Invest in Pools"
-          description="Explore investment pools with different APYs and requirements."
-          icon={Wallet}
-          buttonText="View Pools"
-          buttonIcon={ArrowRight}
-          href="/dashboard/investments"
-          gradient="from-purple-500 to-blue-500"
-        />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((poolId) => {
+            const pool = {
+              id: poolId,
+              name: `Pool ${poolId}`,
+              apy: poolId === 1 ? "12%" : poolId === 2 ? "18%" : "25%",
+              lockPeriod: poolId === 1 ? "30 days" : poolId === 2 ? "60 days" : "90 days",
+              requirement: poolId === 1 ? 550000 : poolId === 2 ? 1250000 : 3000000,
+              qualified: userRank >= poolId,
+              color:
+                poolId === 1
+                  ? "from-blue-600 to-blue-400"
+                  : poolId === 2
+                    ? "from-purple-600 to-purple-400"
+                    : "from-indigo-600 to-indigo-400",
+            }
 
-        <QuickActionCard
-          title="Refer Friends"
-          description="Earn 5% commission on your referrals' investments."
-          icon={Users}
-          buttonText="Get Referral Link"
-          buttonIcon={ArrowRight}
-          href="/dashboard/referrals"
-          gradient="from-blue-500 to-cyan-400"
-        />
+            return (
+              <motion.div
+                key={pool.id}
+                className={`relative overflow-hidden rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 ${
+                  pool.qualified
+                    ? "border-purple-500/50 bg-black/40 backdrop-blur-sm"
+                    : "border-gray-700/50 bg-black/30 backdrop-blur-sm"
+                }`}
+                whileHover={pool.qualified ? { scale: 1.02, borderColor: "rgba(139, 92, 246, 0.8)" } : {}}
+              >
+                <div
+                  className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r opacity-80 rounded-t-lg"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, ${
+                      pool.qualified ? `var(--${pool.color.split(" ")[0].substring(5)})` : "gray"
+                    }, 
+                       ${pool.qualified ? `var(--${pool.color.split(" ")[1].substring(3)})` : "gray"})`,
+                  }}
+                />
 
-        <QuickActionCard
-          title="Track Earnings"
-          description="View detailed analytics of your investment performance."
-          icon={BarChart3}
-          buttonText="View Analytics"
-          buttonIcon={ArrowRight}
-          href="/dashboard/analytics"
-          gradient="from-cyan-400 to-teal-500"
-        />
-      </motion.div>
+                <div className="flex items-start justify-between mb-3">
+                  <h4 className="text-lg font-medium text-white">{pool.name}</h4>
+                  <div
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      pool.qualified ? "bg-green-900/50 text-green-300" : "bg-red-900/50 text-red-300"
+                    }`}
+                  >
+                    {pool.qualified ? "Eligible" : "Not Eligible"}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <div className="text-xs text-gray-400">APY</div>
+                    <div className={`text-lg font-bold ${pool.qualified ? "text-white" : "text-gray-500"}`}>
+                      {pool.apy}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-400">Lock Period</div>
+                    <div className={`text-lg font-bold ${pool.qualified ? "text-white" : "text-gray-500"}`}>
+                      {pool.lockPeriod}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <div className="text-xs text-gray-400 mb-1">Requirement</div>
+                  <div className="flex items-center">
+                    <div
+                      className={`h-1 flex-1 rounded-full ${pool.qualified ? "bg-gradient-to-r " + pool.color : "bg-gray-700"}`}
+                    ></div>
+                    <span className={`ml-2 text-xs ${pool.qualified ? "text-white" : "text-gray-500"}`}>
+                      {formatNumber(pool.requirement)} 5PT
+                    </span>
+                  </div>
+                </div>
+
+                <CyberButton
+                  variant={pool.qualified ? "primary" : "secondary"}
+                  size="sm"
+                  className="w-full"
+                  disabled={!pool.qualified}
+                >
+                  {pool.qualified ? "Invest Now" : "Not Eligible"}
+                </CyberButton>
+              </motion.div>
+            )
+          })}
+        </div>
+      </GlowCard>
+
+      {/* Platform Stats & Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Platform Stats */}
+        <GlowCard className="p-6 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white flex items-center">
+              <BarChart3 className="mr-2 h-5 w-5 text-purple-400" />
+              Platform Statistics
+            </h3>
+            <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-purple-300 hover:bg-purple-900/20">
+              <RefreshCw className="mr-1 h-3 w-3" />
+              Refresh
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-black/30 rounded-lg p-4 text-center">
+              <p className="text-xs text-gray-400 mb-1">Total Value Locked</p>
+              <AnimatedCounter
+                value={totalValueLocked * 1.25}
+                formatFn={(val) => "$" + formatNumber(val)}
+                className="text-xl font-bold text-white"
+              />
+            </div>
+
+            <div className="bg-black/30 rounded-lg p-4 text-center">
+              <p className="text-xs text-gray-400 mb-1">Total Investors</p>
+              <AnimatedCounter
+                value={totalInvestors}
+                formatFn={(val) => formatNumber(val)}
+                className="text-xl font-bold text-white"
+              />
+            </div>
+
+            <div className="bg-black/30 rounded-lg p-4 text-center">
+              <p className="text-xs text-gray-400 mb-1">Active Pools</p>
+              <p className="text-xl font-bold text-white">7</p>
+            </div>
+
+            <div className="bg-black/30 rounded-lg p-4 text-center">
+              <p className="text-xs text-gray-400 mb-1">Total Rewards Paid</p>
+              <AnimatedCounter
+                value={totalValueLocked * 0.3}
+                formatFn={(val) => "$" + formatNumber(val)}
+                className="text-xl font-bold text-white"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-black/30 rounded-lg border border-purple-500/10">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-white">Platform Growth</p>
+              <div className="flex items-center text-xs text-green-400">
+                <ChevronUp className="h-3 w-3 mr-1" />
+                +12.4% this month
+              </div>
+            </div>
+
+            <div className="h-12 w-full bg-black/50 rounded-md overflow-hidden relative">
+              {/* Simplified chart visualization */}
+              <div className="absolute inset-0 flex items-end">
+                {Array.from({ length: 30 }).map((_, i) => {
+                  const height = 20 + Math.random() * 60
+                  return (
+                    <div
+                      key={i}
+                      className="flex-1 bg-gradient-to-t from-purple-600 to-blue-500 opacity-80 mx-px rounded-t-sm"
+                      style={{ height: `${height}%` }}
+                    ></div>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>30 days ago</span>
+              <span>Today</span>
+            </div>
+          </div>
+        </GlowCard>
+
+        {/* Quick Actions */}
+        <GlowCard className="p-6">
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+            <Zap className="mr-2 h-5 w-5 text-purple-400" />
+            Quick Actions
+          </h3>
+
+          <div className="space-y-3">
+            <Button variant="outline" className="w-full justify-start border-purple-500/30 hover:bg-purple-900/20 h-12">
+              <Wallet className="mr-3 h-5 w-5 text-purple-400" />
+              <div className="text-left">
+                <div className="font-medium">Invest in Pools</div>
+                <div className="text-xs text-gray-400">Explore investment options</div>
+              </div>
+              <ArrowRight className="ml-auto h-4 w-4" />
+            </Button>
+
+            <Button variant="outline" className="w-full justify-start border-purple-500/30 hover:bg-purple-900/20 h-12">
+              <Users className="mr-3 h-5 w-5 text-blue-400" />
+              <div className="text-left">
+                <div className="font-medium">Refer Friends</div>
+                <div className="text-xs text-gray-400">Earn 5% commission</div>
+              </div>
+              <ArrowRight className="ml-auto h-4 w-4" />
+            </Button>
+
+            <Button variant="outline" className="w-full justify-start border-purple-500/30 hover:bg-purple-900/20 h-12">
+              <BarChart3 className="mr-3 h-5 w-5 text-green-400" />
+              <div className="text-left">
+                <div className="font-medium">View Analytics</div>
+                <div className="text-xs text-gray-400">Track your performance</div>
+              </div>
+              <ArrowRight className="ml-auto h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="mt-4 p-3 bg-purple-900/20 rounded-lg border border-purple-500/20">
+            <p className="text-sm text-center text-purple-300">Need help? Contact support or visit our documentation</p>
+          </div>
+        </GlowCard>
+      </div>
     </div>
   )
 }
@@ -405,73 +650,45 @@ function ConnectWalletPrompt() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="glass-card-purple rounded-xl p-8 text-center max-w-2xl mx-auto my-12"
+      className="relative overflow-hidden rounded-xl bg-black/40 backdrop-blur-lg border border-purple-500/30 p-8 text-center max-w-2xl mx-auto my-12"
     >
-      <div className="w-20 h-20 rounded-full bg-purple-900/30 mx-auto flex items-center justify-center mb-6">
-        <Wallet className="h-10 w-10 text-purple-400" />
-      </div>
+      <div className="absolute -right-32 -top-32 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl filter" />
+      <div className="absolute -left-32 -bottom-32 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl filter" />
 
-      <h2 className="text-3xl font-bold mb-4 text-gradient">Connect Your Wallet</h2>
-
-      <p className="text-gray-300 mb-8 max-w-md mx-auto">
-        Connect your wallet to view your investment dashboard, manage your pools, and track your earnings in real-time.
-      </p>
-
-      <div className="flex justify-center">
-        <CustomConnectButton />
-      </div>
-
-      <div className="mt-8 pt-8 border-t border-purple-900/30 grid grid-cols-3 gap-4">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gradient">7</p>
-          <p className="text-xs text-gray-400">Investment Pools</p>
+      <div className="relative z-10">
+        <div className="w-20 h-20 rounded-full bg-purple-900/30 mx-auto flex items-center justify-center mb-6 border border-purple-500/50">
+          <Wallet className="h-10 w-10 text-purple-400" />
         </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gradient">292%</p>
-          <p className="text-xs text-gray-400">Annual APY</p>
+
+        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          Connect Your Wallet
+        </h2>
+
+        <p className="text-gray-300 mb-8 max-w-md mx-auto">
+          Connect your wallet to view your investment dashboard, manage your pools, and track your earnings in
+          real-time.
+        </p>
+
+        <div className="flex justify-center mb-8">
+          <CustomConnectButton />
         </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gradient">12,847</p>
-          <p className="text-xs text-gray-400">Active Investors</p>
+
+        <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+          <div className="text-center p-3 bg-black/30 rounded-lg border border-purple-500/20">
+            <p className="text-2xl font-bold text-gradient">7</p>
+            <p className="text-xs text-gray-400">Investment Pools</p>
+          </div>
+          <div className="text-center p-3 bg-black/30 rounded-lg border border-purple-500/20">
+            <p className="text-2xl font-bold text-gradient">292%</p>
+            <p className="text-xs text-gray-400">Annual APY</p>
+          </div>
+          <div className="text-center p-3 bg-black/30 rounded-lg border border-purple-500/20">
+            <p className="text-2xl font-bold text-gradient">12,847</p>
+            <p className="text-xs text-gray-400">Active Investors</p>
+          </div>
         </div>
       </div>
     </motion.div>
-  )
-}
-
-interface QuickActionCardProps {
-  title: string
-  description: string
-  icon: React.ElementType
-  buttonText: string
-  buttonIcon: React.ElementType
-  href: string
-  gradient: string
-}
-
-function QuickActionCard({
-  title,
-  description,
-  icon: Icon,
-  buttonText,
-  buttonIcon: ButtonIcon,
-  href,
-  gradient,
-}: QuickActionCardProps) {
-  return (
-    <Card className="glass-card-purple p-6 hover:shadow-lg hover:shadow-purple-500/10 transition-all">
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4`}>
-        <Icon className="h-6 w-6 text-white" />
-      </div>
-
-      <h3 className="text-lg font-bold mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm mb-4">{description}</p>
-
-      <a href={href} className="flex items-center text-purple-400 hover:text-purple-300 transition-colors">
-        <span>{buttonText}</span>
-        <ButtonIcon className="ml-2 h-4 w-4" />
-      </a>
-    </Card>
   )
 }
 

@@ -35,14 +35,18 @@ export function QueryClientDebugWithErrorBoundary() {
   const [queryClient, setQueryClient] = useState<any>(null)
 
   useEffect(() => {
+    let client: any = null
     try {
       // Try to access QueryClient
-      const client = useQueryClient()
+      client = useQueryClient()
       setQueryClient(client)
       console.log("QueryClient check passed:", client)
+      setHasError(false)
     } catch (error) {
       console.error("QueryClient error:", error)
       setHasError(true)
+    } finally {
+      setQueryClient(client)
     }
   }, [])
 
