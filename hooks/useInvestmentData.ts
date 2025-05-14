@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAccount, useReadContract, useChainId } from "wagmi"
-import { INVESTMENT_MANAGER_ABI, TOKEN_ABI, getContractAddress } from "@/lib/contracts"
+import { INVESTMENT_MANAGER_ABI, TOKEN_ABI, getContractAddress, REWARD_SYSTEM } from "@/lib/contracts"
 
 export function useInvestmentData() {
   const { address, isConnected } = useAccount()
@@ -129,6 +129,24 @@ export function useInvestmentData() {
     return Number(amount) / 10 ** Number(tokenDecimals)
   }
 
+  // Calculate projected yields based on reward system
+  const calculateProjectedYields = () => {
+    const deposit = formatTokenAmount(userTotalDeposits)
+
+    // Use the actual reward rates from the contract
+    const dailyRate = REWARD_SYSTEM.dailyBonus // 0.3% daily
+    const dailyYield = deposit * dailyRate
+
+    return {
+      daily: dailyYield,
+      weekly: dailyYield * 7,
+      monthly: dailyYield * 30,
+      annual: dailyYield * 365,
+    }
+  }
+
+  const projectedYields = calculateProjectedYields()
+
   // Return default values if not mounted yet
   if (!mounted) {
     return {
@@ -142,6 +160,11 @@ export function useInvestmentData() {
       totalValueLocked: 0,
       tokenSymbol: "5PT",
       userTokenBalance: 0,
+      projectedDailyYield: 0,
+      projectedWeeklyYield: 0,
+      projectedMonthlyYield: 0,
+      projectedAnnualYield: 0,
+      dailyRatePercent: 0,
     }
   }
 
@@ -156,5 +179,10 @@ export function useInvestmentData() {
     totalValueLocked: formatTokenAmount(totalValueLocked),
     tokenSymbol: tokenSymbol.toString(),
     userTokenBalance: formatTokenAmount(userTokenBalance),
+    projectedDailyYield: projectedYields.daily,
+    projectedWeeklyYield: projectedYields.weekly,
+    projectedMonthlyYield: projectedYields.monthly,
+    projectedAnnualYield: projectedYields.annual,
+    dailyRatePercent: REWARD_SYSTEM.dailyBonus * 100,
   }
 }

@@ -6,7 +6,7 @@ import { useAccount } from "wagmi"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { TrendingUp, Wallet, Clock } from "lucide-react"
+import { TrendingUp, Wallet, Clock, BarChartIcon as ChartBar, Award } from "lucide-react"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
 import { Web3ProviderWrapper } from "@/components/providers/Web3ProviderWrapper"
 
@@ -15,6 +15,27 @@ const WalletOverview = dynamic(
   () => import("@/components/dashboard/WalletOverview").then((mod) => mod.WalletOverview),
   {
     loading: () => <WalletOverviewSkeleton />,
+  },
+)
+
+const ShareableStats = dynamic(
+  () => import("@/components/dashboard/ShareableStats").then((mod) => mod.ShareableStats),
+  {
+    loading: () => <Skeleton className="h-[300px] w-full" />,
+  },
+)
+
+const TokenomicsVisual = dynamic(
+  () => import("@/components/dashboard/TokenomicsVisual").then((mod) => mod.TokenomicsVisual),
+  {
+    loading: () => <Skeleton className="h-[300px] w-full" />,
+  },
+)
+
+const PoolQualificationCard = dynamic(
+  () => import("@/components/dashboard/PoolQualificationCard").then((mod) => mod.PoolQualificationCard),
+  {
+    loading: () => <Skeleton className="h-[300px] w-full" />,
   },
 )
 
@@ -103,6 +124,9 @@ function DashboardContentInternal() {
 
   return (
     <div className="space-y-6">
+      {/* Shareable Stats Card - New Component */}
+      <ShareableStats />
+
       {/* Overview Section */}
       <WalletOverview />
 
@@ -111,7 +135,7 @@ function DashboardContentInternal() {
         {/* Investment Stats and Pools */}
         <div className="md:col-span-2 space-y-6">
           <Tabs defaultValue="stats" className="w-full">
-            <TabsList className="grid grid-cols-3 mb-4">
+            <TabsList className="grid grid-cols-5 mb-4">
               <TabsTrigger value="stats" className="data-[state=active]:bg-purple-900/50">
                 <TrendingUp className="mr-2 h-4 w-4" />
                 Stats
@@ -119,6 +143,14 @@ function DashboardContentInternal() {
               <TabsTrigger value="pools" className="data-[state=active]:bg-purple-900/50">
                 <Wallet className="mr-2 h-4 w-4" />
                 Pools
+              </TabsTrigger>
+              <TabsTrigger value="tokenomics" className="data-[state=active]:bg-purple-900/50">
+                <ChartBar className="mr-2 h-4 w-4" />
+                Tokenomics
+              </TabsTrigger>
+              <TabsTrigger value="qualify" className="data-[state=active]:bg-purple-900/50">
+                <Award className="mr-2 h-4 w-4" />
+                Qualify
               </TabsTrigger>
               <TabsTrigger value="history" className="data-[state=active]:bg-purple-900/50">
                 <Clock className="mr-2 h-4 w-4" />
@@ -132,6 +164,14 @@ function DashboardContentInternal() {
 
             <TabsContent value="pools" className="mt-0">
               <InvestmentPools />
+            </TabsContent>
+
+            <TabsContent value="tokenomics" className="mt-0">
+              <TokenomicsVisual />
+            </TabsContent>
+
+            <TabsContent value="qualify" className="mt-0">
+              <PoolQualificationCard />
             </TabsContent>
 
             <TabsContent value="history" className="mt-0">

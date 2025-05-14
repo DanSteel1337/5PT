@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { useInvestmentData } from "@/hooks/useInvestmentData"
-import { formatCrypto, formatNumber } from "@/lib/utils"
-import { TrendingUp, Award, Wallet } from "lucide-react"
+import { formatCrypto, formatNumber, formatPercent } from "@/lib/utils"
+import { TrendingUp, Award, Wallet, ArrowUpRight } from "lucide-react"
+import { motion } from "framer-motion"
 
 export function WalletOverview() {
-  const { userTotalDeposits, userReferralBonus, userPoolRewards, tokenSymbol, userTokenBalance } = useInvestmentData()
+  const {
+    userTotalDeposits,
+    userReferralBonus,
+    userPoolRewards,
+    tokenSymbol,
+    userTokenBalance,
+    projectedDailyYield,
+    dailyRatePercent,
+  } = useInvestmentData()
 
   const [mounted, setMounted] = useState(false)
 
@@ -18,7 +27,12 @@ export function WalletOverview() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="glass-card-purple rounded-xl p-6 animate-pulse-glow">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="glass-card-purple rounded-xl p-6 animate-pulse-glow"
+      >
         <div className="flex items-start justify-between">
           <div>
             <p className="text-gray-400 mb-1">Total Balance</p>
@@ -35,9 +49,14 @@ export function WalletOverview() {
             <p className="font-medium">{formatCrypto(userTokenBalance * 0.8, tokenSymbol)}</p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="glass-card-purple rounded-xl p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="glass-card-purple rounded-xl p-6"
+      >
         <div className="flex items-start justify-between">
           <div>
             <p className="text-gray-400 mb-1">Total Investments</p>
@@ -50,13 +69,21 @@ export function WalletOverview() {
         </div>
         <div className="mt-4 pt-4 border-t border-purple-900/30">
           <div className="flex justify-between items-center">
-            <p className="text-gray-400 text-sm">Daily Yield</p>
-            <p className="font-medium text-green-400">+{formatCrypto(userTotalDeposits * 0.08, tokenSymbol)}</p>
+            <p className="text-gray-400 text-sm">Daily Yield ({formatPercent(dailyRatePercent)})</p>
+            <div className="flex items-center">
+              <p className="font-medium text-green-400">+{formatCrypto(projectedDailyYield, tokenSymbol)}</p>
+              <ArrowUpRight className="h-3 w-3 text-green-400 ml-1" />
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="glass-card-purple rounded-xl p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="glass-card-purple rounded-xl p-6"
+      >
         <div className="flex items-start justify-between">
           <div>
             <p className="text-gray-400 mb-1">Total Earnings</p>
@@ -72,10 +99,13 @@ export function WalletOverview() {
         <div className="mt-4 pt-4 border-t border-purple-900/30">
           <div className="flex justify-between items-center">
             <p className="text-gray-400 text-sm">Referral Earnings</p>
-            <p className="font-medium text-purple-400">{formatCrypto(userReferralBonus, tokenSymbol)}</p>
+            <div className="flex items-center">
+              <p className="font-medium text-purple-400">{formatCrypto(userReferralBonus, tokenSymbol)}</p>
+              <ArrowUpRight className="h-3 w-3 text-purple-400 ml-1" />
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
