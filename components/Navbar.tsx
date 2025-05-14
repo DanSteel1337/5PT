@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
 import { Logo } from "@/components/shared/logo"
-import { NetworkSwitcher } from "@/components/web3/NetworkSwitcher"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -83,7 +82,6 @@ export function Navbar() {
             </Link>
             {/* Network information and wallet connect in one area */}
             <div className="flex items-center gap-2">
-              <NetworkSwitcher />
               <CustomConnectButton />
             </div>
           </motion.div>
@@ -121,7 +119,6 @@ export function Navbar() {
               <MobileNavLink href="/#tokenomics" label="Tokenomics" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#roadmap" label="Roadmap" onClick={() => setIsMobileMenuOpen(false)} />
               <div className="pt-2 flex flex-col gap-3">
-                <NetworkSwitcher />
                 <CustomConnectButton />
               </div>
             </div>
