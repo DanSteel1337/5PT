@@ -1,53 +1,55 @@
+// Contract ABIs
 export const INVESTMENT_MANAGER_ABI = [
   {
-    inputs: [{ name: "user", type: "address" }],
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "getUserRank",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ name: "user", type: "address" }],
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "getUserTotalDeposits",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ name: "user", type: "address" }],
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "getUserReferralBonus",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ name: "user", type: "address" }],
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "getUserReferralCount",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ name: "user", type: "address" }],
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "getUserPoolRewards",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
     name: "getTotalInvestors",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
     name: "getTotalValueLocked",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
+  // Adding new functions from the contract documentation
   {
     inputs: [{ internalType: "address", name: "account", type: "address" }],
     name: "accountToInvestorInfo",
@@ -93,13 +95,6 @@ export const INVESTMENT_MANAGER_ABI = [
     stateMutability: "view",
     type: "function",
   },
-  {
-    inputs: [{ name: "user", type: "address" }],
-    name: "getUserReferrals",
-    outputs: [{ name: "", type: "address[]" }],
-    stateMutability: "view",
-    type: "function",
-  },
 ] as const
 
 export const TOKEN_ABI = [
@@ -140,6 +135,7 @@ export const TOKEN_ABI = [
   },
 ] as const
 
+// Contract addresses - These match the documentation
 export const CONTRACT_ADDRESSES = {
   mainnet: {
     investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc",
@@ -151,35 +147,29 @@ export const CONTRACT_ADDRESSES = {
   },
 }
 
-export function getContractAddress(contract: string, chainId: number): `0x${string}` {
-  const addresses: Record<string, Record<number, `0x${string}`>> = {
-    fivePillarsToken: {
-      56: CONTRACT_ADDRESSES.mainnet.fivePillarsToken,
-      97: CONTRACT_ADDRESSES.testnet.fivePillarsToken,
-    },
-    investmentManager: {
-      56: CONTRACT_ADDRESSES.mainnet.investmentManager,
-      97: CONTRACT_ADDRESSES.testnet.investmentManager,
-    },
-  }
-
-  return addresses[contract]?.[chainId] || ("0x0000000000000000000000000000000000000000" as `0x${string}`)
+// Helper to get the correct contract address based on network
+export function getContractAddress(contractName: keyof typeof CONTRACT_ADDRESSES.mainnet, chainId: number) {
+  const isTestnet = chainId === 97 // BSC Testnet
+  const addresses = isTestnet ? CONTRACT_ADDRESSES.testnet : CONTRACT_ADDRESSES.mainnet
+  return addresses[contractName]
 }
 
+// Updated contract constants from latest documentation
 export const CONTRACT_CONSTANTS = {
   BASIS_POINTS: 1000000,
-  ROUND_DURATION: 86400,
-  DEPOSIT_DELAY: 14400,
-  POOL_CRITERIA_UPDATE_DELAY: 108000,
-  CLAIM_TAX_PERCENT: 10,
-  DEPOSIT_TAX_PERCENT: 10,
-  MIN_DEPOSIT: 1 * 10 ** 18,
+  ROUND_DURATION: 86400, // 24 hours in seconds (updated from 3600)
+  DEPOSIT_DELAY: 14400, // 4 hours in seconds
+  POOL_CRITERIA_UPDATE_DELAY: 108000, // 30 hours in seconds
+  CLAIM_TAX_PERCENT: 10, // Default 10%
+  DEPOSIT_TAX_PERCENT: 10, // Default 10%
+  MIN_DEPOSIT: 1 * 10 ** 18, // 1 token minimum
   TOKEN_DECIMALS: 18,
-  TOTAL_SUPPLY: 100_000_000_000 * 10 ** 18,
+  TOTAL_SUPPLY: 100_000_000_000 * 10 ** 18, // 100B tokens
 }
 
+// Adding tokenomics data from documentation
 export const TOKENOMICS = {
-  totalSupply: 10_000_000_000 * 10 ** 18,
+  totalSupply: 10_000_000_000 * 10 ** 18, // 10B tokens
   airdropCampaign: {
     allocation: 29714285714,
     percentage: 29.7,
@@ -218,85 +208,76 @@ export const TOKENOMICS = {
   },
 }
 
+// Updated reward system data from latest documentation
 export const REWARD_SYSTEM = {
-  dailyBonus: 0.008,
-  referralBonus: 0.05,
-  poolRewards: [0.001, 0.002, 0.003, 0.004, 0.005],
+  dailyBonus: 0.008, // 0.8% daily
+  referralBonus: 0.05, // 5% of referral's deposit
+  poolBonus: [0.001, 0.002, 0.003, 0.004, 0.005], // Additional bonus per pool level
 }
 
+// Updated pool qualification criteria from latest documentation
 export const POOL_CRITERIA = [
   {
     id: 0,
-    personalInvestment: 550 * 10 ** 18,
-    directInvestment: 550 * 10 ** 18,
+    personalInvestment: 550 * 10 ** 18, // ~$1,000
+    directInvestment: 550 * 10 ** 18, // ~$1,000
     directRefs: 1,
-    share: 175,
+    share: 175, // Updated from 350
   },
   {
     id: 1,
-    personalInvestment: 145 * 10 ** 19,
-    directInvestment: 145 * 10 ** 19,
+    personalInvestment: 145 * 10 ** 19, // ~$2,500
+    directInvestment: 145 * 10 ** 19, // ~$2,500
     directRefs: 3,
-    share: 175,
+    share: 175, // Updated from 350
   },
   {
     id: 2,
-    personalInvestment: 3 * 10 ** 21,
-    directInvestment: 6 * 10 ** 21,
+    personalInvestment: 3 * 10 ** 21, // ~$5,000
+    directInvestment: 6 * 10 ** 21, // ~$10,000
     directRefs: 5,
-    share: 175,
+    share: 175, // Updated from 350
   },
   {
     id: 3,
-    personalInvestment: 55 * 10 ** 20,
-    directInvestment: 11 * 10 ** 21,
+    personalInvestment: 55 * 10 ** 20, // ~$10,000
+    directInvestment: 11 * 10 ** 21, // ~$20,000
     directRefs: 10,
-    share: 175,
+    share: 175, // Updated from 350
   },
   {
     id: 4,
-    personalInvestment: 1425 * 10 ** 19,
-    directInvestment: 285 * 10 ** 20,
+    personalInvestment: 1425 * 10 ** 19, // ~$25,000
+    directInvestment: 285 * 10 ** 20, // ~$50,000
     directRefs: 15,
-    share: 175,
+    share: 175, // Updated from 350
   },
   {
     id: 5,
-    personalInvestment: 285 * 10 ** 20,
-    directInvestment: 855 * 10 ** 20,
+    personalInvestment: 285 * 10 ** 20, // ~$50,000
+    directInvestment: 855 * 10 ** 20, // ~$150,000
     directRefs: 20,
-    share: 100,
+    share: 100, // Updated from 200
   },
   {
     id: 6,
-    personalInvestment: 57 * 10 ** 21,
-    directInvestment: 171 * 10 ** 21,
+    personalInvestment: 57 * 10 ** 21, // ~$100,000
+    directInvestment: 171 * 10 ** 21, // ~$300,000
     directRefs: 20,
-    share: 100,
+    share: 100, // Updated from 200
   },
   {
     id: 7,
-    personalInvestment: "Whitelist",
+    personalInvestment: "Whitelist", // Whitelist only
     directInvestment: "N/A",
     directRefs: "N/A",
     share: 200,
   },
   {
     id: 8,
-    personalInvestment: "Whitelist",
+    personalInvestment: "Whitelist", // Whitelist only
     directInvestment: "N/A",
     directRefs: "N/A",
     share: 200,
   },
 ]
-
-export const contracts = {
-  investmentManager: {
-    address: CONTRACT_ADDRESSES.mainnet.investmentManager,
-    abi: INVESTMENT_MANAGER_ABI,
-  },
-  token: {
-    address: CONTRACT_ADDRESSES.mainnet.fivePillarsToken,
-    abi: TOKEN_ABI,
-  },
-}

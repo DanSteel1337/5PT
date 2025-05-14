@@ -28,13 +28,5 @@ export const config = getDefaultConfig({
     [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
   },
   // Add explicit SSR configuration to prevent localStorage errors
-  ssr: true, // Enable SSR mode for wagmi
-  // Fix metadata URL to use relative URL instead of hardcoded domain
-  // This prevents the URL mismatch warning
-  metadata: {
-    name: "5PT Investment Manager",
-    description: "BSC Investment DApp",
-    url: "", // Use empty string to default to current URL
-    icons: ["/images/5pt-logo.png"],
-  },
+  ssr: true, // ✅ Enable SSR mode for wagmi
 })

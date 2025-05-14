@@ -7,13 +7,10 @@ import Image from "next/image"
 import { ArrowRight, Zap, Target, Users } from "lucide-react"
 import { ParallaxBackground } from "@/components/parallax/parallax-background"
 import { ScrollIndicator } from "@/components/ui/scroll-indicator"
-import { useAccount } from "wagmi"
-import { CustomConnectButton } from "@/components/web3/ConnectButton"
 
 export function Hero() {
   const [mounted, setMounted] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
-  const { isConnected } = useAccount()
 
   useEffect(() => {
     setMounted(true)
@@ -107,37 +104,30 @@ export function Hero() {
               </li>
             </motion.ul>
 
-            {/* CTA button - Updated to handle wallet connection */}
+            {/* CTA button */}
             <motion.div
               className="mt-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.8 }}
             >
-              {isConnected ? (
-                <Link href="/dashboard">
-                  <button className="group relative overflow-hidden rounded-lg">
-                    {/* Button background with animated gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 group-hover:from-purple-700 group-hover:via-purple-600 group-hover:to-blue-700 transition-all duration-500 animate-gradient-x"></div>
+              <Link href="/dashboard">
+                <button className="group relative overflow-hidden rounded-lg">
+                  {/* Button background with animated gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 group-hover:from-purple-700 group-hover:via-purple-600 group-hover:to-blue-700 transition-all duration-500 animate-gradient-x"></div>
 
-                    {/* Button content */}
-                    <div className="relative px-8 py-4 flex items-center justify-center gap-3 text-white font-bold text-lg">
-                      <span>Launch App</span>
-                      <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all duration-300">
-                        <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform duration-300" />
-                      </div>
+                  {/* Button content */}
+                  <div className="relative px-8 py-4 flex items-center justify-center gap-3 text-white font-bold text-lg">
+                    <span>Launch App</span>
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-all duration-300">
+                      <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform duration-300" />
                     </div>
+                  </div>
 
-                    {/* Animated shine effect */}
-                    <div className="absolute top-0 -left-[100%] w-[120%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform skew-x-[30deg] group-hover:animate-shine"></div>
-                  </button>
-                </Link>
-              ) : (
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <CustomConnectButton />
-                  <p className="text-sm text-purple-300 mt-2 sm:mt-0 sm:ml-4">Connect wallet to access dashboard</p>
-                </div>
-              )}
+                  {/* Animated shine effect */}
+                  <div className="absolute top-0 -left-[100%] w-[120%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform skew-x-[30deg] group-hover:animate-shine"></div>
+                </button>
+              </Link>
             </motion.div>
 
             {/* Stats - Updated to match contract values */}
