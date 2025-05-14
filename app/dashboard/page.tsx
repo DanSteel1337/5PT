@@ -1,11 +1,11 @@
-import { Suspense } from "react"
-import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton"
-import DashboardClientWrapper from "./client-wrapper"
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
+import { ClientWrapper } from "./client-wrapper"
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardClientWrapper />
-    </Suspense>
+    <>
+      <DashboardHeader title="Investment Dashboard" />
+      <ClientWrapper />
+    </>
   )
 }

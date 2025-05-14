@@ -5,9 +5,8 @@ import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
-
-// Import logo from shared components
 import { Logo } from "@/components/shared/logo"
+import { NetworkSwitcher } from "@/components/web3/NetworkSwitcher"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -52,7 +51,7 @@ export function Navbar() {
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* FIX: Don't wrap Logo in Link if Logo already has href prop */}
+        {/* Logo - Only show once */}
         <div className="z-10">
           <Logo size={36} className="py-1" href="/" />
         </div>
@@ -69,7 +68,6 @@ export function Navbar() {
             <NavLink href="/#features" label="Features" />
             <NavLink href="/#tokenomics" label="Tokenomics" />
             <NavLink href="/#roadmap" label="Roadmap" />
-            {/* Removed any links to early-investor section if they existed */}
           </motion.div>
 
           <motion.div
@@ -83,7 +81,11 @@ export function Navbar() {
                 Dashboard
               </button>
             </Link>
-            <CustomConnectButton />
+            {/* Network information and wallet connect in one area */}
+            <div className="flex items-center gap-2">
+              <NetworkSwitcher />
+              <CustomConnectButton />
+            </div>
           </motion.div>
         </div>
 
@@ -118,8 +120,8 @@ export function Navbar() {
               <MobileNavLink href="/#features" label="Features" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#tokenomics" label="Tokenomics" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#roadmap" label="Roadmap" onClick={() => setIsMobileMenuOpen(false)} />
-              {/* Removed any links to early-investor section if they existed */}
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col gap-3">
+                <NetworkSwitcher />
                 <CustomConnectButton />
               </div>
             </div>

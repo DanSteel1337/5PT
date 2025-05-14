@@ -25,12 +25,22 @@ export function NetworkSwitcher() {
 
   const currentChain = chains.find((c) => c.id === chainId) || chains[0]
 
+  // Determine if we're on testnet
+  const isTestnet = currentChain.id === bscTestnet.id
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <CyberButton variant="outline" size="sm" className="text-purple-400">
-          {currentChain.icon} {currentChain.name}
-          <ChevronDown className="ml-2 h-4 w-4" />
+        <CyberButton
+          variant="outline"
+          size="sm"
+          className={`text-sm ${isTestnet ? "text-purple-400" : "text-yellow-400"}`}
+        >
+          <span className="flex items-center">
+            <span className="mr-1">{currentChain.icon}</span>
+            <span className="hidden md:inline mr-1">{isTestnet ? "BSC TESTNET" : "BSC MAINNET"}</span>
+            <ChevronDown className="h-3 w-3 ml-1" />
+          </span>
         </CyberButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-black/90 border border-purple-500/30">
