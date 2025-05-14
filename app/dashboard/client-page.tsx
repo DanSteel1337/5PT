@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAccount } from "wagmi"
-import { DashboardContent } from "@/components/dashboard/DashboardContent"
+import { DashboardOverview } from "@/components/dashboard/DashboardOverview"
 import { PageLoading } from "@/components/ui/page-loading"
 import { RainbowKitDebug } from "@/components/web3/RainbowKitDebug"
 import { QueryClientDebug } from "@/components/debug/QueryClientDebug"
@@ -36,7 +36,7 @@ export default function DashboardClientPage() {
       {isLoading ? (
         <PageLoading message="Initializing dashboard..." />
       ) : (
-        <DashboardContent isConnected={isConnected} address={address} />
+        <DashboardOverview isConnected={isConnected} address={address} />
       )}
     </div>
   )
