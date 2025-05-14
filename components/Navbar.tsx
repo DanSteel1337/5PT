@@ -75,25 +75,14 @@ export function Navbar() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <Link href="/dashboard">
-              <button className="px-4 py-2 bg-transparent border border-purple-500/50 rounded-lg text-purple-400 font-medium hover:bg-purple-500/10 transition-colors">
-                Dashboard
-              </button>
-            </Link>
-            {/* Network information and wallet connect in one area */}
-            <div className="flex items-center gap-2">
-              <CustomConnectButton />
-            </div>
+            {/* Remove this dashboard link block */}
+            <CustomConnectButton />
           </motion.div>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-4 md:hidden">
-          <Link href="/dashboard">
-            <button className="px-3 py-1.5 bg-transparent border border-purple-500/50 rounded-lg text-purple-400 text-sm font-medium hover:bg-purple-500/10 transition-colors">
-              Dashboard
-            </button>
-          </Link>
+          {/* Remove this dashboard button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="text-white p-2 bg-black/30 rounded-lg backdrop-blur-sm"

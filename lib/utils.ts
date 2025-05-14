@@ -30,39 +30,3 @@ export function formatAddress(address: string): string {
 export function formatPercent(percent: number): string {
   return `${percent.toFixed(2)}%`
 }
-
-// Get rank name based on rank number
-export function getRankName(rank: number): string {
-  const ranks = [
-    "Novice",
-    "Apprentice",
-    "Adept",
-    "Expert",
-    "Master",
-    "Grandmaster",
-    "Legend",
-    "Mythic",
-    "Divine",
-    "Immortal",
-  ]
-
-  return ranks[rank] || "Unknown"
-}
-
-// Get rank color based on rank number
-export function getRankColor(rank: number): string {
-  const colors = [
-    "text-gray-400",
-    "text-blue-400",
-    "text-green-400",
-    "text-yellow-400",
-    "text-orange-400",
-    "text-red-400",
-    "text-pink-400",
-    "text-purple-400",
-    "text-indigo-400",
-    "text-violet-500",
-  ]
-
-  return colors[rank] || "text-gray-400"
-}
