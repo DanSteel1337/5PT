@@ -8,37 +8,63 @@ import { useEffect, useState } from "react"
  * This helps diagnose context issues in different environments
  */
 export function QueryClientDebug() {
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  // Try to access the QueryClient context
+  // This will throw if the context is not available
+  const queryClient = useQueryClient()
+
+  // Log the QueryClient for debugging
+  useEffect(() => {
+    console.log("QueryClient available:", queryClient)
+    console.log("QueryClient defaultOptions:", queryClient.getDefaultOptions())
+    console.log("Environment:", process.env.NODE_ENV)
+    console.log("Is Vercel v0:", typeof window !== "undefined" && window.location.hostname.includes("vusercontent"))
+  }, [queryClient])
+
+  // Visual indicator of QueryClient status
+  return (
+    <div className="fixed bottom-4 right-4 z-50 p-3 bg-green-800 text-white text-xs rounded shadow-lg">
+      ✅ QueryClient Available
+      <div className="text-xs opacity-70 mt-1">Check console for details</div>
+    </div>
+  )
+}
+
+// Error boundary wrapper to catch QueryClient errors
+export function QueryClientDebugWithErrorBoundary() {
+  const [hasError, setHasError] = useState(false)
   const [queryClient, setQueryClient] = useState<any>(null)
 
   useEffect(() => {
     try {
-      // This will throw if QueryClient context is not available
+      // Try to access QueryClient
       const client = useQueryClient()
       setQueryClient(client)
-
-      if (client) {
-        console.log("QueryClient is available:", client)
-        setSuccess(true)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-      console.error("QueryClient error:", err)
+      console.log("QueryClient check passed:", client)
+    } catch (error) {
+      console.error("QueryClient error:", error)
+      setHasError(true)
     }
   }, [])
 
-  if (error) {
+  if (hasError) {
     return (
-      <div className="fixed bottom-4 right-4 z-50 p-2 bg-red-800 text-white text-xs rounded">
-        ❌ QueryClient Error: {error || "Unknown error"}
+      <div className="fixed bottom-4 right-4 z-50 p-3 bg-red-800 text-white text-xs rounded shadow-lg">
+        ❌ QueryClient Error
+        <div className="text-xs opacity-70 mt-1">Check console for details</div>
       </div>
     )
   }
 
-  return (
-    <div className="fixed bottom-4 right-4 z-50 p-2 bg-green-800 text-white text-xs rounded">
-      {success ? "✅ QueryClient OK" : "⏳ Checking QueryClient..."}
-    </div>
-  )
+  // Only render the actual component if no error occurred during the check
+  try {
+    return <QueryClientDebug />
+  } catch (error) {
+    console.error("QueryClient render error:", error)
+    return (
+      <div className="fixed bottom-4 right-4 z-50 p-3 bg-red-800 text-white text-xs rounded shadow-lg">
+        ❌ QueryClient Render Error
+        <div className="text-xs opacity-70 mt-1">Check console for details</div>
+      </div>
+    )
+  }
 }

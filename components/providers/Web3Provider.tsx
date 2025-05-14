@@ -37,7 +37,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }),
   )
 
-  // Handle hydration safely
+  // Since we're using ssr: true in wagmi config, we can simplify the mounting logic
+  // This reduces the risk of race conditions or delays in provider rendering
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -61,22 +62,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // During SSR and initial hydration, render a minimal version
-  // This prevents hydration mismatches and context issues
-  if (!mounted) {
-    // Return a minimal version during SSR/initial hydration
-    // The key part is that we still establish the providers even before mounting
-    // This ensures context is available as soon as possible
-    return (
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <div className="min-h-screen bg-black"></div>
-        </QueryClientProvider>
-      </WagmiProvider>
-    )
-  }
-
-  // After hydration, render the full provider tree with children
+  // With ssr: true, we can render the providers immediately
+  // This ensures context is established as early as possible
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -89,7 +76,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
               learnMoreUrl: "https://5pt.finance/about",
             }}
           >
-            {children}
+            {mounted ? children : <div className="min-h-screen bg-black"></div>}
           </RainbowKitProvider>
         </RainbowKitStylesProvider>
       </QueryClientProvider>

@@ -13,20 +13,18 @@ const nextConfig = {
   webpack: (config) => {
     // Ensure consistent module resolution for @tanstack/react-query
     // This helps prevent duplicate instances in Vercel v0
-    // Using path-based resolution instead of require.resolve for ESM compatibility
     config.resolve.alias = {
       ...config.resolve.alias,
-      // Use direct path resolution instead of require.resolve
-      "@tanstack/react-query": "./node_modules/@tanstack/react-query/build/lib/index.esm.js",
+      "@tanstack/react-query": require.resolve("@tanstack/react-query"),
     }
-    
+
     return config
   },
   // Explicitly set esmExternals to 'loose' to help with module resolution
   // This has been reported to fix similar issues in Vercel environments
   experimental: {
-    esmExternals: 'loose',
-  }
+    esmExternals: "loose",
+  },
 }
 
-export default nextConfig
+module.exports = nextConfig
