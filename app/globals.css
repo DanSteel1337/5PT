@@ -596,3 +596,32 @@
   background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03), transparent 70%);
   pointer-events: none;
 }
+
+/* Add these scrollbar styles to your existing globals.css */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thumb-purple-500\/30 {
+    scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+  }
+
+  .scrollbar-track-transparent {
+    scrollbar-track-color: transparent;
+  }
+
+  /* For Webkit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(139, 92, 246, 0.3);
+    border-radius: 3px;
+  }
+}

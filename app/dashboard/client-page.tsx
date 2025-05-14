@@ -1,27 +1,43 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import { useAccount } from "wagmi"
 import { DashboardContent } from "@/components/dashboard/DashboardContent"
-import { Web3ProviderWrapper } from "@/components/providers/Web3ProviderWrapper"
+import { PageLoading } from "@/components/ui/page-loading"
+import { RainbowKitDebug } from "@/components/web3/RainbowKitDebug"
 import { QueryClientDebug } from "@/components/debug/QueryClientDebug"
 
 export default function DashboardClientPage() {
-  const [showDebug, setShowDebug] = useState(false)
+  const { isConnected, address } = useAccount()
+  const [mounted, setMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Only show debug in development or if URL has debug parameter
-    const isDebug = process.env.NODE_ENV === "development" || window.location.search.includes("debug=true")
-    setShowDebug(isDebug)
+    setMounted(true)
+    // Simulate loading for smoother transitions
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+    return () => clearTimeout(timer)
   }, [])
 
-  return (
-    <>
-      <Web3ProviderWrapper>
-        <DashboardContent />
-      </Web3ProviderWrapper>
+  if (!mounted) return null
 
-      {/* Add debug component to help diagnose context issues */}
-      {showDebug && <QueryClientDebug />}
-    </>
+  return (
+    <div className="relative min-h-screen w-full bg-gradient-to-b from-black via-purple-950/20 to-black">
+      {/* Debug components - only visible in development */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+          <RainbowKitDebug />
+          <QueryClientDebug />
+        </div>
+      )}
+
+      {isLoading ? (
+        <PageLoading message="Initializing dashboard..." />
+      ) : (
+        <DashboardContent isConnected={isConnected} address={address} />
+      )}
+    </div>
   )
 }

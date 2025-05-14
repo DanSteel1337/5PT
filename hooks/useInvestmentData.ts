@@ -124,6 +124,17 @@ export function useInvestmentData() {
     },
   })
 
+  // Get user referrals
+  const { data: userReferrals = [] } = useReadContract({
+    address: investmentManagerAddress,
+    abi: INVESTMENT_MANAGER_ABI,
+    functionName: "getUserReferrals",
+    args: [address || "0x0000000000000000000000000000000000000000"],
+    query: {
+      enabled: mounted && isConnected && !!address,
+    },
+  })
+
   // Format values with proper decimals
   const formatTokenAmount = (amount: bigint) => {
     return Number(amount) / 10 ** Number(tokenDecimals)
@@ -160,6 +171,7 @@ export function useInvestmentData() {
       totalValueLocked: 0,
       tokenSymbol: "5PT",
       userTokenBalance: 0,
+      userReferrals: [],
       projectedDailyYield: 0,
       projectedWeeklyYield: 0,
       projectedMonthlyYield: 0,
@@ -179,6 +191,7 @@ export function useInvestmentData() {
     totalValueLocked: formatTokenAmount(totalValueLocked),
     tokenSymbol: tokenSymbol.toString(),
     userTokenBalance: formatTokenAmount(userTokenBalance),
+    userReferrals,
     projectedDailyYield: projectedYields.daily,
     projectedWeeklyYield: projectedYields.weekly,
     projectedMonthlyYield: projectedYields.monthly,
