@@ -2,11 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-// ⚠️ REMOVED: import "@rainbow-me/rainbowkit/styles.css"
 // RainbowKit styles are now handled by RainbowKitStylesProvider
-import { Suspense } from "react"
-
-// Import the Providers component directly, but render it with Suspense
 import Providers from "@/components/providers/Providers"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -37,12 +33,10 @@ export default function RootLayout({
         1. suppressHydrationWarning is required to prevent hydration errors with RainbowKit
         2. The body must have position:relative for proper modal positioning
         3. RainbowKit styles are now handled by RainbowKitStylesProvider component
-           instead of being imported directly here
+        4. Removed Suspense boundary to simplify provider initialization
       */}
       <body className={inter.className}>
-        <Suspense fallback={<div className="min-h-screen bg-black"></div>}>
-          <Providers>{children}</Providers>
-        </Suspense>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

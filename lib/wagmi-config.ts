@@ -27,4 +27,6 @@ export const config = getDefaultConfig({
     [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
     [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
   },
+  // Add explicit SSR configuration to prevent localStorage errors
+  ssr: true, // ✅ Enable SSR mode for wagmi
 })
