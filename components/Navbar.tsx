@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LayoutDashboard } from "lucide-react"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
 import { Logo } from "@/components/shared/logo"
+import { useAccount } from "wagmi"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const { isConnected } = useAccount()
 
   // Handle scroll event to change navbar appearance
   useEffect(() => {
@@ -67,6 +69,7 @@ export function Navbar() {
             <NavLink href="/#features" label="Features" />
             <NavLink href="/#tokenomics" label="Tokenomics" />
             <NavLink href="/#roadmap" label="Roadmap" />
+            {isConnected && <NavLink href="/dashboard" label="Dashboard" icon={<LayoutDashboard size={16} />} />}
           </motion.div>
 
           <motion.div
@@ -75,14 +78,13 @@ export function Navbar() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            {/* Remove this dashboard link block */}
             <CustomConnectButton />
           </motion.div>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-4 md:hidden">
-          {/* Remove this dashboard button */}
+          <CustomConnectButton />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="text-white p-2 bg-black/30 rounded-lg backdrop-blur-sm"
@@ -107,9 +109,14 @@ export function Navbar() {
               <MobileNavLink href="/#features" label="Features" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#tokenomics" label="Tokenomics" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#roadmap" label="Roadmap" onClick={() => setIsMobileMenuOpen(false)} />
-              <div className="pt-2 flex flex-col gap-3">
-                <CustomConnectButton />
-              </div>
+              {isConnected && (
+                <MobileNavLink
+                  href="/dashboard"
+                  label="Dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  icon={<LayoutDashboard size={16} className="mr-2" />}
+                />
+              )}
             </div>
           </motion.div>
         )}
@@ -118,22 +125,24 @@ export function Navbar() {
   )
 }
 
-function NavLink({ href, label }) {
+function NavLink({ href, label, icon }) {
   return (
-    <Link href={href} className="relative text-white/80 hover:text-white transition-colors group">
+    <Link href={href} className="relative text-white/80 hover:text-white transition-colors group flex items-center">
+      {icon && <span className="mr-1">{icon}</span>}
       {label}
       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 group-hover:w-full transition-all duration-300"></span>
     </Link>
   )
 }
 
-function MobileNavLink({ href, label, onClick }) {
+function MobileNavLink({ href, label, onClick, icon }) {
   return (
     <Link
       href={href}
-      className="text-white/80 hover:text-white py-2 transition-colors border-b border-purple-900/20"
+      className="text-white/80 hover:text-white py-2 transition-colors border-b border-purple-900/20 flex items-center"
       onClick={onClick}
     >
+      {icon && icon}
       {label}
     </Link>
   )
