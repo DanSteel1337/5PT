@@ -22,6 +22,7 @@ import { useEffect, useState, type ReactNode } from "react"
 export function RainbowKitStylesProvider({ children }: { children: ReactNode }) {
   const [isVercelPreview, setIsVercelPreview] = useState(false)
   const [stylesLoaded, setStylesLoaded] = useState(false)
+  const [stylesAttempted, setStylesAttempted] = useState(false)
 
   useEffect(() => {
     // Check if we're in Vercel v0 preview environment
@@ -31,6 +32,10 @@ export function RainbowKitStylesProvider({ children }: { children: ReactNode }) 
       (window.location.hostname.includes("vusercontent.net") || window.location.hostname.includes("v0.dev"))
 
     setIsVercelPreview(isPreview)
+
+    // Prevent multiple attempts to load styles
+    if (stylesAttempted) return
+    setStylesAttempted(true)
 
     if (!isPreview) {
       // Not in preview: Dynamically import RainbowKit styles
@@ -148,7 +153,7 @@ export function RainbowKitStylesProvider({ children }: { children: ReactNode }) 
       document.head.appendChild(style)
       setStylesLoaded(true)
     }
-  }, [])
+  }, [stylesAttempted])
 
   // Show a minimal loading state while styles are being loaded
   if (!stylesLoaded && typeof window !== "undefined") {

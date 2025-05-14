@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { ConnectButton as RainbowKitConnectButton } from "@rainbow-me/rainbowkit"
 import { CyberButton } from "@/components/ui/cyber-button"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 
 /**
  * CustomConnectButton Component
@@ -41,11 +42,11 @@ export function CustomConnectButton() {
       if (
         event.message.includes("walletconnect") ||
         event.message.includes("heartbeat") ||
+        event.message.includes("preferred account") ||
         event.filename?.includes("walletconnect")
       ) {
         console.warn("WalletConnect error suppressed:", event.message)
         event.preventDefault()
-        setError(new Error(event.message))
         return true
       }
     }
@@ -74,8 +75,14 @@ export function CustomConnectButton() {
   }
 
   // Render the RainbowKit ConnectButton with custom styling
-  try {
-    return (
+  return (
+    <ErrorBoundary
+      fallback={
+        <CyberButton variant="primary" size="sm" onClick={() => window.location.reload()}>
+          Connect Wallet
+        </CyberButton>
+      }
+    >
       <div className="relative z-10">
         {/* CRITICAL: Relative positioning and z-index for proper modal positioning */}
         <RainbowKitConnectButton.Custom>
@@ -134,16 +141,8 @@ export function CustomConnectButton() {
           }}
         </RainbowKitConnectButton.Custom>
       </div>
-    )
-  } catch (err) {
-    console.error("Error rendering ConnectButton:", err)
-    setError(err instanceof Error ? err : new Error("Unknown error"))
-    return (
-      <CyberButton variant="primary" size="sm" onClick={() => window.location.reload()}>
-        Connect Wallet
-      </CyberButton>
-    )
-  }
+    </ErrorBoundary>
+  )
 }
 
 export default CustomConnectButton

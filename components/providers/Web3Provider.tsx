@@ -1,87 +1,56 @@
 "use client"
 
 import { useState, useEffect, type ReactNode } from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider } from "wagmi"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import { config } from "@/lib/wagmi-config"
-import { customRainbowKitTheme } from "@/lib/rainbowkit-theme"
-import { RainbowKitStylesProvider } from "./RainbowKitStylesProvider"
+import RainbowKitStylesProvider from "./RainbowKitStylesProvider"
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // 1 minute
+    },
+  },
+})
 
 /**
  * Web3Provider Component
  *
  * This component provides the necessary context for Web3 functionality.
+ * It wraps the application with WagmiProvider, QueryClientProvider, and RainbowKitProvider.
  *
- * CRITICAL REQUIREMENTS:
- * 1. Must be a client component ('use client' directive)
- * 2. Must maintain correct provider nesting order:
- *    WagmiProvider > QueryClientProvider > RainbowKitProvider
- * 3. Must create a stable QueryClient instance
- * 4. Must handle hydration safely
+ * IMPORTANT: This component should only be mounted once in the application.
  */
 export function Web3Provider({ children }: { children: ReactNode }) {
-  // Create a stable QueryClient instance that persists across renders
-  // This is CRITICAL to ensure context stability
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60 * 1000, // 1 minute
-            gcTime: 10 * 60 * 1000, // 10 minutes
-            retry: false,
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-  )
-
-  // Since we're using ssr: true in wagmi config, we can simplify the mounting logic
-  // This reduces the risk of race conditions or delays in provider rendering
+  // Use state to prevent double initialization during development
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
 
-    // Add global error handler for WalletConnect errors
-    const originalOnError = window.onerror
-    window.onerror = (message, source, lineno, colno, error) => {
-      if (
-        message &&
-        (message.toString().includes("walletconnect") || (source && source.toString().includes("walletconnect")))
-      ) {
-        console.warn("WalletConnect error suppressed:", message)
-        return true // Prevents the error from propagating
-      }
-      return originalOnError ? originalOnError(message, source, lineno, colno, error) : false
-    }
-
+    // Cleanup function to help prevent double initialization
     return () => {
-      window.onerror = originalOnError
+      setMounted(false)
     }
   }, [])
 
-  // With ssr: true, we can render the providers immediately
-  // This ensures context is established as early as possible
+  // Only render the providers after the component has mounted
+  // This prevents double initialization during development
+  if (!mounted) {
+    return <>{children}</>
+  }
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitStylesProvider>
-          <RainbowKitProvider
-            theme={customRainbowKitTheme}
-            modalSize="compact"
-            appInfo={{
-              appName: "5PT Investment Manager",
-              learnMoreUrl: "https://5pt.finance/about",
-            }}
-          >
-            {mounted ? children : <div className="min-h-screen bg-black"></div>}
-          </RainbowKitProvider>
+          <RainbowKitProvider>{children}</RainbowKitProvider>
         </RainbowKitStylesProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )
 }
-
-export default Web3Provider
