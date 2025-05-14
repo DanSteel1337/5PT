@@ -4,8 +4,8 @@ import { useState, useEffect, type ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider } from "wagmi"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
-import { config } from "@/lib/wagmi-config"
-import { customRainbowKitTheme } from "@/lib/rainbowkit-theme"
+import { config } from "@/lib/wagmi-config" // ✅ Using correct import name
+import { customRainbowKitTheme } from "@/lib/rainbowkit-theme" // ✅ Using correct import name
 import { RainbowKitStylesProvider } from "./RainbowKitStylesProvider"
 
 /**
@@ -95,7 +95,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <RainbowKitStylesProvider>
           <RainbowKitProvider
-            theme={customRainbowKitTheme}
+            theme={customRainbowKitTheme} // ✅ Using correct theme variable
             modalSize="compact"
             appInfo={{
               appName: "5PT Investment Manager",
