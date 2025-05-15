@@ -15,6 +15,7 @@ import { useChainId } from "wagmi"
 import { Info, ArrowRight } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import { useMounted } from "@/hooks/useMounted"
+import { CustomConnectButton } from "@/components/ui/custom-connect-button"
 
 export function DepositForm() {
   const { address, isConnected } = useAccount()
@@ -100,6 +101,20 @@ export function DepositForm() {
   }
 
   if (!mounted) return null
+
+  if (!isConnected) {
+    return (
+      <Card className="glass-card-purple p-6">
+        <h3 className="text-xl font-bold mb-4 text-gradient">Make a Deposit</h3>
+        <div className="flex flex-col items-center justify-center py-6">
+          <p className="text-gray-400 mb-4 text-center">
+            Connect your wallet to make deposits and manage your investments.
+          </p>
+          <CustomConnectButton />
+        </div>
+      </Card>
+    )
+  }
 
   return (
     <TooltipProvider>

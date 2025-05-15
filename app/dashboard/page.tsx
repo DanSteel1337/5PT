@@ -1,10 +1,10 @@
 import { Suspense } from "react"
-import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton"
+import { FuturisticDashboardSkeleton } from "@/components/dashboard/FuturisticDashboardSkeleton"
 import ClientDashboardPage from "./client-page"
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<DashboardSkeleton />}>
+    <Suspense fallback={<FuturisticDashboardSkeleton />}>
       <ClientDashboardPage />
     </Suspense>
   )

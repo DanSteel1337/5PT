@@ -47,3 +47,31 @@ export interface InvestmentDataContextType {
   // Actions
   refetch: () => Promise<void>
 }
+
+export interface InvestmentData {
+  isConnected: boolean
+  userRank: number
+  userTotalDeposits: number
+  userReferralBonus: number
+  userReferralCount: number
+  userPoolRewards: number
+  userDirectReferralVolume: number
+  userReferralVolume: number
+  totalInvestors: number
+  totalValueLocked: number
+  tokenSymbol: string
+  userTokenBalance: number
+  projectedDailyYield: number
+  projectedWeeklyYield: number
+  projectedMonthlyYield: number
+  projectedAnnualYield: number
+  dailyRatePercent: number
+  accumulatedRewards: number
+  lastRoundRewards: {
+    dailyReward: number
+    refReward: number
+    poolsReward: number
+  } | null
+  poolEligibility: boolean[]
+  isLoading: boolean
+}
