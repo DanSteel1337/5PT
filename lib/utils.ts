@@ -39,7 +39,7 @@ export function formatNumber(num: number | string | undefined | null, decimals =
  */
 export function formatCrypto(
   amount: number | string | bigint | undefined | null,
-  symbol = "BNB",
+  symbol = "5PT",
   decimals = 4,
 ): string {
   // Handle undefined or null values

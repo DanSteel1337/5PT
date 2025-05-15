@@ -8,40 +8,24 @@ import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
 
 // Dynamically import components with error boundaries
-const WalletOverview = dynamic(
-  () => import("@/components/dashboard/WalletOverview").then((mod) => ({ default: mod.WalletOverview })),
-  {
-    loading: () => <WalletOverviewSkeleton />,
-    ssr: false,
-  },
-)
-
-const InvestmentStats = dynamic(
-  () => import("@/components/dashboard/InvestmentStats").then((mod) => ({ default: mod.InvestmentStats })),
+const DashboardOverview = dynamic(
+  () => import("@/components/dashboard/DashboardOverview").then((mod) => ({ default: mod.DashboardOverview })),
   {
     loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
     ssr: false,
   },
 )
 
-const RealTimeEarnings = dynamic(
-  () => import("@/components/dashboard/RealTimeEarnings").then((mod) => ({ default: mod.RealTimeEarnings })),
+const ShareableStats = dynamic(
+  () => import("@/components/dashboard/ShareableStats").then((mod) => ({ default: mod.ShareableStats })),
   {
     loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
     ssr: false,
   },
 )
 
-const InvestmentPools = dynamic(
-  () => import("@/components/dashboard/InvestmentPools").then((mod) => ({ default: mod.InvestmentPools })),
-  {
-    loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
-    ssr: false,
-  },
-)
-
-const PoolQualificationCard = dynamic(
-  () => import("@/components/dashboard/PoolQualificationCard").then((mod) => ({ default: mod.PoolQualificationCard })),
+const TokenomicsVisual = dynamic(
+  () => import("@/components/dashboard/TokenomicsVisual").then((mod) => ({ default: mod.TokenomicsVisual })),
   {
     loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
     ssr: false,
@@ -57,22 +41,25 @@ const ReferralSystem = dynamic(
 )
 
 // Skeleton components
-function WalletOverviewSkeleton() {
+function DashboardSkeleton() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="h-[150px] bg-purple-900/20 animate-pulse rounded-lg"></div>
-      ))}
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-[150px] bg-purple-900/20 animate-pulse rounded-lg"></div>
+        ))}
+      </div>
+      <div className="h-[500px] bg-purple-900/20 animate-pulse rounded-lg"></div>
     </div>
   )
 }
 
-export default function DashboardContent() {
+export function DashboardContent() {
   const { isConnected } = useAccount()
   const mounted = useMounted()
 
   if (!mounted) {
-    return <WalletOverviewSkeleton />
+    return <DashboardSkeleton />
   }
 
   if (!isConnected) {
@@ -89,45 +76,26 @@ export default function DashboardContent() {
 
   return (
     <div className="space-y-8">
-      {/* Wallet Overview */}
-      <ErrorBoundary fallback={<WalletOverviewSkeleton />}>
-        <Suspense fallback={<WalletOverviewSkeleton />}>
-          <WalletOverview />
+      {/* Main Dashboard Overview */}
+      <ErrorBoundary fallback={<DashboardSkeleton />}>
+        <Suspense fallback={<DashboardSkeleton />}>
+          <DashboardOverview />
         </Suspense>
       </ErrorBoundary>
 
-      {/* Main Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-6">
-          <ErrorBoundary>
-            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
-              <RealTimeEarnings />
-            </Suspense>
-          </ErrorBoundary>
+      {/* Shareable Stats */}
+      <ErrorBoundary>
+        <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+          <ShareableStats />
+        </Suspense>
+      </ErrorBoundary>
 
-          <ErrorBoundary>
-            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
-              <PoolQualificationCard />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-          <ErrorBoundary>
-            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
-              <InvestmentStats />
-            </Suspense>
-          </ErrorBoundary>
-
-          <ErrorBoundary>
-            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
-              <InvestmentPools />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-      </div>
+      {/* Tokenomics Visual */}
+      <ErrorBoundary>
+        <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+          <TokenomicsVisual />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Referral System */}
       <ErrorBoundary>

@@ -1,198 +1,186 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useRef } from "react"
 import { Card } from "@/components/ui/card"
-import { CyberButton } from "@/components/ui/cyber-button"
 import { useInvestmentData } from "@/hooks/useInvestmentData"
-import { formatCrypto, formatPercent, formatNumber } from "@/lib/utils"
-import { Share2, Twitter, Facebook, Copy, Check } from "lucide-react"
+import { formatCrypto, formatPercent } from "@/lib/utils"
+import { useAccount } from "wagmi"
+import { Share2, Download, Camera, Twitter, Facebook, Linkedin } from "lucide-react"
 import { motion } from "framer-motion"
-import { Logo } from "@/components/shared/logo"
+import { CyberButton } from "@/components/ui/cyber-button"
+import { useMounted } from "@/hooks/useMounted"
+import html2canvas from "html2canvas"
 
 export function ShareableStats() {
-  const {
-    userTotalDeposits,
-    userReferralBonus,
-    userPoolRewards,
-    tokenSymbol,
-    totalValueLocked,
-    totalInvestors,
-    projectedAnnualYield,
-  } = useInvestmentData()
-
-  const [mounted, setMounted] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [showShareOptions, setShowShareOptions] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const { address } = useAccount()
+  const { userTotalDeposits, userReferralBonus, userPoolRewards, tokenSymbol, dailyRatePercent, userReferralCount } =
+    useInvestmentData()
+  const [isGenerating, setIsGenerating] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const mounted = useMounted()
 
   if (!mounted) return null
 
-  // Calculate some impressive stats
+  // Calculate total earnings and ROI
   const totalEarnings = userPoolRewards + userReferralBonus
   const roi = userTotalDeposits > 0 ? (totalEarnings / userTotalDeposits) * 100 : 0
-  const dailyYield = userTotalDeposits * 0.08 // 8% daily
-  const weeklyYield = dailyYield * 7
-  const monthlyYield = dailyYield * 30
-  const yearlyYield = dailyYield * 365
 
-  // Platform growth metrics (simulated for impressive stats)
-  const platformGrowthRate = 12.8 // 12.8% weekly growth
-  const newInvestorsDaily = 142
-  const averageInvestment = totalValueLocked / Math.max(totalInvestors, 1)
+  // Calculate daily earnings based on the daily rate
+  const dailyEarnings = userTotalDeposits * (dailyRatePercent / 100)
 
-  // Share text
-  const shareText = `🚀 I'm earning ${formatCrypto(dailyYield, tokenSymbol)} DAILY with 5PT Finance! Join the future of DeFi investing and earn up to ${formatPercent(365 * 8)} APY. #5PTFinance #DeFi #PassiveIncome`
+  // Generate shareable image
+  const generateImage = async () => {
+    if (!cardRef.current) return
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareText)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setIsGenerating(true)
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: "#0f0f13",
+        scale: 2,
+      })
+      const image = canvas.toDataURL("image/png")
+      const link = document.createElement("a")
+      link.href = image
+      link.download = "5pt-investment-stats.png"
+      link.click()
+    } catch (error) {
+      console.error("Error generating image:", error)
+    }
+    setIsGenerating(false)
   }
 
-  const shareToTwitter = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank")
+  // Share on social media
+  const shareOnTwitter = () => {
+    const text = `I've earned ${formatCrypto(
+      totalEarnings,
+      tokenSymbol,
+    )} with 5 Pillars Token! Join me and start earning daily rewards. #5PT #Crypto #PassiveIncome`
+    const url = window.location.origin
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`)
   }
 
-  const shareToFacebook = () => {
+  const shareOnFacebook = () => {
+    const url = window.location.origin
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`)
+  }
+
+  const shareOnLinkedin = () => {
+    const url = window.location.origin
+    const title = "My 5 Pillars Token Investment Stats"
     window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(shareText)}`,
-      "_blank",
+      `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(
+        title,
+      )}`,
     )
   }
 
   return (
-    <Card className="glass-card-purple p-6 relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
-
+    <Card className="glass-card-purple p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Logo size={32} withText={true} />
-          <h3 className="text-xl font-bold text-gradient">My Investment Dashboard</h3>
-        </div>
-        <div className="relative">
-          <CyberButton
-            variant="outline"
-            size="sm"
-            onClick={() => setShowShareOptions(!showShareOptions)}
-            className="flex items-center gap-2"
-          >
-            <Share2 className="h-4 w-4" />
+        <h3 className="text-xl font-bold text-gradient">Shareable Stats</h3>
+        <div className="flex gap-2">
+          <CyberButton variant="outline" size="sm" onClick={generateImage} disabled={isGenerating}>
+            <Download className="h-4 w-4 mr-1" />
+            {isGenerating ? "Generating..." : "Download"}
+          </CyberButton>
+          <CyberButton variant="outline" size="sm">
+            <Share2 className="h-4 w-4 mr-1" />
             Share
           </CyberButton>
-
-          {showShareOptions && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute right-0 mt-2 p-2 bg-black/80 border border-purple-500/30 rounded-lg z-50 w-40"
-            >
-              <button
-                onClick={shareToTwitter}
-                className="flex items-center gap-2 w-full p-2 hover:bg-purple-900/20 rounded text-left"
-              >
-                <Twitter className="h-4 w-4 text-blue-400" />
-                <span>Twitter</span>
-              </button>
-              <button
-                onClick={shareToFacebook}
-                className="flex items-center gap-2 w-full p-2 hover:bg-purple-900/20 rounded text-left"
-              >
-                <Facebook className="h-4 w-4 text-blue-600" />
-                <span>Facebook</span>
-              </button>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-2 w-full p-2 hover:bg-purple-900/20 rounded text-left"
-              >
-                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                <span>{copied ? "Copied!" : "Copy Text"}</span>
-              </button>
-            </motion.div>
-          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-black/30 rounded-lg p-4 text-center">
-          <p className="text-gray-400 text-sm mb-1">Daily Earnings</p>
-          <p className="text-2xl font-bold text-green-400">{formatCrypto(dailyYield, tokenSymbol)}</p>
-        </div>
-        <div className="bg-black/30 rounded-lg p-4 text-center">
-          <p className="text-gray-400 text-sm mb-1">Monthly Potential</p>
-          <p className="text-2xl font-bold text-green-400">{formatCrypto(monthlyYield, tokenSymbol)}</p>
-        </div>
-        <div className="bg-black/30 rounded-lg p-4 text-center">
-          <p className="text-gray-400 text-sm mb-1">Annual Yield</p>
-          <p className="text-2xl font-bold text-green-400">{formatPercent(365 * 8)}</p>
-        </div>
-        <div className="bg-black/30 rounded-lg p-4 text-center">
-          <p className="text-gray-400 text-sm mb-1">My ROI</p>
-          <p className="text-2xl font-bold text-gradient">{formatPercent(roi)}</p>
-        </div>
-      </div>
+      <div
+        ref={cardRef}
+        className="bg-black/40 rounded-lg p-6 border border-purple-900/30 mb-6 relative overflow-hidden"
+      >
+        {/* Background effects */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-black/30 rounded-lg p-4">
-          <p className="text-gray-400 text-sm mb-1">Platform Statistics</p>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Total Value Locked</span>
-              <span className="font-medium text-gradient">${formatNumber(totalValueLocked * 1.25)}</span>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center mr-3">
+              <span className="font-bold text-white">5PT</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Total Investors</span>
-              <span className="font-medium">{formatNumber(totalInvestors)}</span>
+            <div>
+              <h4 className="font-bold">5 Pillars Token</h4>
+              <p className="text-xs text-gray-400">Investment Dashboard</p>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Weekly Growth</span>
-              <span className="font-medium text-green-400">+{platformGrowthRate}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">New Investors Daily</span>
-              <span className="font-medium text-green-400">+{newInvestorsDaily}</span>
-            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-400">Wallet</p>
+            <p className="text-sm font-medium">
+              {address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : "Not connected"}
+            </p>
           </div>
         </div>
 
-        <div className="bg-black/30 rounded-lg p-4">
-          <p className="text-gray-400 text-sm mb-1">My Investment Growth</p>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Initial Investment</span>
-              <span className="font-medium">{formatCrypto(userTotalDeposits, tokenSymbol)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Total Earnings</span>
-              <span className="font-medium text-green-400">{formatCrypto(totalEarnings, tokenSymbol)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Referral Earnings</span>
-              <span className="font-medium text-purple-400">{formatCrypto(userReferralBonus, tokenSymbol)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Projected 1Y Earnings</span>
-              <span className="font-medium text-green-400">{formatCrypto(yearlyYield, tokenSymbol)}</span>
-            </div>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <p className="text-gray-400 text-xs mb-1">Total Investment</p>
+            <p className="text-xl font-bold text-gradient">{formatCrypto(userTotalDeposits, tokenSymbol)}</p>
+          </div>
+          <div>
+            <p className="text-gray-400 text-xs mb-1">Total Earnings</p>
+            <p className="text-xl font-bold text-green-400">{formatCrypto(totalEarnings, tokenSymbol)}</p>
+          </div>
+          <div>
+            <p className="text-gray-400 text-xs mb-1">Daily Earnings</p>
+            <p className="text-xl font-bold text-blue-400">{formatCrypto(dailyEarnings, tokenSymbol)}</p>
+          </div>
+          <div>
+            <p className="text-gray-400 text-xs mb-1">ROI</p>
+            <p className="text-xl font-bold text-purple-400">{formatPercent(roi)}</p>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center text-sm">
+          <div className="flex items-center">
+            <Camera className="h-4 w-4 mr-1 text-gray-500" />
+            <span className="text-gray-500">Generated on {new Date().toLocaleDateString()}</span>
+          </div>
+          <div className="flex items-center">
+            <span className="text-gray-500 mr-1">Referrals:</span>
+            <span className="font-medium">{userReferralCount}</span>
           </div>
         </div>
       </div>
 
-      <div className="text-center">
-        <p className="text-sm text-gray-400 mb-2">
-          Join thousands of investors earning passive income with 5PT Finance
+      <div className="bg-black/30 rounded-lg p-4">
+        <h4 className="font-bold mb-4">Share on Social Media</h4>
+        <div className="flex gap-3 justify-center">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-12 h-12 rounded-full bg-[#1DA1F2]/20 flex items-center justify-center hover:bg-[#1DA1F2]/30 transition-colors"
+            onClick={shareOnTwitter}
+          >
+            <Twitter className="h-5 w-5 text-[#1DA1F2]" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-12 h-12 rounded-full bg-[#4267B2]/20 flex items-center justify-center hover:bg-[#4267B2]/30 transition-colors"
+            onClick={shareOnFacebook}
+          >
+            <Facebook className="h-5 w-5 text-[#4267B2]" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-12 h-12 rounded-full bg-[#0077B5]/20 flex items-center justify-center hover:bg-[#0077B5]/30 transition-colors"
+            onClick={shareOnLinkedin}
+          >
+            <Linkedin className="h-5 w-5 text-[#0077B5]" />
+          </motion.button>
+        </div>
+      </div>
+
+      <div className="mt-4 text-center">
+        <p className="text-xs text-gray-500">
+          Share your investment stats with friends and earn referral bonuses when they join!
         </p>
-        <div className="h-2 bg-gray-800 rounded-full overflow-hidden mb-1">
-          <div
-            className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 animate-pulse-slow"
-            style={{ width: "85%" }}
-          ></div>
-        </div>
-        <p className="text-xs text-gray-500">85% of Phase 1 pool allocation filled</p>
       </div>
     </Card>
   )

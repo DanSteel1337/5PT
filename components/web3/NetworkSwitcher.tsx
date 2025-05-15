@@ -52,3 +52,5 @@ export function NetworkSwitcher() {
 }
 
 export default NetworkSwitcher
+
+// This file might be setting network-specific token symbols

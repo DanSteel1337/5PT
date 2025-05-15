@@ -36,3 +36,5 @@ export function Web3ProviderWrapper({ children }: { children: ReactNode }) {
 }
 
 export default Web3ProviderWrapper
+
+// This file might be wrapping the Web3Provider with additional context

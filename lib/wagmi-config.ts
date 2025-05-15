@@ -28,3 +28,6 @@ export const config = getDefaultConfig({
     [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
   },
 })
+
+// This file might contain token configuration
+// Let's check if there's any hardcoded token symbol here

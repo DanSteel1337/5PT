@@ -8,3 +8,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   )
 }
+// This file might be setting layout context with token symbols

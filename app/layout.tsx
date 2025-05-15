@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
-
+// This file might be setting global context with token symbols
 export const metadata = {
       generator: 'v0.dev'
     };
