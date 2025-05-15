@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useInvestmentData } from "@/hooks/useInvestmentData"
 import { formatCrypto, formatNumber, formatPercent } from "@/lib/utils"
 import { TrendingUp, Award, Wallet, ArrowUpRight } from "lucide-react"
 import { motion } from "framer-motion"
+import { useMounted } from "@/hooks/useMounted"
 
 export function WalletOverview() {
   const {
@@ -17,12 +17,10 @@ export function WalletOverview() {
     dailyRatePercent,
   } = useInvestmentData()
 
-  const [mounted, setMounted] = useState(false)
+  // Use the custom hook instead of duplicating mounting logic
+  const mounted = useMounted()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
+  // Don't render anything until client-side hydration is complete
   if (!mounted) return null
 
   return (

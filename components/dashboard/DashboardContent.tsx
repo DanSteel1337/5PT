@@ -1,253 +1,140 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
+import { Suspense } from "react"
 import { useAccount } from "wagmi"
-import { Card } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { TrendingUp, Wallet, Clock, BarChartIcon as ChartBar, Award } from "lucide-react"
+import { useMounted } from "@/hooks/useMounted"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { CustomConnectButton } from "@/components/web3/ConnectButton"
-import { Web3ProviderWrapper } from "@/components/providers/Web3ProviderWrapper"
 
-// Dynamically import wallet-dependent components
+// Dynamically import components with error boundaries
 const WalletOverview = dynamic(
-  () => import("@/components/dashboard/WalletOverview").then((mod) => mod.WalletOverview),
+  () => import("@/components/dashboard/WalletOverview").then((mod) => ({ default: mod.WalletOverview })),
   {
     loading: () => <WalletOverviewSkeleton />,
-  },
-)
-
-const ShareableStats = dynamic(
-  () => import("@/components/dashboard/ShareableStats").then((mod) => mod.ShareableStats),
-  {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
-  },
-)
-
-const RealTimeEarnings = dynamic(
-  () => import("@/components/dashboard/RealTimeEarnings").then((mod) => mod.RealTimeEarnings),
-  {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
-  },
-)
-
-const TokenomicsVisual = dynamic(
-  () => import("@/components/dashboard/TokenomicsVisual").then((mod) => mod.TokenomicsVisual),
-  {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
-  },
-)
-
-const PoolQualificationCard = dynamic(
-  () => import("@/components/dashboard/PoolQualificationCard").then((mod) => mod.PoolQualificationCard),
-  {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
+    ssr: false,
   },
 )
 
 const InvestmentStats = dynamic(
-  () => import("@/components/dashboard/InvestmentStats").then((mod) => mod.InvestmentStats),
+  () => import("@/components/dashboard/InvestmentStats").then((mod) => ({ default: mod.InvestmentStats })),
   {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
+    loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
+    ssr: false,
   },
 )
 
-const ReferralSystem = dynamic(
-  () => import("@/components/dashboard/ReferralSystem").then((mod) => mod.ReferralSystem),
+const RealTimeEarnings = dynamic(
+  () => import("@/components/dashboard/RealTimeEarnings").then((mod) => ({ default: mod.RealTimeEarnings })),
   {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
+    loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
+    ssr: false,
   },
 )
 
 const InvestmentPools = dynamic(
-  () => import("@/components/dashboard/InvestmentPools").then((mod) => mod.InvestmentPools),
+  () => import("@/components/dashboard/InvestmentPools").then((mod) => ({ default: mod.InvestmentPools })),
   {
-    loading: () => <Skeleton className="h-[300px] w-full" />,
+    loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
+    ssr: false,
   },
 )
 
-const RankDisplay = dynamic(() => import("@/components/dashboard/RankDisplay").then((mod) => mod.RankDisplay), {
-  loading: () => <Skeleton className="h-[300px] w-full" />,
-})
+const PoolQualificationCard = dynamic(
+  () => import("@/components/dashboard/PoolQualificationCard").then((mod) => ({ default: mod.PoolQualificationCard })),
+  {
+    loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
+    ssr: false,
+  },
+)
 
+const ReferralSystem = dynamic(
+  () => import("@/components/dashboard/ReferralSystem").then((mod) => ({ default: mod.ReferralSystem })),
+  {
+    loading: () => <div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>,
+    ssr: false,
+  },
+)
+
+// Skeleton components
 function WalletOverviewSkeleton() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-      <div className="glass-card rounded-xl h-40"></div>
-      <div className="glass-card rounded-xl h-40"></div>
-      <div className="glass-card rounded-xl h-40"></div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-[150px] bg-purple-900/20 animate-pulse rounded-lg"></div>
+      ))}
     </div>
   )
 }
 
-function ConnectWalletPrompt() {
-  return (
-    <div className="glass-card-purple rounded-xl p-8 text-center">
-      <h2 className="text-2xl font-bold mb-4 text-gradient">Connect Your Wallet</h2>
-      <p className="text-gray-300 mb-6">
-        Connect your wallet to view your investment dashboard, manage your pools, and track your earnings.
-      </p>
-      <div className="flex justify-center">
-        <CustomConnectButton />
-      </div>
-    </div>
-  )
-}
-
-// This is the internal implementation that uses Wagmi hooks
-function DashboardContentInternal() {
+export default function DashboardContent() {
   const { isConnected } = useAccount()
-  const [mounted, setMounted] = useState(false)
+  const mounted = useMounted()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  if (!mounted) {
+    return <WalletOverviewSkeleton />
+  }
 
-  if (!mounted) return <DashboardSkeleton />
-
-  function DashboardSkeleton() {
+  if (!isConnected) {
     return (
-      <div className="animate-pulse">
-        <Skeleton className="h-12 w-full mb-4" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-40 w-full" />
-        </div>
-        <Skeleton className="h-60 w-full mt-6" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
-        </div>
+      <div className="flex flex-col items-center justify-center py-12 px-4 bg-black/30 rounded-lg border border-purple-900/30">
+        <h3 className="text-xl font-semibold mb-4 text-gradient">Connect Wallet to View Dashboard</h3>
+        <p className="text-gray-400 mb-6 text-center max-w-md">
+          Connect your wallet to access your investment dashboard, view your earnings, and manage your investments.
+        </p>
+        <CustomConnectButton />
       </div>
     )
   }
 
-  if (!isConnected) {
-    return <ConnectWalletPrompt />
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Shareable Stats Card */}
-      <ShareableStats />
+    <div className="space-y-8">
+      {/* Wallet Overview */}
+      <ErrorBoundary fallback={<WalletOverviewSkeleton />}>
+        <Suspense fallback={<WalletOverviewSkeleton />}>
+          <WalletOverview />
+        </Suspense>
+      </ErrorBoundary>
 
-      {/* Real-Time Earnings Counter - New Component */}
-      <RealTimeEarnings />
-
-      {/* Overview Section */}
-      <WalletOverview />
-
-      {/* Main Dashboard Content */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Investment Stats and Pools */}
-        <div className="md:col-span-2 space-y-6">
-          <Tabs defaultValue="stats" className="w-full">
-            <TabsList className="grid grid-cols-5 mb-4">
-              <TabsTrigger value="stats" className="data-[state=active]:bg-purple-900/50">
-                <TrendingUp className="mr-2 h-4 w-4" />
-                Stats
-              </TabsTrigger>
-              <TabsTrigger value="pools" className="data-[state=active]:bg-purple-900/50">
-                <Wallet className="mr-2 h-4 w-4" />
-                Pools
-              </TabsTrigger>
-              <TabsTrigger value="tokenomics" className="data-[state=active]:bg-purple-900/50">
-                <ChartBar className="mr-2 h-4 w-4" />
-                Tokenomics
-              </TabsTrigger>
-              <TabsTrigger value="qualify" className="data-[state=active]:bg-purple-900/50">
-                <Award className="mr-2 h-4 w-4" />
-                Qualify
-              </TabsTrigger>
-              <TabsTrigger value="history" className="data-[state=active]:bg-purple-900/50">
-                <Clock className="mr-2 h-4 w-4" />
-                History
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="stats" className="mt-0">
-              <InvestmentStats />
-            </TabsContent>
-
-            <TabsContent value="pools" className="mt-0">
-              <InvestmentPools />
-            </TabsContent>
-
-            <TabsContent value="tokenomics" className="mt-0">
-              <TokenomicsVisual />
-            </TabsContent>
-
-            <TabsContent value="qualify" className="mt-0">
-              <PoolQualificationCard />
-            </TabsContent>
-
-            <TabsContent value="history" className="mt-0">
-              <Card className="glass-card-purple p-6">
-                <h3 className="text-xl font-bold mb-4 text-gradient">Transaction History</h3>
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                      <div>
-                        <p className="font-medium">Deposit to Pool {(i % 3) + 1}</p>
-                        <p className="text-sm text-gray-400">
-                          {new Date(Date.now() - i * 86400000).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-purple-400">+{(i * 0.5).toFixed(2)} 5PT</p>
-                        <p className="text-xs text-gray-400">Confirmed</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* Rank and Referrals */}
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column */}
         <div className="space-y-6">
-          <RankDisplay />
-          <ReferralSystem />
+          <ErrorBoundary>
+            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+              <RealTimeEarnings />
+            </Suspense>
+          </ErrorBoundary>
+
+          <ErrorBoundary>
+            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+              <PoolQualificationCard />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          <ErrorBoundary>
+            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+              <InvestmentStats />
+            </Suspense>
+          </ErrorBoundary>
+
+          <ErrorBoundary>
+            <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+              <InvestmentPools />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
 
-      {/* Platform Stats */}
-      <div className="glass-card-purple rounded-xl p-6">
-        <h3 className="text-xl font-bold mb-4 text-gradient">Platform Statistics</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Total Value Locked</p>
-            <p className="text-2xl font-bold text-white">$4,582,941</p>
-          </div>
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Total Investors</p>
-            <p className="text-2xl font-bold text-white">12,847</p>
-          </div>
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Active Pools</p>
-            <p className="text-2xl font-bold text-white">5</p>
-          </div>
-          <div className="bg-black/30 rounded-lg p-4 text-center">
-            <p className="text-gray-400 text-sm mb-1">Total Rewards Paid</p>
-            <p className="text-2xl font-bold text-white">$1,245,632</p>
-          </div>
-        </div>
-      </div>
+      {/* Referral System */}
+      <ErrorBoundary>
+        <Suspense fallback={<div className="h-[400px] bg-purple-900/20 animate-pulse rounded-lg"></div>}>
+          <ReferralSystem />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   )
 }
-
-// This is the exported component that wraps the internal implementation with the Web3ProviderWrapper
-export function DashboardContent() {
-  return (
-    <Web3ProviderWrapper>
-      <DashboardContentInternal />
-    </Web3ProviderWrapper>
-  )
-}
-
-export default DashboardContent
