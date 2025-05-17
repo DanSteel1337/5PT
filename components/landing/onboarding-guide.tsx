@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { CyberButton } from "@/components/ui/cyber-button"
-import { Wallet, Coins, LayoutGrid, TrendingUp, Users, ArrowRight, ChevronRight, Check } from "lucide-react"
+import { Wallet, Coins, LayoutGrid, TrendingUp, Users, ArrowRight, ChevronRight } from "lucide-react"
 import { SectionContainer } from "@/components/ui/section-container"
 import { useMounted } from "@/hooks/use-mounted"
 import React from "react"
@@ -18,9 +18,6 @@ const OnboardingStation = React.memo(function OnboardingStation({
   totalSteps,
   isCompleted,
 }) {
-  // Determine if this step should show details
-  const showDetails = isActive
-
   return (
     <motion.div
       className="relative"
@@ -29,49 +26,15 @@ const OnboardingStation = React.memo(function OnboardingStation({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       style={{ willChange: "transform, opacity" }}
     >
-      {/* Connection line between steps */}
-      {index < totalSteps - 1 && (
-        <div className="absolute top-[40px] left-[calc(100%-10px)] w-[calc(100%-60px)] h-[2px] z-0 overflow-hidden">
-          {/* Base line */}
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/70 via-indigo-500/40 to-blue-500/70"></div>
-
-          {/* Animated pulse effect */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 opacity-70"
-            animate={{
-              x: ["-100%", "100%"],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-          />
-        </div>
-      )}
+      {/* Connection lines removed as requested */}
 
       <div className="flex flex-col items-center">
         {/* Step indicator with futuristic design */}
         <div className="relative mb-6">
-          {/* Outer glow ring */}
-          <motion.div
-            className={`absolute inset-[-15px] rounded-full ${
-              isActive
-                ? "bg-purple-500/10 shadow-[0_0_30px_rgba(139,92,246,0.6)]"
-                : isCompleted
-                  ? "bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
-                  : "bg-purple-900/10"
-            }`}
-            animate={{
-              scale: isActive ? [1, 1.1, 1] : 1,
-              opacity: isActive ? [0.6, 1, 0.6] : 0.6,
-            }}
-            transition={{
-              duration: 3,
-              repeat: isActive ? Number.POSITIVE_INFINITY : 0,
-              repeatType: "reverse",
-            }}
-          />
+          {/* Outer glow ring - only for active step */}
+          {isActive && (
+            <div className="absolute inset-[-15px] rounded-full bg-purple-500/10 shadow-[0_0_30px_rgba(139,92,246,0.6)]" />
+          )}
 
           {/* Hexagonal container */}
           <div className="relative cursor-pointer" onClick={onClick}>
@@ -103,73 +66,15 @@ const OnboardingStation = React.memo(function OnboardingStation({
                 }}
               />
 
-              {/* Animated shine effect */}
-              <div
-                className="absolute inset-0 opacity-30"
-                style={{
-                  clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                  background: "linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.8) 50%, transparent 60%)",
-                  backgroundSize: "200% 200%",
-                  animation: isActive ? "shine 3s infinite linear" : "none",
-                }}
-              />
-
               {/* Icon */}
               <div className="relative z-10">{React.cloneElement(step.icon, { size: 32 })}</div>
-
-              {/* Completion indicator */}
-              {isCompleted && !isActive && (
-                <motion.div
-                  className="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full p-1 z-20 shadow-lg"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                >
-                  <Check className="h-3 w-3" />
-                </motion.div>
-              )}
-
-              {/* Step number */}
-              <motion.div
-                className={`absolute -top-3 -left-3 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  isActive
-                    ? "bg-purple-500 text-white"
-                    : isCompleted
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-800 text-gray-400"
-                }`}
-              >
-                {index + 1}
-              </motion.div>
             </div>
 
-            {/* Animated scanner effect */}
-            {isActive && (
-              <motion.div
-                className="absolute inset-0 overflow-hidden"
-                style={{
-                  clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/30 to-transparent"
-                  animate={{
-                    top: ["-100%", "200%"],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear",
-                  }}
-                />
-              </motion.div>
-            )}
-
-            {/* Corner accents for active state */}
+            {/* Corner dots for active state - matching the screenshot */}
             {isActive && (
               <>
-                <div className="absolute top-0 left-[10px] w-2 h-2 bg-purple-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
-                <div className="absolute bottom-0 right-[10px] w-2 h-2 bg-purple-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.8)]" />
+                <div className="absolute top-0 left-[10px] w-2 h-2 bg-purple-500 rounded-full" />
+                <div className="absolute bottom-0 right-[10px] w-2 h-2 bg-purple-500 rounded-full" />
               </>
             )}
           </div>
@@ -178,7 +83,7 @@ const OnboardingStation = React.memo(function OnboardingStation({
         {/* Title */}
         <h3
           className={`text-xl font-bold mb-2 text-center transition-colors duration-300 ${
-            isActive ? "text-white text-shadow-sm" : "text-gray-200"
+            isActive ? "text-white" : "text-gray-200"
           }`}
         >
           {step.title}
@@ -187,11 +92,11 @@ const OnboardingStation = React.memo(function OnboardingStation({
         {/* Description */}
         <p className="text-gray-400 text-center mb-4 max-w-[250px]">{step.description}</p>
 
-        {/* Expandable details */}
+        {/* Expandable details - only for active step */}
         <AnimatePresence>
-          {showDetails && (
+          {isActive && (
             <motion.div
-              className="w-full space-y-3 border-t border-purple-500/30 pt-4"
+              className="w-full space-y-3"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -210,7 +115,7 @@ const OnboardingStation = React.memo(function OnboardingStation({
                 </motion.div>
               ))}
 
-              {/* Action button */}
+              {/* Action button - styled to match the screenshot */}
               {step.action && (
                 <motion.div
                   className="mt-4 pt-2"
@@ -220,7 +125,7 @@ const OnboardingStation = React.memo(function OnboardingStation({
                 >
                   <Link
                     href={step.action.link}
-                    className="inline-flex items-center px-4 py-2 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-colors border border-purple-500/40 cyber-glow"
+                    className="inline-flex items-center px-4 py-2 rounded-md bg-purple-900/80 text-purple-100 hover:bg-purple-800 transition-colors"
                   >
                     {step.action.text} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -484,7 +389,7 @@ export function OnboardingGuide() {
           </motion.button>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA Button - styled to match the screenshot */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -493,7 +398,7 @@ export function OnboardingGuide() {
           transition={{ duration: 0.8 }}
         >
           <Link href="/dashboard">
-            <CyberButton variant="primary" size="lg" className="animate-pulse">
+            <CyberButton variant="primary" size="lg" className="uppercase">
               Start Your Investment Journey
             </CyberButton>
           </Link>
@@ -504,29 +409,6 @@ export function OnboardingGuide() {
   )
 }
 
-// Add keyframes for the shine effect
-const styles = `
-@keyframes shine {
-  0% {
-    background-position: -100% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.text-shadow-sm {
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-}
-`
-
 export default function OnboardingGuideWithStyles() {
-  return (
-    <>
-      <style jsx global>
-        {styles}
-      </style>
-      <OnboardingGuide />
-    </>
-  )
+  return <OnboardingGuide />
 }

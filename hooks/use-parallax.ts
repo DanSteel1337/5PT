@@ -13,7 +13,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type RefObject } from "react"
 import { useMotionValue, useSpring } from "framer-motion"
 
 /**
@@ -56,9 +56,19 @@ import { useMotionValue, useSpring } from "framer-motion"
  *     }}
  *   />
  * );
+ *
+ * // Parallax effect on a specific element
+ * const parallaxRef = useRef(null);
+ * const { x, y } = useParallax(parallaxRef);
+ *
+ * return (
+ *   <motion.div ref={parallaxRef} style={{ x, y }}>
+ *     This element moves based on mouse position
+ *   </motion.div>
+ * );
  * \`\`\`
  */
-export function useParallax() {
+export function useParallax(ref: RefObject<HTMLElement>) {
   // Client-side mounting check for SSR compatibility
   const [mounted, setMounted] = useState(false)
 
@@ -66,6 +76,7 @@ export function useParallax() {
   const scrollY = useMotionValue(0)
   const smoothScrollY = useSpring(scrollY, { damping: 50, stiffness: 400 })
   const rawScrollY = useMotionValue(0)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
 
   // Set up scroll event listener
   useEffect(() => {
@@ -89,9 +100,32 @@ export function useParallax() {
     }
   }, [scrollY, rawScrollY])
 
+  useEffect(() => {
+    if (!ref.current) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e
+      const { width, height } = ref.current?.getBoundingClientRect() || { width: 0, height: 0 }
+
+      // Calculate position relative to the center of the element
+      const x = (clientX - width / 2) / 25
+      const y = (clientY - height / 2) / 25
+
+      setPosition({ x, y })
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+    }
+  }, [ref])
+
   return {
     scrollY: smoothScrollY,
     rawScrollY: rawScrollY,
+    x: position.x,
+    y: position.y,
   }
 }
 

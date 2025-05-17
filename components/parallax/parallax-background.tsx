@@ -1,79 +1,89 @@
-/**
- * ParallaxBackground Component
- *
- * A responsive parallax background with multiple layers of stars and gradient effects.
- * Creates a dynamic, animated background with parallax scrolling effects.
- */
-
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, useTransform } from "framer-motion"
+import { useRef } from "react"
+import { motion } from "framer-motion"
 import { useParallax } from "@/hooks/use-parallax"
 
 export function ParallaxBackground() {
-  // Client-side mounting check to prevent hydration issues
-  const [mounted, setMounted] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const { x, y } = useParallax(ref)
 
-  // Get scrollY motion value from the parallax hook
-  const { scrollY } = useParallax()
+  // Create a grid of dots for the background
+  const gridSize = 20
+  const dots = []
 
-  // Set mounted state on client-side
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Create transform values for different layers with varying parallax speeds
-  const y1 = useTransform(scrollY, [0, 1000], [0, -150]) // Far stars (slow movement)
-  const y2 = useTransform(scrollY, [0, 1000], [0, -100]) // Medium stars (medium movement)
-  const y3 = useTransform(scrollY, [0, 1000], [0, -50]) // Close stars (fast movement)
-
-  // Gradient overlay opacity that fades as you scroll
-  const opacity = useTransform(scrollY, [0, 300, 600], [0.7, 0.4, 0]) // Reduced initial opacity
-
-  // Don't render anything until client-side to prevent hydration issues
-  if (!mounted) return null
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      dots.push({
+        id: `dot-${i}-${j}`,
+        x: `${(i / gridSize) * 100}%`,
+        y: `${(j / gridSize) * 100}%`,
+        delay: (i + j) * 0.05,
+      })
+    }
+  }
 
   return (
-    <>
-      {/* Base background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/10 to-black z-10"></div>
+    <div
+      ref={ref}
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      style={{ zIndex: 0 }}
+      aria-hidden="true"
+    >
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-radial from-gray-900 via-gray-900 to-black"></div>
 
-      {/* Parallax stars container */}
-      <div className="absolute inset-0 overflow-hidden z-20">
-        {/* Layer 1: Far stars (slow movement) */}
-        <motion.div
-          className="absolute inset-0 bg-[url('/images/stars-small.png')] bg-repeat opacity-30"
-          style={{ y: y1 }}
-          aria-hidden="true"
-        />
-
-        {/* Layer 2: Medium stars (medium movement) */}
-        <motion.div
-          className="absolute inset-0 bg-[url('/images/stars-medium.png')] bg-repeat opacity-40"
-          style={{ y: y2 }}
-          aria-hidden="true"
-        />
-
-        {/* Layer 3: Close stars (fast movement) */}
-        <motion.div
-          className="absolute inset-0 bg-[url('/images/stars-large.png')] bg-repeat opacity-50"
-          style={{ y: y3 }}
-          aria-hidden="true"
-        />
+      {/* Grid of dots */}
+      <div className="absolute inset-0">
+        {dots.map((dot) => (
+          <motion.div
+            key={dot.id}
+            className="absolute w-1 h-1 bg-purple-500/20 rounded-full"
+            style={{
+              left: dot.x,
+              top: dot.y,
+              opacity: 0,
+            }}
+            animate={{
+              opacity: [0, 0.5, 0],
+              scale: [0, 1, 0],
+            }}
+            transition={{
+              duration: 4,
+              delay: dot.delay,
+              repeat: Number.POSITIVE_INFINITY,
+              repeatType: "loop",
+            }}
+          />
+        ))}
       </div>
 
-      {/* Gradient overlay that fades as you scroll */}
+      {/* Animated gradient orbs */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-transparent to-transparent z-30"
-        style={{ opacity }}
-        aria-hidden="true"
+        className="absolute w-96 h-96 rounded-full bg-purple-500/10 filter blur-3xl"
+        style={{
+          x: x,
+          y: y,
+          left: "20%",
+          top: "30%",
+        }}
       />
 
-      {/* Grid overlay for visual texture */}
-      <div className="absolute inset-0 bg-[url('/images/grid.png')] bg-repeat opacity-5 z-20" aria-hidden="true"></div>
-    </>
+      <motion.div
+        className="absolute w-96 h-96 rounded-full bg-blue-500/10 filter blur-3xl"
+        style={{
+          x: x,
+          y: y,
+          right: "20%",
+          bottom: "30%",
+        }}
+      />
+
+      {/* Grid lines */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[length:50px_50px]"></div>
+
+      {/* Vignette effect */}
+      <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
+    </div>
   )
 }
-
-export default ParallaxBackground
