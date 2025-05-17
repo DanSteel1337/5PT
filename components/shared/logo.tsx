@@ -4,6 +4,19 @@ import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useInView } from "framer-motion"
+import type { JSX } from "react/jsx-runtime"
+
+// Define Particle class type
+interface Particle {
+  x: number
+  y: number
+  size: number
+  speedX: number
+  speedY: number
+  color: string
+  update: () => void
+  draw: () => void
+}
 
 interface LogoProps {
   size?: number
@@ -13,10 +26,16 @@ interface LogoProps {
   animated?: boolean
 }
 
-export function Logo({ size = 40, withText = true, className = "", href = "", animated = true }: LogoProps) {
-  const [mounted, setMounted] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const ref = useRef(null)
+export function Logo({
+  size = 40,
+  withText = true,
+  className = "",
+  href = "",
+  animated = true,
+}: LogoProps): JSX.Element {
+  const [mounted, setMounted] = useState<boolean>(false)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   const isInView = useInView(ref, { once: false })
 
   useEffect(() => {
@@ -30,7 +49,7 @@ export function Logo({ size = 40, withText = true, className = "", href = "", an
       const particles: Particle[] = []
       const particleCount = 20
 
-      class Particle {
+      class ParticleImpl implements Particle {
         x: number
         y: number
         size: number
@@ -47,7 +66,7 @@ export function Logo({ size = 40, withText = true, className = "", href = "", an
           this.color = `rgba(139, 92, 246, ${Math.random() * 0.5 + 0.3})`
         }
 
-        update() {
+        update(): void {
           this.x += this.speedX
           this.y += this.speedY
 
@@ -60,7 +79,8 @@ export function Logo({ size = 40, withText = true, className = "", href = "", an
           }
         }
 
-        draw() {
+        draw(): void {
+          if (!ctx) return
           ctx.fillStyle = this.color
           ctx.beginPath()
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
@@ -68,13 +88,13 @@ export function Logo({ size = 40, withText = true, className = "", href = "", an
         }
       }
 
-      const init = () => {
+      const init = (): void => {
         for (let i = 0; i < particleCount; i++) {
-          particles.push(new Particle())
+          particles.push(new ParticleImpl())
         }
       }
 
-      const animate = () => {
+      const animate = (): void => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
 
         for (let i = 0; i < particles.length; i++) {

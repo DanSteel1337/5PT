@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react"
 
 /**
- * Custom hook to check if component is mounted on client-side
- * Prevents hydration errors with client-side only code
+ * Custom hook to handle client-side mounting
+ * Prevents hydration errors by ensuring components only render on client
+ *
+ * @returns {boolean} Whether the component is mounted on the client
  */
 export function useMounted(): boolean {
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState<boolean>(false)
 
   useEffect(() => {
     setMounted(true)
@@ -15,3 +17,5 @@ export function useMounted(): boolean {
 
   return mounted
 }
+
+export default useMounted

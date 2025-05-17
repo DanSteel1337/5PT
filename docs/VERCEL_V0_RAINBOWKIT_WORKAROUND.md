@@ -85,6 +85,3 @@ When Vercel v0 resolves the CSS loading issue, or when RainbowKit provides an of
 1. Removing the `RainbowKitStylesProvider` component
 2. Restoring the direct import in `app/layout.tsx`
 3. Updating the `Web3Provider` to remove the wrapper
-\`\`\`
-
-Let's also add a debug component to help troubleshoot any issues:

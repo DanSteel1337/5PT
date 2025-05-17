@@ -1,3 +1,10 @@
+/**
+ * Hero Component
+ *
+ * The main hero section for the 5PT Investment Platform landing page.
+ * Features animated elements, parallax effects, and call-to-action buttons.
+ */
+
 "use client"
 
 import { useState, useEffect, useRef } from "react"
@@ -9,21 +16,26 @@ import { ParallaxBackground } from "@/components/parallax/parallax-background"
 import { ScrollIndicator } from "@/components/ui/scroll-indicator"
 
 export function Hero() {
+  // Client-side mounting check to prevent hydration issues
   const [mounted, setMounted] = useState(false)
+
+  // Reference to the hero section for scroll functionality
   const heroRef = useRef<HTMLDivElement>(null)
 
+  // Set mounted state on client-side
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // Don't render until client-side to prevent hydration issues
   if (!mounted) return null
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center overflow-hidden" ref={heroRef}>
-      {/* Animated background */}
+      {/* Animated parallax background */}
       <ParallaxBackground />
 
-      {/* Floating particles */}
+      {/* Floating particles for visual effect */}
       <div className="absolute inset-0 pointer-events-none">
         {Array.from({ length: 20 }).map((_, i) => (
           <div
@@ -35,11 +47,12 @@ export function Hero() {
               animationDelay: `${Math.random() * 5}s`,
               animationDuration: `${5 + Math.random() * 10}s`,
             }}
+            aria-hidden="true"
           />
         ))}
       </div>
 
-      {/* Main content */}
+      {/* Main content container */}
       <div className="container mx-auto px-4 md:px-6 lg:px-8 py-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left column - Text content */}
@@ -49,7 +62,7 @@ export function Hero() {
             transition={{ duration: 0.8 }}
             className="flex flex-col gap-6"
           >
-            {/* Badge */}
+            {/* Badge - Network indicator */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -60,7 +73,7 @@ export function Hero() {
               Now Live on Binance Smart Chain
             </motion.div>
 
-            {/* Headline */}
+            {/* Main headline with animated gradient */}
             <motion.h1
               className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
               initial={{ opacity: 0 }}
@@ -77,25 +90,30 @@ export function Hero() {
               </div>
             </motion.h1>
 
-            {/* Feature list */}
+            {/* Feature list with icons */}
             <motion.ul
               className="space-y-5 text-gray-200 mt-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.8 }}
             >
+              {/* Feature 1 - Daily rewards */}
               <li className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/30 flex items-center justify-center group-hover:bg-purple-800/60 transition-colors duration-300">
                   <Zap className="w-5 h-5 text-purple-300" />
                 </div>
                 <span className="text-lg">Stake 5PT tokens and earn daily rewards</span>
               </li>
+
+              {/* Feature 2 - Reward pools */}
               <li className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/30 flex items-center justify-center group-hover:bg-purple-800/60 transition-colors duration-300">
                   <Target className="w-5 h-5 text-purple-300" />
                 </div>
                 <span className="text-lg">Qualify for exclusive reward pools</span>
               </li>
+
+              {/* Feature 3 - Referral commissions */}
               <li className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/30 flex items-center justify-center group-hover:bg-purple-800/60 transition-colors duration-300">
                   <Users className="w-5 h-5 text-purple-300" />
@@ -104,7 +122,7 @@ export function Hero() {
               </li>
             </motion.ul>
 
-            {/* CTA button */}
+            {/* Call-to-action button */}
             <motion.div
               className="mt-8"
               initial={{ opacity: 0, y: 20 }}
@@ -112,7 +130,7 @@ export function Hero() {
               transition={{ delay: 0.9, duration: 0.8 }}
             >
               <Link href="/dashboard">
-                <button className="group relative overflow-hidden rounded-lg">
+                <button className="group relative overflow-hidden rounded-lg" aria-label="Launch App">
                   {/* Button background with animated gradient */}
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 group-hover:from-purple-700 group-hover:via-purple-600 group-hover:to-blue-700 transition-all duration-500 animate-gradient-x"></div>
 
@@ -125,12 +143,15 @@ export function Hero() {
                   </div>
 
                   {/* Animated shine effect */}
-                  <div className="absolute top-0 -left-[100%] w-[120%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform skew-x-[30deg] group-hover:animate-shine"></div>
+                  <div
+                    className="absolute top-0 -left-[100%] w-[120%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform skew-x-[30deg] group-hover:animate-shine"
+                    aria-hidden="true"
+                  ></div>
                 </button>
               </Link>
             </motion.div>
 
-            {/* Stats - Updated to match contract values */}
+            {/* Stats section - Key metrics */}
             <motion.div
               className="grid grid-cols-3 gap-4 mt-10"
               initial={{ opacity: 0 }}
@@ -152,25 +173,41 @@ export function Hero() {
           >
             <div className="relative w-full max-w-md aspect-square">
               {/* Glowing background effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full filter blur-3xl animate-pulse-slow"
+                aria-hidden="true"
+              ></div>
 
-              {/* Rotating circles */}
+              {/* Rotating circles for visual effect */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-full h-full border border-purple-500/30 rounded-full animate-spin-slow"></div>
-                <div className="absolute w-[80%] h-[80%] border border-blue-500/20 rounded-full animate-spin-slow-reverse"></div>
-                <div className="absolute w-[60%] h-[60%] border border-purple-500/10 rounded-full animate-spin-slow"></div>
+                <div
+                  className="w-full h-full border border-purple-500/30 rounded-full animate-spin-slow"
+                  aria-hidden="true"
+                ></div>
+                <div
+                  className="absolute w-[80%] h-[80%] border border-blue-500/20 rounded-full animate-spin-slow-reverse"
+                  aria-hidden="true"
+                ></div>
+                <div
+                  className="absolute w-[60%] h-[60%] border border-purple-500/10 rounded-full animate-spin-slow"
+                  aria-hidden="true"
+                ></div>
               </div>
 
-              {/* Token logo */}
+              {/* Token logo with glow effect */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative w-[50%] h-[50%] animate-float">
-                  <div className="absolute inset-0 bg-purple-500/30 rounded-full filter blur-xl animate-pulse"></div>
+                  <div
+                    className="absolute inset-0 bg-purple-500/30 rounded-full filter blur-xl animate-pulse"
+                    aria-hidden="true"
+                  ></div>
                   <Image
                     src="/images/5pt-logo.png"
                     alt="5PT Token"
                     width={200}
                     height={200}
                     className="relative z-10"
+                    priority
                   />
                 </div>
               </div>
@@ -186,11 +223,12 @@ export function Hero() {
                     animationDelay: `${Math.random() * 3}s`,
                     animationDuration: `${2 + Math.random() * 3}s`,
                   }}
+                  aria-hidden="true"
                 />
               ))}
             </div>
 
-            {/* Floating data cards - Updated to match contract values */}
+            {/* Floating data cards with feature highlights */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -218,7 +256,7 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator at the bottom */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
         <ScrollIndicator targetId="features" />
       </div>
@@ -226,6 +264,12 @@ export function Hero() {
   )
 }
 
+/**
+ * StatCard Component
+ *
+ * Displays a key statistic with an icon, value, and label.
+ * Features hover animations and gradient effects.
+ */
 function StatCard({ value, label, icon }) {
   return (
     <motion.div
@@ -233,10 +277,16 @@ function StatCard({ value, label, icon }) {
       whileHover={{ y: -5, boxShadow: "0 10px 30px -10px rgba(139, 92, 246, 0.3)" }}
     >
       {/* Background glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        aria-hidden="true"
+      ></div>
 
       {/* Top accent line */}
-      <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+      <div
+        className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"
+        aria-hidden="true"
+      ></div>
 
       {/* Icon */}
       <div className="absolute top-3 right-3 text-purple-400/70 group-hover:text-purple-400 transition-colors duration-300">
@@ -256,100 +306,4 @@ function StatCard({ value, label, icon }) {
   )
 }
 
-// Add this to your globals.css or define it inline
-const animationStyles = `
-@keyframes gradient-x {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient-x {
-  background-size: 200% 200%;
-  animation: gradient-x 3s ease infinite;
-}
-
-@keyframes shine {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-.animate-shine {
-  animation: shine 1.5s ease-in-out;
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes spin-slow-reverse {
-  from {
-    transform: rotate(360deg);
-  }
-  to {
-    transform: rotate(0deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 30s linear infinite;
-}
-
-.animate-spin-slow-reverse {
-  animation: spin-slow-reverse 20s linear infinite;
-}
-
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
-}
-
-@keyframes particle-flow {
-  0% {
-    transform: translate(0, 0);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate(calc(cos(var(--angle, 45deg)) * 100px), calc(sin(var(--angle, 45deg)) * 100px));
-    opacity: 0;
-  }
-}
-
-.animate-particle-flow {
-  --angle: 45deg;
-  animation: particle-flow 3s ease-out infinite;
-}
-`
-
-// Add the styles to the document
-if (typeof document !== "undefined") {
-  const style = document.createElement("style")
-  style.textContent = animationStyles
-  document.head.appendChild(style)
-}
+export default Hero

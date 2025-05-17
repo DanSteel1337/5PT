@@ -1,33 +1,60 @@
-"use client"
+/**
+ * @file wagmi-config.ts
+ * @description Configuration for wagmi library
+ *
+ * This file sets up the wagmi configuration including:
+ * - Chain configuration (BSC Mainnet and Testnet)
+ * - Transport configuration
+ * - Network detection based on hostname
+ *
+ * @dependencies
+ * - wagmi: Core Web3 library
+ * - viem: Ethereum RPC client
+ *
+ * @related
+ * - components/providers/Providers.tsx: Uses this configuration
+ */
 
-import { http } from "wagmi"
+import { http, createConfig } from "wagmi"
 import { bsc, bscTestnet } from "wagmi/chains"
-import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 
-// Update the project ID handling to be more robust
-// Get WalletConnect projectId from environment variable
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
+// Chain IDs as constants (ALWAYS use numeric IDs)
+export const BSC_MAINNET_ID = 56
+export const BSC_TESTNET_ID = 97
 
-// Ensure we have a valid project ID
-if (!projectId) {
-  console.warn(
-    "WalletConnect Project ID is missing. Please set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in your environment variables.",
-  )
+/**
+ * Detect network based on hostname
+ *
+ * CRITICAL: Always use hostname-based detection
+ * Default to BSC Testnet for all environments
+ *
+ * @returns The chain ID to use based on hostname
+ */
+function detectNetwork(): number {
+  // Default to testnet in SSR
+  if (typeof window === "undefined") {
+    return BSC_TESTNET_ID
+  }
+
+  const hostname = window.location.hostname
+
+  // Production domains use mainnet
+  if (hostname === "app.5pt.finance" || hostname === "www.5pt.finance" || hostname === "5pt.finance") {
+    return BSC_MAINNET_ID
+  }
+
+  // All other environments use testnet
+  return BSC_TESTNET_ID
 }
 
-// Configure supported chains
-export const chains = [bsc, bscTestnet]
+// Get the chain ID based on hostname
+const chainId = detectNetwork()
 
-// Create wagmi config with RainbowKit
-export const config = getDefaultConfig({
-  appName: "5PT Investment Manager",
-  projectId: projectId || "", // Provide empty string as fallback to prevent undefined errors
-  chains,
+// Create wagmi config
+export const config = createConfig({
+  chains: [chainId === BSC_MAINNET_ID ? bsc : bscTestnet],
   transports: {
-    [bsc.id]: http("https://bsc-dataseed1.binance.org/"),
-    [bscTestnet.id]: http("https://data-seed-prebsc-1-s1.binance.org:8545/"),
+    [BSC_MAINNET_ID]: http("https://bsc-dataseed.binance.org"),
+    [BSC_TESTNET_ID]: http("https://data-seed-prebsc-1-s1.binance.org:8545"),
   },
 })
-
-// This file might contain token configuration
-// Let's check if there's any hardcoded token symbol here

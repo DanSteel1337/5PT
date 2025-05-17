@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { TrendingUp, Shield, Users, Award, Layers } from "lucide-react"
 import { motion } from "framer-motion"
-import { TrendingUp, Shield, Users, Award, ChevronRight, Layers } from "lucide-react"
-import { ParallaxLayer } from "@/components/parallax/parallax-layer"
-import { TiltCard } from "@/components/parallax/tilt-card"
 import { SectionContainer } from "@/components/ui/section-container"
-import { ContentCard } from "@/components/ui/content-card"
+import { FeatureCard } from "./feature-card"
+import type { FeatureData } from "@/types/features"
 
 export function Features() {
   const [mounted, setMounted] = useState(false)
@@ -17,7 +16,7 @@ export function Features() {
 
   if (!mounted) return null
 
-  const features = [
+  const features: FeatureData[] = [
     {
       icon: <Layers className="h-8 w-8" />,
       title: "GLOBAL YIELD SYSTEM",
@@ -54,108 +53,47 @@ export function Features() {
     },
   ]
 
+  // Animation variants for staggered animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  }
+
   return (
     <SectionContainer
       id="features"
       title="INVESTMENT FEATURES"
       subtitle="The Five Pillars Token implements a comprehensive investment platform with multiple reward mechanisms"
     >
-      <div className="grid md:grid-cols-3 gap-8">
-        {features.slice(0, 3).map((feature, index) => (
-          <ParallaxLayer key={index} speed={0.2 + index * 0.1} direction="up" offset={index * 10}>
-            <TiltCard>
-              <FeatureCard feature={feature} index={index} />
-            </TiltCard>
-          </ParallaxLayer>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8 mt-8">
-        {features.slice(3).map((feature, index) => (
-          <ParallaxLayer key={index + 3} speed={0.2 + index * 0.1} direction="up" offset={(index + 3) * 10}>
-            <TiltCard>
-              <FeatureCard feature={feature} index={index + 3} />
-            </TiltCard>
-          </ParallaxLayer>
-        ))}
-      </div>
-    </SectionContainer>
-  )
-}
-
-function FeatureCard({ feature, index }) {
-  return (
-    <ContentCard>
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors duration-500"></div>
-
-      {/* Glowing dot */}
-      <div className="absolute top-4 right-4">
-        <motion.div
-          className="w-2 h-2 bg-purple-500 rounded-full"
-          animate={{
-            boxShadow: [
-              "0 0 5px rgba(139, 92, 246, 0.5)",
-              "0 0 15px rgba(139, 92, 246, 0.8)",
-              "0 0 5px rgba(139, 92, 246, 0.5)",
-            ],
-          }}
-          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: index * 0.2 }}
-        />
-      </div>
-
-      {/* Icon */}
       <motion.div
-        className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-900/50 to-blue-900/50 flex items-center justify-center mb-6 text-purple-400"
-        initial={{ scale: 0.8, opacity: 0 }}
-        whileInView={{ scale: 1, opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
-        whileHover={{ rotate: [0, -5, 5, 0] }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
       >
-        {feature.icon}
+        {features.slice(0, 3).map((feature, index) => (
+          <FeatureCard key={index} feature={feature} index={index} />
+        ))}
       </motion.div>
 
-      {/* Content */}
-      <motion.h3
-        className="card-title"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-6 lg:mt-8"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
       >
-        {feature.title}
-      </motion.h3>
-
-      <motion.p
-        className="text-gray-300 mb-6"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: index * 0.1 + 0.4 }}
-      >
-        {feature.description}
-      </motion.p>
-
-      <motion.ul
-        className="space-y-2"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
-      >
-        {feature.points.map((point, i) => (
-          <li key={i} className="flex items-center text-sm text-gray-300 group-hover:text-white transition-colors">
-            <ChevronRight className="h-4 w-4 text-purple-400 mr-2" />
-            {point}
-          </li>
+        {features.slice(3).map((feature, index) => (
+          <FeatureCard key={index + 3} feature={feature} index={index + 3} />
         ))}
-      </motion.ul>
-
-      {/* Bottom border animation */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500/50 to-blue-500/50 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
-    </ContentCard>
+      </motion.div>
+    </SectionContainer>
   )
 }
 

@@ -1,3 +1,21 @@
+/**
+ * @file slider.tsx
+ * @description Slider component for selecting values from a range
+ *
+ * This file implements a slider component based on Radix UI's Slider primitive.
+ * It provides a way to select values from a range with customizable styling
+ * and accessibility features.
+ *
+ * @dependencies
+ * - react: For component structure
+ * - @radix-ui/react-slider: For slider functionality
+ * - lib/utils.ts: For class name utilities
+ *
+ * @related
+ * - components/landing/investment-calculator.tsx: Uses this component
+ * - components/landing/onboarding-guide.tsx: Uses this component
+ */
+
 "use client"
 
 import * as React from "react"
@@ -5,6 +23,45 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Slider Component
+ *
+ * A customizable slider component for selecting values from a range.
+ * Built on top of Radix UI's Slider primitive with custom styling.
+ *
+ * Features:
+ * - Customizable track and thumb appearance
+ * - Support for multiple thumbs
+ * - Accessible keyboard navigation
+ * - Touch support
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <Slider
+ *   defaultValue={[50]}
+ *   max={100}
+ *   step={1}
+ *   className="w-full"
+ * />
+ *
+ * // With onChange handler
+ * <Slider
+ *   value={[value]}
+ *   onValueChange={(values) => setValue(values[0])}
+ *   min={0}
+ *   max={100}
+ *   step={1}
+ * />
+ *
+ * // Multiple thumbs
+ * <Slider
+ *   defaultValue={[25, 75]}
+ *   max={100}
+ *   step={1}
+ * />
+ * ```
+ */
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>

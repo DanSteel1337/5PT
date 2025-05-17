@@ -45,7 +45,7 @@
 
 ### CSS Loading Errors
 
-If you see: `Failed to load "@rainbow-me/rainbowkit/styles.css" from "blob:..." Modules must be served with a valid MIME type`
+If you see: `Failed to load module script: Expected a JavaScript module script but the server responded with a MIME type of 'text/css'. Strict MIME type checking is enforced for module scripts per HTML spec.`
 
 **Solution**:
 1. Remove direct CSS imports from client components
@@ -97,6 +97,3 @@ If issues persist, check:
 - [ ] All Web3 components have mounting checks
 - [ ] Provider nesting order is correct
 - [ ] Browser cache is cleared and dev server restarted
-\`\`\`
-
-Let's also update the CustomConnectButton component with proper documentation:

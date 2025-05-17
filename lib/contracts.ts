@@ -1,209 +1,92 @@
-// Contract ABIs
-export const INVESTMENT_MANAGER_ABI = [
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "getUserRank",
-    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "getUserTotalDeposits",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "getUserReferralBonus",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "getUserReferralCount",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "getUserPoolRewards",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getTotalInvestors",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getTotalValueLocked",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  // Adding new functions from the contract documentation
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "accountToInvestorInfo",
-    outputs: [
-      {
-        components: [
-          { internalType: "uint256", name: "totalDeposit", type: "uint256" },
-          { internalType: "uint256", name: "totalReferralDeposit", type: "uint256" },
-          { internalType: "uint256", name: "referralCount", type: "uint256" },
-          { internalType: "address", name: "referrer", type: "address" },
-          { internalType: "uint256", name: "lastDepositTime", type: "uint256" },
-          { internalType: "uint256", name: "lastClaimTime", type: "uint256" },
-        ],
-        internalType: "struct InvestmentManager.InvestorInfo",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "account", type: "address" },
-      { internalType: "uint8", name: "poolId", type: "uint8" },
-    ],
-    name: "isInvestorInPool",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getAccumulatedRewards",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getLastRoundRewards",
-    outputs: [
-      {
-        components: [
-          { internalType: "uint256", name: "dailyReward", type: "uint256" },
-          { internalType: "uint256", name: "refReward", type: "uint256" },
-          { internalType: "uint256", name: "poolsReward", type: "uint256" },
-        ],
-        internalType: "struct InvestmentManager.LastRoundRewards",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "claimReward",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "uint256", name: "amount", type: "uint256" },
-      { internalType: "address", name: "referrer", type: "address" },
-    ],
-    name: "deposit",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-] as const
+/**
+ * @file contracts.ts
+ * @description Smart contract configuration for the 5PT Investment Platform
+ *
+ * This file contains contract addresses, ABIs, and constants for interacting
+ * with the 5PT Investment Platform smart contracts. It provides type-safe
+ * definitions for contract interactions and configuration data.
+ *
+ * @dependencies
+ * - wagmi: Used for typed contract ABIs
+ *
+ * @related
+ * - hooks/useContract.ts: Uses these definitions for contract interactions
+ * - components/web3/InvestmentForm.tsx: Uses contract constants
+ */
 
-export const TOKEN_ABI = [
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "decimals",
-    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "symbol",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "name",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "totalSupply",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "spender", type: "address" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
-    ],
-    name: "approve",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "owner", type: "address" },
-      { internalType: "address", name: "spender", type: "address" },
-    ],
-    name: "allowance",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const
+import type { ContractAddresses, ContractConstants, PoolConfig, PoolCriteria, Tokenomics } from "@/types/contracts"
 
-// Contract addresses - These match the documentation
-export const CONTRACT_ADDRESSES = {
-  mainnet: {
+/**
+ * Contract addresses for different networks
+ *
+ * IMPORTANT: Always use chain IDs as keys (56 for BSC Mainnet, 97 for BSC Testnet)
+ * NEVER use named properties like "mainnet" or "testnet"
+ */
+export const CONTRACT_ADDRESSES: ContractAddresses = {
+  // BSC Testnet addresses
+  97: {
+    token: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    investmentManager: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  },
+  // BSC Mainnet addresses
+  56: {
+    token: "0x8FafdFB035C9426a50D842873D5d401C933bE09F",
     investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc",
-    fivePillarsToken: "0x8FafdFB035C9426a50D842873D5d401C933bE09F",
-  },
-  testnet: {
-    investmentManager: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
-    fivePillarsToken: "0x8FafdFB035C9426a50D842873D5d401C933bE09F",
   },
 }
 
-// Helper to get the correct contract address based on network
-export function getContractAddress(contractName: keyof typeof CONTRACT_ADDRESSES.mainnet, chainId: number) {
-  const isTestnet = chainId === 97 // BSC Testnet
-  const addresses = isTestnet ? CONTRACT_ADDRESSES.testnet : CONTRACT_ADDRESSES.mainnet
-  return addresses[contractName]
-}
+/**
+ * ERC20 Token ABI
+ *
+ * Contains the standard ERC20 functions and events needed for token interactions
+ */
+export const TOKEN_ABI = [
+  // ERC20 standard functions
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function transfer(address to, uint amount) returns (bool)",
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function approve(address spender, uint amount) returns (bool)",
+  "function transferFrom(address sender, address recipient, uint amount) returns (bool)",
+  // Events
+  "event Transfer(address indexed from, address indexed to, uint amount)",
+  "event Approval(address indexed owner, address indexed spender, uint amount)",
+] as const
 
-// Updated contract constants from latest documentation
-export const CONTRACT_CONSTANTS = {
+/**
+ * Investment Manager ABI
+ *
+ * Contains the functions and events for interacting with the 5PT Investment Manager contract
+ */
+export const INVESTMENT_MANAGER_ABI = [
+  // View functions
+  "function getInvestorData(address investor) view returns (uint256 totalDeposited, uint256 totalReinvested, uint256 totalWithdrawn, uint256 lastActionTimestamp)",
+  "function getPoolData(uint256 poolId) view returns (string name, uint256 minDeposit, uint256 maxDeposit, uint256 dailyRewardRate, uint256 totalDeposited)",
+  "function getAvailableRewards(address investor) view returns (uint256)",
+  "function getReferralData(address referrer) view returns (address[] referrals, uint256 totalCommission)",
+  "function getUserRank(address user) view returns (uint256)",
+  "function isQualifiedForPool(address user, uint256 poolId) view returns (bool)",
+  // Transaction functions
+  "function deposit(uint256 poolId, uint256 amount, address referrer) returns (bool)",
+  "function withdraw() returns (uint256)",
+  "function reinvest() returns (bool)",
+  "function claimReferralCommission() returns (uint256)",
+  // Events
+  "event Deposit(address indexed user, uint256 indexed poolId, uint256 amount, address indexed referrer)",
+  "event Withdrawal(address indexed user, uint256 amount)",
+  "event ReferralCommission(address indexed referrer, address indexed referee, uint256 amount)",
+  "event RankUpdated(address indexed user, uint256 newRank)",
+] as const
+
+/**
+ * System constants for the 5PT Investment Platform
+ *
+ * These constants are used for calculations and validations
+ */
+export const CONTRACT_CONSTANTS: ContractConstants = {
   BASIS_POINTS: 1000000,
   ROUND_DURATION: 86400, // 24 hours in seconds
   DEPOSIT_DELAY: 14400, // 4 hours in seconds
@@ -215,18 +98,52 @@ export const CONTRACT_CONSTANTS = {
   TOTAL_SUPPLY: 100_000_000_000 * 10 ** 18, // 100B tokens
 }
 
-// Update the REWARD_SYSTEM object to reflect the correct values
-export const REWARD_SYSTEM = {
-  dailyBonus: 0.003, // 0.3% daily
-  directReferralBonus: 0.00025, // 0.025% daily on direct referrals
-  downlineReferralBonus: 0.0006, // 0.06% daily from downline referrals
-  reinvestmentPercent: 0.5, // 50% of rewards are automatically reinvested
-  claimTaxPercent: 0.1, // 10% claim tax
-  depositTaxPercent: 0.1, // 10% deposit tax
-}
+/**
+ * Pool configuration data
+ *
+ * Contains information about each investment pool
+ */
+export const POOLS: PoolConfig[] = [
+  {
+    id: 0,
+    name: "Starter Pool",
+    minDeposit: 100,
+    maxDeposit: 1000,
+    dailyRewardRate: 0.3, // 0.3% daily
+    rankRequirement: 0, // Novice rank
+  },
+  {
+    id: 1,
+    name: "Growth Pool",
+    minDeposit: 500,
+    maxDeposit: 5000,
+    dailyRewardRate: 0.5, // 0.5% daily
+    rankRequirement: 2, // Adept rank
+  },
+  {
+    id: 2,
+    name: "Advanced Pool",
+    minDeposit: 1000,
+    maxDeposit: 10000,
+    dailyRewardRate: 0.7, // 0.7% daily
+    rankRequirement: 4, // Master rank
+  },
+  {
+    id: 3,
+    name: "Elite Pool",
+    minDeposit: 5000,
+    maxDeposit: 50000,
+    dailyRewardRate: 1.0, // 1.0% daily
+    rankRequirement: 6, // Legend rank
+  },
+]
 
-// Updated pool qualification criteria from latest documentation
-export const POOL_CRITERIA = [
+/**
+ * Pool qualification criteria from documentation
+ *
+ * Contains the requirements for qualifying for each pool
+ */
+export const POOL_CRITERIA: PoolCriteria[] = [
   {
     id: 0,
     personalInvestment: 550 * 10 ** 18, // ~$1,000
@@ -292,8 +209,12 @@ export const POOL_CRITERIA = [
   },
 ]
 
-// Adding tokenomics data from documentation
-export const TOKENOMICS = {
+/**
+ * Tokenomics data for the 5PT token
+ *
+ * Contains information about token distribution and allocation
+ */
+export const TOKENOMICS: Tokenomics = {
   totalSupply: 100_000_000_000, // 100B tokens
   distribution: [
     {

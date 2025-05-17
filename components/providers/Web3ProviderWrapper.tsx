@@ -1,40 +1,52 @@
+/**
+ * @file Web3ProviderWrapper.tsx
+ * @description Client component wrapper for Web3 functionality
+ *
+ * This component ensures that Web3 functionality is only used
+ * on the client side, preventing server-side rendering errors.
+ *
+ * @dependencies
+ * - react: Provides React functionality
+ *
+ * @related
+ * - components/web3/ConnectButton.tsx: Uses this wrapper
+ * - components/web3/NetworkSwitcher.tsx: Uses this wrapper
+ */
+
 "use client"
 
-import { useState, useEffect, type ReactNode } from "react"
+import { type ReactNode, useState, useEffect } from "react"
+
+interface Web3ProviderWrapperProps {
+  children: ReactNode
+}
 
 /**
- * This component ensures that components are only rendered after client-side hydration
- * It acts as a safety barrier for components that use browser APIs or client-side hooks
+ * Web3ProviderWrapper Component
  *
- * IMPORTANT: This component does NOT use any wagmi hooks directly to avoid circular dependencies
- * It only handles client-side mounting checks
+ * A client-side only wrapper for Web3 components.
+ * Prevents hydration errors by only rendering children
+ * after client-side hydration is complete.
+ *
+ * @example
+ * ```tsx
+ * <Web3ProviderWrapper>
+ *   <ConnectButton />
+ * </Web3ProviderWrapper>
+ * ```
  */
-export function Web3ProviderWrapper({ children }: { children: ReactNode }) {
+export function Web3ProviderWrapper({ children }: Web3ProviderWrapperProps) {
   const [mounted, setMounted] = useState(false)
 
-  // Set mounted state after component mounts on the client
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Don't render children until client-side hydration is complete
   if (!mounted) {
-    return (
-      <div className="animate-pulse" aria-label="Loading content...">
-        <div className="h-12 w-full mb-4 bg-gray-800 rounded"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="h-40 w-full bg-gray-800 rounded"></div>
-          <div className="h-40 w-full bg-gray-800 rounded"></div>
-          <div className="h-40 w-full bg-gray-800 rounded"></div>
-        </div>
-      </div>
-    )
+    return null
   }
 
-  // Once mounted, render children
   return <>{children}</>
 }
 
 export default Web3ProviderWrapper
-
-// This file might be wrapping the Web3Provider with additional context

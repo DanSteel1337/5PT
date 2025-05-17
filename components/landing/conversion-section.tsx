@@ -5,7 +5,6 @@ import { motion } from "framer-motion"
 import { ArrowRight, Check, ChevronDown, ChevronUp, Flame, TrendingUp, Users } from "lucide-react"
 import { CyberButton } from "@/components/ui/cyber-button"
 import { CyberCard } from "@/components/ui/cyber-card"
-import { ClientOnly } from "@/components/ClientOnly"
 import { cn } from "@/lib/utils"
 import { CONTRACT_CONSTANTS, CONTRACT_ADDRESSES } from "@/lib/contracts"
 
@@ -68,6 +67,9 @@ export function ConversionSection() {
   const toggleFAQ = (index: number) => {
     setExpandedFAQ(expandedFAQ === index ? null : index)
   }
+
+  // BSC Mainnet chain ID
+  const BSC_MAINNET_CHAIN_ID = 56
 
   return (
     <section id="join-now" ref={sectionRef} className="relative py-20 overflow-hidden">
@@ -152,7 +154,7 @@ export function ConversionSection() {
                     <span className="text-sm">Verified Smart Contract</span>
                   </div>
                   <a
-                    href={`https://bscscan.com/address/${CONTRACT_ADDRESSES.mainnet.investmentManager}`}
+                    href={`https://bscscan.com/address/${CONTRACT_ADDRESSES[BSC_MAINNET_CHAIN_ID].investmentManager}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
@@ -219,39 +221,37 @@ export function ConversionSection() {
                 </div>
 
                 {/* Main CTA */}
-                <ClientOnly>
-                  <div className="space-y-4">
-                    <CyberButton variant="primary" size="lg" className="w-full text-center py-5 group">
-                      <span className="flex items-center justify-center">
-                        Connect Wallet & Start Investing
-                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </CyberButton>
+                <div className="space-y-4">
+                  <CyberButton variant="primary" size="lg" className="w-full text-center py-5 group">
+                    <span className="flex items-center justify-center">
+                      Connect Wallet & Start Investing
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </CyberButton>
 
-                    <div className="flex gap-3">
-                      <a
-                        href="https://bscscan.com/address/0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc#code"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
-                      >
-                        <CyberButton variant="outline" size="md" className="w-full text-center">
-                          View Contract
-                        </CyberButton>
-                      </a>
-                      <a
-                        href="https://bscscan.com/token/0x8FafdFB035C9426a50D842873D5d401C933bE09F"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
-                      >
-                        <CyberButton variant="outline" size="md" className="w-full text-center">
-                          View Token
-                        </CyberButton>
-                      </a>
-                    </div>
+                  <div className="flex gap-3">
+                    <a
+                      href={`https://bscscan.com/address/${CONTRACT_ADDRESSES[BSC_MAINNET_CHAIN_ID].investmentManager}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1"
+                    >
+                      <CyberButton variant="outline" size="md" className="w-full text-center">
+                        View Contract
+                      </CyberButton>
+                    </a>
+                    <a
+                      href={`https://bscscan.com/token/${CONTRACT_ADDRESSES[BSC_MAINNET_CHAIN_ID].token}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1"
+                    >
+                      <CyberButton variant="outline" size="md" className="w-full text-center">
+                        View Token
+                      </CyberButton>
+                    </a>
                   </div>
-                </ClientOnly>
+                </div>
               </div>
             </div>
           </CyberCard>
@@ -308,11 +308,9 @@ export function ConversionSection() {
           {/* Final CTA */}
           <div className="text-center mt-12">
             <p className="text-xl mb-6 enhanced-text">Ready to benefit from early adoption advantages?</p>
-            <ClientOnly>
-              <CyberButton variant="primary" size="lg" className="mx-auto">
-                Connect Wallet & Invest Now
-              </CyberButton>
-            </ClientOnly>
+            <CyberButton variant="primary" size="lg" className="mx-auto">
+              Connect Wallet & Invest Now
+            </CyberButton>
           </div>
         </motion.div>
       </div>

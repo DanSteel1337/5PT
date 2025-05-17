@@ -1,26 +1,40 @@
+/**
+ * @file ConnectButton.tsx
+ * @description A customized RainbowKit connect button for wallet connection
+ *
+ * This component provides a styled wallet connection button that integrates
+ * with RainbowKit and wagmi. It handles different connection states and
+ * provides a consistent UI across the application with proper error handling
+ * and loading states.
+ *
+ * @dependencies
+ * - @rainbow-me/rainbowkit: Provides the ConnectButton component
+ * - wagmi: Provides wallet connection hooks
+ * - components/ui/CyberButton: Used for styling the button
+ *
+ * @related
+ * - components/providers/Providers.tsx: Provides the Web3 context
+ * - lib/wagmi-config.ts: Provides network detection utilities
+ */
+
 "use client"
 
 import { useState, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { ConnectButton as RainbowKitConnectButton } from "@rainbow-me/rainbowkit"
-import { CyberButton } from "@/components/ui/cyber-button"
+import { CyberButton } from "@/components/ui/CyberButton"
 
 /**
  * CustomConnectButton Component
  *
+ * A styled wallet connection button that integrates with RainbowKit.
+ *
  * ⚠️ IMPORTANT: RainbowKit Integration Guidelines ⚠️
  *
- * 1. DO NOT import RainbowKit styles here:
- *    ❌ import "@rainbow-me/rainbowkit/styles.css"
- *
+ * 1. DO NOT import RainbowKit styles here
  * 2. ALWAYS use mounting checks to prevent hydration errors
- *
  * 3. ALWAYS wrap the button in a relative positioned div with z-index
  *    to ensure proper modal positioning
- *
- * 4. If the modal appears but is unstyled:
- *    - Check that RainbowKit styles are imported in app/layout.tsx
- *    - Clear browser cache and restart dev server
  */
 export function CustomConnectButton() {
   // CRITICAL: Mounting check to prevent hydration errors
@@ -146,4 +160,8 @@ export function CustomConnectButton() {
   }
 }
 
+// Add a named export for backward compatibility
+export { CustomConnectButton as ConnectButton }
+
+// Default export for easier imports
 export default CustomConnectButton

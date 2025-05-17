@@ -1,174 +1,36 @@
+/**
+ * Utility functions for the 5PT Investment Dashboard
+ */
+
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 /**
- * Combines class names with Tailwind
+ * Combines class names with Tailwind CSS
  */
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Format number with commas and specified decimal places
- * Safely handles undefined/null values
+ * Formats a crypto value with the token symbol
+ * @param value The value to format
+ * @param symbol The token symbol
+ * @returns Formatted string
  */
-export function formatNumber(num: number | string | undefined | null, decimals = 2): string {
-  // Handle undefined or null values
-  if (num === undefined || num === null) return "0.00"
-
-  // Parse string to number if needed
-  const parsedNum = typeof num === "string" ? Number.parseFloat(num) : num
-
-  // Handle NaN
-  if (isNaN(parsedNum)) return "0.00"
-
-  try {
-    return parsedNum.toLocaleString("en-US", {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    })
-  } catch (error) {
-    console.error("Error formatting number:", error)
-    return "0.00"
-  }
+export function formatCrypto(value: number, symbol = "5PT"): string {
+  // Format with 6 decimal places for small values, 2 for larger values
+  const formatted = value < 0.01 ? value.toFixed(6) : value.toFixed(2)
+  return `${formatted} ${symbol}`
 }
 
 /**
- * Format crypto amount with symbol
- * Safely handles undefined/null values
+ * Gets the name of a rank based on its level
+ * @param rank The rank level (0-9)
+ * @returns The rank name
  */
-export function formatCrypto(
-  amount: number | string | bigint | undefined | null,
-  symbol = "5PT",
-  decimals = 4,
-): string {
-  // Handle undefined or null values
-  if (amount === undefined || amount === null) return `0.0000 ${symbol}`
-
-  // Handle BigInt
-  if (typeof amount === "bigint") {
-    try {
-      // Convert BigInt to number for formatting
-      // This is safe for display purposes
-      return `${formatNumber(Number(amount) / 10 ** 18, decimals)} ${symbol}`
-    } catch (error) {
-      console.error("Error formatting BigInt:", error)
-      return `0.0000 ${symbol}`
-    }
-  }
-
-  try {
-    return `${formatNumber(amount, decimals)} ${symbol}`
-  } catch (error) {
-    console.error("Error formatting crypto:", error)
-    return `0.0000 ${symbol}`
-  }
-}
-
-/**
- * Format address to show only first and last few characters
- * Safely handles undefined/null/invalid addresses
- */
-export function formatAddress(address: string | undefined | null): string {
-  if (!address) return ""
-
-  // Validate address format (basic check)
-  if (!address.startsWith("0x") || address.length < 10) return address
-
-  try {
-    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-  } catch (error) {
-    console.error("Error formatting address:", error)
-    return address
-  }
-}
-
-/**
- * Format percentage
- * Safely handles undefined/null values
- */
-export function formatPercent(percent: number | undefined | null): string {
-  if (percent === undefined || percent === null) return "0.00%"
-
-  if (isNaN(percent)) return "0.00%"
-
-  try {
-    return `${percent.toFixed(2)}%`
-  } catch (error) {
-    console.error("Error formatting percent:", error)
-    return "0.00%"
-  }
-}
-
-/**
- * Format token amount from BigInt with proper decimals
- */
-export function formatTokenAmount(amount: bigint | undefined | null, decimals = 18): number {
-  if (amount === undefined || amount === null) return 0
-
-  try {
-    return Number(amount) / 10 ** decimals
-  } catch (error) {
-    console.error("Error formatting token amount:", error)
-    return 0
-  }
-}
-
-/**
- * Format date to locale string
- */
-export function formatDate(
-  date: Date | number | string | undefined | null,
-  options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  },
-): string {
-  if (!date) return ""
-
-  try {
-    const dateObj = typeof date === "object" ? date : new Date(date)
-    return dateObj.toLocaleDateString("en-US", options)
-  } catch (error) {
-    console.error("Error formatting date:", error)
-    return ""
-  }
-}
-
-/**
- * Format time duration (seconds to days/hours/minutes/seconds)
- */
-export function formatDuration(seconds: number | undefined | null): string {
-  if (seconds === undefined || seconds === null || isNaN(seconds)) return "0s"
-
-  try {
-    const days = Math.floor(seconds / 86400)
-    const hours = Math.floor((seconds % 86400) / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const remainingSeconds = Math.floor(seconds % 60)
-
-    const parts = []
-
-    if (days > 0) parts.push(`${days}d`)
-    if (hours > 0) parts.push(`${hours}h`)
-    if (minutes > 0) parts.push(`${minutes}m`)
-    if (remainingSeconds > 0 || parts.length === 0) parts.push(`${remainingSeconds}s`)
-
-    return parts.join(" ")
-  } catch (error) {
-    console.error("Error formatting duration:", error)
-    return "0s"
-  }
-}
-
-/**
- * Get rank name based on rank number
- */
-export function getRankName(rank: number | undefined | null): string {
-  if (rank === undefined || rank === null) return "Unknown"
-
-  const ranks = [
+export function getRankName(rank: number): string {
+  const rankNames = [
     "Novice",
     "Apprentice",
     "Adept",
@@ -180,28 +42,109 @@ export function getRankName(rank: number | undefined | null): string {
     "Divine",
     "Immortal",
   ]
-
-  return ranks[rank] || "Unknown"
+  return rankNames[Math.min(rank, rankNames.length - 1)]
 }
 
 /**
- * Get rank color based on rank number
+ * Gets the color class for a rank
+ * @param rank The rank level (0-9)
+ * @returns Tailwind color class
  */
-export function getRankColor(rank: number | undefined | null): string {
-  if (rank === undefined || rank === null) return "text-gray-400"
-
-  const colors = [
-    "text-gray-400",
-    "text-blue-400",
-    "text-green-400",
-    "text-yellow-400",
-    "text-orange-400",
-    "text-red-400",
-    "text-pink-400",
-    "text-purple-400",
-    "text-indigo-400",
-    "text-violet-500",
+export function getRankColor(rank: number): string {
+  const rankColors = [
+    "text-gray-400", // Novice
+    "text-blue-400", // Apprentice
+    "text-green-400", // Adept
+    "text-yellow-400", // Expert
+    "text-orange-400", // Master
+    "text-red-400", // Grandmaster
+    "text-purple-400", // Legend
+    "text-pink-400", // Mythic
+    "text-indigo-400", // Divine
+    "text-gradient", // Immortal
   ]
+  return rankColors[Math.min(rank, rankColors.length - 1)]
+}
 
-  return colors[rank] || "text-gray-400"
+/**
+ * Formats a wallet address for display
+ * @param address The wallet address
+ * @returns Shortened address
+ */
+export function formatAddress(address: string): string {
+  if (!address || address.length < 10) return address
+  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+}
+
+/**
+ * Formats a date for display
+ * @param date The date to format
+ * @returns Formatted date string
+ */
+export function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
+}
+
+/**
+ * Formats a percentage for display
+ * @param value The percentage value
+ * @returns Formatted percentage string
+ */
+export function formatPercent(value: number): string {
+  return `${value.toFixed(2)}%`
+}
+
+/**
+ * Formats a number for display
+ * @param value The number value
+ * @returns Formatted number string
+ */
+export function formatNumber(value: number): string {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+/**
+ * Delays execution for a specified time
+ * @param ms Milliseconds to delay
+ * @returns Promise that resolves after the delay
+ */
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
+ * Checks if a value is a valid number
+ * @param value The value to check
+ * @returns True if the value is a valid number
+ */
+export function isValidNumber(value: unknown): boolean {
+  if (typeof value === "number") return !isNaN(value)
+  if (typeof value === "string") return !isNaN(Number(value))
+  return false
+}
+
+/**
+ * Generates a random ID
+ * @returns Random ID string
+ */
+export function generateId(): string {
+  return Math.random().toString(36).substring(2, 10)
+}
+
+/**
+ * Truncates text to a specified length
+ * @param text The text to truncate
+ * @param length Maximum length
+ * @returns Truncated text
+ */
+export function truncateText(text: string, length: number): string {
+  if (text.length <= length) return text
+  return `${text.substring(0, length)}...`
 }
