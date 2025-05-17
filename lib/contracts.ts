@@ -1,92 +1,33 @@
 /**
  * @file contracts.ts
- * @description Smart contract configuration for the 5PT Investment Platform
- *
- * This file contains contract addresses, ABIs, and constants for interacting
- * with the 5PT Investment Platform smart contracts. It provides type-safe
- * definitions for contract interactions and configuration data.
- *
- * @dependencies
- * - wagmi: Used for typed contract ABIs
- *
- * @related
- * - hooks/useContract.ts: Uses these definitions for contract interactions
- * - components/web3/InvestmentForm.tsx: Uses contract constants
+ * @description Contract addresses and constants
  */
 
-import type { ContractAddresses, ContractConstants, PoolConfig, PoolCriteria, Tokenomics } from "@/types/contracts"
+// Chain IDs
+export const BSC_MAINNET_ID = 56
+export const BSC_TESTNET_ID = 97
 
-/**
- * Contract addresses for different networks
- *
- * IMPORTANT: Always use chain IDs as keys (56 for BSC Mainnet, 97 for BSC Testnet)
- * NEVER use named properties like "mainnet" or "testnet"
- */
-export const CONTRACT_ADDRESSES: ContractAddresses = {
-  // BSC Testnet addresses
-  97: {
-    token: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-    investmentManager: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+// Contract addresses by chain ID
+export const CONTRACT_ADDRESSES = {
+  [BSC_MAINNET_ID]: {
+    token: "0x8FafdFB035C9426a50D842873D5d401C933bE09F",
+    investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc",
   },
-  // BSC Mainnet addresses
-  56: {
+  [BSC_TESTNET_ID]: {
     token: "0x8FafdFB035C9426a50D842873D5d401C933bE09F",
     investmentManager: "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc",
   },
 }
 
-/**
- * ERC20 Token ABI
- *
- * Contains the standard ERC20 functions and events needed for token interactions
- */
-export const TOKEN_ABI = [
-  // ERC20 standard functions
-  "function name() view returns (string)",
-  "function symbol() view returns (string)",
-  "function decimals() view returns (uint8)",
-  "function totalSupply() view returns (uint256)",
-  "function balanceOf(address) view returns (uint256)",
-  "function transfer(address to, uint amount) returns (bool)",
-  "function allowance(address owner, address spender) view returns (uint256)",
-  "function approve(address spender, uint amount) returns (bool)",
-  "function transferFrom(address sender, address recipient, uint amount) returns (bool)",
-  // Events
-  "event Transfer(address indexed from, address indexed to, uint amount)",
-  "event Approval(address indexed owner, address indexed spender, uint amount)",
-] as const
-
-/**
- * Investment Manager ABI
- *
- * Contains the functions and events for interacting with the 5PT Investment Manager contract
- */
-export const INVESTMENT_MANAGER_ABI = [
-  // View functions
-  "function getInvestorData(address investor) view returns (uint256 totalDeposited, uint256 totalReinvested, uint256 totalWithdrawn, uint256 lastActionTimestamp)",
-  "function getPoolData(uint256 poolId) view returns (string name, uint256 minDeposit, uint256 maxDeposit, uint256 dailyRewardRate, uint256 totalDeposited)",
-  "function getAvailableRewards(address investor) view returns (uint256)",
-  "function getReferralData(address referrer) view returns (address[] referrals, uint256 totalCommission)",
-  "function getUserRank(address user) view returns (uint256)",
-  "function isQualifiedForPool(address user, uint256 poolId) view returns (bool)",
-  // Transaction functions
-  "function deposit(uint256 poolId, uint256 amount, address referrer) returns (bool)",
-  "function withdraw() returns (uint256)",
-  "function reinvest() returns (bool)",
-  "function claimReferralCommission() returns (uint256)",
-  // Events
-  "event Deposit(address indexed user, uint256 indexed poolId, uint256 amount, address indexed referrer)",
-  "event Withdrawal(address indexed user, uint256 amount)",
-  "event ReferralCommission(address indexed referrer, address indexed referee, uint256 amount)",
-  "event RankUpdated(address indexed user, uint256 newRank)",
-] as const
+// Token and Investment Manager addresses
+export const TOKEN_ADDRESS = "0x8FafdFB035C9426a50D842873D5d401C933bE09F"
+export const INVESTMENT_MANAGER_ADDRESS = "0x7CcFFB3Dc39b50f4EEB8aA2D9aCF667d6ef8D0bc"
 
 /**
  * System constants for the 5PT Investment Platform
- *
  * These constants are used for calculations and validations
  */
-export const CONTRACT_CONSTANTS: ContractConstants = {
+export const CONTRACT_CONSTANTS = {
   BASIS_POINTS: 1000000,
   ROUND_DURATION: 86400, // 24 hours in seconds
   DEPOSIT_DELAY: 14400, // 4 hours in seconds
@@ -98,123 +39,78 @@ export const CONTRACT_CONSTANTS: ContractConstants = {
   TOTAL_SUPPLY: 100_000_000_000 * 10 ** 18, // 100B tokens
 }
 
-/**
- * Pool configuration data
- *
- * Contains information about each investment pool
- */
-export const POOLS: PoolConfig[] = [
+// Pool qualification criteria
+export const POOL_CRITERIA = [
   {
     id: 0,
-    name: "Starter Pool",
-    minDeposit: 100,
-    maxDeposit: 1000,
-    dailyRewardRate: 0.3, // 0.3% daily
-    rankRequirement: 0, // Novice rank
-  },
-  {
-    id: 1,
-    name: "Growth Pool",
-    minDeposit: 500,
-    maxDeposit: 5000,
-    dailyRewardRate: 0.5, // 0.5% daily
-    rankRequirement: 2, // Adept rank
-  },
-  {
-    id: 2,
-    name: "Advanced Pool",
-    minDeposit: 1000,
-    maxDeposit: 10000,
-    dailyRewardRate: 0.7, // 0.7% daily
-    rankRequirement: 4, // Master rank
-  },
-  {
-    id: 3,
-    name: "Elite Pool",
-    minDeposit: 5000,
-    maxDeposit: 50000,
-    dailyRewardRate: 1.0, // 1.0% daily
-    rankRequirement: 6, // Legend rank
-  },
-]
-
-/**
- * Pool qualification criteria from documentation
- *
- * Contains the requirements for qualifying for each pool
- */
-export const POOL_CRITERIA: PoolCriteria[] = [
-  {
-    id: 0,
-    personalInvestment: 550 * 10 ** 18, // ~$1,000
-    directInvestment: 550 * 10 ** 18, // ~$1,000
-    directRefs: 1,
-    share: 175, // 0.0175% daily
-  },
-  {
-    id: 1,
-    personalInvestment: 145 * 10 ** 19, // ~$2,500
-    directInvestment: 145 * 10 ** 19, // ~$2,500
-    directRefs: 3,
-    share: 175, // 0.0175% daily
-  },
-  {
-    id: 2,
-    personalInvestment: 3 * 10 ** 21, // ~$5,000
-    directInvestment: 6 * 10 ** 21, // ~$10,000
+    personalInvestment: "1000000000000000000000", // 1,000 5PT
     directRefs: 5,
-    share: 175, // 0.0175% daily
+    directInvestment: "5000000000000000000000", // 5,000 5PT
+    share: 175, // 0.0175%
+  },
+  {
+    id: 1,
+    personalInvestment: "2500000000000000000000", // 2,500 5PT
+    directRefs: 10,
+    directInvestment: "15000000000000000000000", // 15,000 5PT
+    share: 175, // 0.0175%
+  },
+  {
+    id: 2,
+    personalInvestment: "5000000000000000000000", // 5,000 5PT
+    directRefs: 15,
+    directInvestment: "30000000000000000000000", // 30,000 5PT
+    share: 175, // 0.0175%
   },
   {
     id: 3,
-    personalInvestment: 55 * 10 ** 20, // ~$10,000
-    directInvestment: 11 * 10 ** 21, // ~$20,000
-    directRefs: 10,
-    share: 175, // 0.0175% daily
+    personalInvestment: "10000000000000000000000", // 10,000 5PT
+    directRefs: 20,
+    directInvestment: "50000000000000000000000", // 50,000 5PT
+    share: 175, // 0.0175%
   },
   {
     id: 4,
-    personalInvestment: 1425 * 10 ** 19, // ~$25,000
-    directInvestment: 285 * 10 ** 20, // ~$50,000
-    directRefs: 15,
-    share: 175, // 0.0175% daily
+    personalInvestment: "25000000000000000000000", // 25,000 5PT
+    directRefs: 25,
+    directInvestment: "100000000000000000000000", // 100,000 5PT
+    share: 175, // 0.0175%
   },
   {
     id: 5,
-    personalInvestment: 285 * 10 ** 20, // ~$50,000
-    directInvestment: 855 * 10 ** 20, // ~$150,000
-    directRefs: 20,
-    share: 100, // 0.01% daily
+    personalInvestment: "50000000000000000000000", // 50,000 5PT
+    directRefs: 30,
+    directInvestment: "250000000000000000000000", // 250,000 5PT
+    share: 100, // 0.01%
   },
   {
     id: 6,
-    personalInvestment: 57 * 10 ** 21, // ~$100,000
-    directInvestment: 171 * 10 ** 21, // ~$300,000
-    directRefs: 20,
-    share: 100, // 0.01% daily
+    personalInvestment: "100000000000000000000000", // 100,000 5PT
+    directRefs: 35,
+    directInvestment: "500000000000000000000000", // 500,000 5PT
+    share: 100, // 0.01%
   },
   {
     id: 7,
-    personalInvestment: "Whitelist", // Whitelist only
-    directInvestment: "N/A",
-    directRefs: "N/A",
-    share: 200, // 0.02% daily
+    personalInvestment: "250000000000000000000000", // 250,000 5PT
+    directRefs: 40,
+    directInvestment: "1000000000000000000000000", // 1,000,000 5PT
+    share: 200, // 0.02%
   },
   {
     id: 8,
-    personalInvestment: "Whitelist", // Whitelist only
-    directInvestment: "N/A",
-    directRefs: "N/A",
-    share: 200, // 0.02% daily
+    personalInvestment: "500000000000000000000000", // 500,000 5PT
+    directRefs: 50,
+    directInvestment: "2500000000000000000000000", // 2,500,000 5PT
+    share: 200, // 0.02%
   },
 ]
 
 /**
  * Tokenomics data for the 5PT token
- *
  * Contains information about token distribution and allocation
  */
-export const TOKENOMICS: Tokenomics = {
+export const TOKENOMICS = {
   totalSupply: 100_000_000_000, // 100B tokens
   distribution: [
     {
@@ -261,3 +157,54 @@ export const TOKENOMICS: Tokenomics = {
     },
   ],
 }
+
+// Get contract address by chain ID and contract name
+export function getContractAddress(chainId: number, contractName: string): string {
+  if (!CONTRACT_ADDRESSES[chainId] || !CONTRACT_ADDRESSES[chainId][contractName]) {
+    throw new Error(`Contract address not found for ${contractName} on chain ${chainId}`)
+  }
+  return CONTRACT_ADDRESSES[chainId][contractName]
+}
+
+/**
+ * @file abis.ts
+ * @description Contract ABIs for the 5PT Investment Platform
+ */
+
+// ERC20 Token ABI
+export const TOKEN_ABI = [
+  // ERC20 standard functions
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function transfer(address to, uint amount) returns (bool)",
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function approve(address spender, uint amount) returns (bool)",
+  "function transferFrom(address sender, address recipient, uint amount) returns (bool)",
+  // Events
+  "event Transfer(address indexed from, address indexed to, uint amount)",
+  "event Approval(address indexed owner, address indexed spender, uint amount)",
+] as const
+
+// Investment Manager ABI
+export const INVESTMENT_MANAGER_ABI = [
+  // View functions
+  "function getInvestorData(address investor) view returns (uint256 totalDeposited, uint256 totalReinvested, uint256 totalWithdrawn, uint256 lastActionTimestamp)",
+  "function getPoolData(uint256 poolId) view returns (string name, uint256 minDeposit, uint256 maxDeposit, uint256 dailyRewardRate, uint256 totalDeposited)",
+  "function getAvailableRewards(address investor) view returns (uint256)",
+  "function getReferralData(address referrer) view returns (address[] referrals, uint256 totalCommission)",
+  "function getUserRank(address user) view returns (uint256)",
+  "function isQualifiedForPool(address user, uint256 poolId) view returns (bool)",
+  // Transaction functions
+  "function deposit(uint256 poolId, uint256 amount, address referrer) returns (bool)",
+  "function withdraw() returns (uint256)",
+  "function reinvest() returns (bool)",
+  "function claimReferralCommission() returns (uint256)",
+  // Events
+  "event Deposit(address indexed user, uint256 indexed poolId, uint256 amount, address indexed referrer)",
+  "event Withdrawal(address indexed user, uint256 amount)",
+  "event ReferralCommission(address indexed referrer, address indexed referee, uint256 amount)",
+  "event RankUpdated(address indexed user, uint256 newRank)",
+] as const

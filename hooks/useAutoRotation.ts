@@ -10,6 +10,11 @@ interface UseAutoRotationProps {
   manualSelectionTimeout?: number
 }
 
+/**
+ * Custom hook for auto-rotating through items
+ *
+ * @returns Functions that should only be called from event handlers or useEffect hooks
+ */
 export function useAutoRotation({
   itemCount,
   initialIndex = 0,
@@ -42,7 +47,7 @@ export function useAutoRotation({
     return () => clearInterval(rotationInterval)
   }, [itemCount, interval, isManualSelection, pauseOnManualSelection])
 
-  // Handle manual selection
+  // Handle manual selection - wrapped in useCallback to prevent unnecessary re-renders
   const selectItem = useCallback((index: number) => {
     setActiveIndex(index)
     setIsManualSelection(true)
@@ -50,7 +55,7 @@ export function useAutoRotation({
 
   return {
     activeIndex,
-    selectItem,
+    selectItem, // Only call from event handlers or useEffect
     isManualSelection,
   }
 }

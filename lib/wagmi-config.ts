@@ -10,9 +10,6 @@
  * @dependencies
  * - wagmi: Core Web3 library
  * - viem: Ethereum RPC client
- *
- * @related
- * - components/providers/Providers.tsx: Uses this configuration
  */
 
 import { http, createConfig } from "wagmi"
@@ -51,7 +48,7 @@ function detectNetwork(): number {
 const chainId = detectNetwork()
 
 // Create wagmi config
-export const config = createConfig({
+export const wagmiConfig = createConfig({
   chains: [chainId === BSC_MAINNET_ID ? bsc : bscTestnet],
   transports: {
     [BSC_MAINNET_ID]: http("https://bsc-dataseed.binance.org"),

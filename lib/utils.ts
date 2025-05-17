@@ -1,27 +1,134 @@
-/**
- * Utility functions for the 5PT Investment Dashboard
- */
-
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 /**
- * Combines class names with Tailwind CSS
+ * Combines multiple class names into a single string
+ * @param inputs - Class names to combine
+ * @returns Combined class names
  */
-export function cn(...inputs: ClassValue[]): string {
+export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Formats a crypto value with the token symbol
- * @param value The value to format
- * @param symbol The token symbol
+ * Formats a cryptocurrency value (handles both number and BigInt)
+ * @param value - Number or BigInt to format
+ * @param symbol - Optional symbol to append (default: "5PT")
+ * @param decimals - Optional decimal places for the token (default: 18)
  * @returns Formatted string
  */
-export function formatCrypto(value: number, symbol = "5PT"): string {
-  // Format with 6 decimal places for small values, 2 for larger values
-  const formatted = value < 0.01 ? value.toFixed(6) : value.toFixed(2)
-  return `${formatted} ${symbol}`
+export function formatCrypto(value: number | bigint | string, symbol = "5PT", decimals = 18): string {
+  // Handle undefined or null
+  if (value === undefined || value === null) return `0 ${symbol}`
+
+  // Convert to string first to safely handle BigInt
+  const valueStr = value.toString()
+
+  // Check if it's a valid number string
+  if (!/^-?\d+(\.\d+)?$/.test(valueStr) && !/^-?\d+n$/.test(valueStr)) {
+    return `0 ${symbol}`
+  }
+
+  try {
+    let numValue: number
+
+    // Handle BigInt values (which need to be divided by 10^decimals)
+    if (typeof value === "bigint") {
+      // Convert to a decimal string with proper precision
+      // For example, 1000000000000000000n (1 ETH in wei) becomes "1.0"
+      const divisor = BigInt(10) ** BigInt(decimals)
+      const integerPart = value / divisor
+      const fractionalPart = value % divisor
+
+      // Format the fractional part to have leading zeros
+      const fractionalStr = fractionalPart.toString().padStart(decimals, "0")
+
+      // Combine integer and fractional parts
+      const combinedStr = `${integerPart}.${fractionalStr}`
+
+      // Parse as float with limited precision to avoid floating point issues
+      numValue = Number.parseFloat(Number.parseFloat(combinedStr).toFixed(6))
+    }
+    // Handle string values that might be large numbers
+    else if (typeof value === "string") {
+      // Check if it's a numeric string
+      if (/^\d+$/.test(value) && value.length > 15) {
+        // Treat as a big integer string (likely wei or similar)
+        const bigValue = BigInt(value)
+        const divisor = BigInt(10) ** BigInt(decimals)
+        const integerPart = bigValue / divisor
+        const fractionalPart = bigValue % divisor
+
+        // Format the fractional part
+        const fractionalStr = fractionalPart.toString().padStart(decimals, "0")
+        const combinedStr = `${integerPart}.${fractionalStr}`
+
+        numValue = Number.parseFloat(Number.parseFloat(combinedStr).toFixed(6))
+      } else {
+        // Regular number string
+        numValue = Number.parseFloat(value)
+      }
+    }
+    // Handle regular numbers
+    else {
+      numValue = value as number
+    }
+
+    // Check if conversion resulted in a valid number
+    if (isNaN(numValue)) return `0 ${symbol}`
+
+    // Format with appropriate decimal places
+    const formatted =
+      numValue >= 1
+        ? numValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : numValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })
+
+    return `${formatted} ${symbol}`
+  } catch (error) {
+    console.error("Error formatting crypto value:", error)
+    return `0 ${symbol}`
+  }
+}
+
+/**
+ * Formats a number as a percentage
+ * @param value - Number to format (0.01 = 1%)
+ * @returns Formatted percentage string
+ */
+export function formatPercent(value: number): string {
+  return `${(value * 100).toFixed(2)}%`
+}
+
+/**
+ * Formats/truncates an Ethereum address for display
+ * @param address - Ethereum address to format
+ * @returns Formatted address (e.g., "0x1234...5678")
+ */
+export function formatAddress(address: string): string {
+  if (!address) return ""
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
+}
+
+/**
+ * Alias for formatAddress for backward compatibility
+ */
+export function truncateAddress(address: string): string {
+  return formatAddress(address)
+}
+
+/**
+ * Formats a date as a relative time string
+ * @param date - Date to format
+ * @returns Relative time string (e.g., "2 hours ago")
+ */
+export function formatRelativeTime(date: Date): string {
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+  if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`
+  return `${Math.floor(diffInSeconds / 86400)} days ago`
 }
 
 /**
@@ -64,38 +171,6 @@ export function getRankColor(rank: number): string {
     "text-gradient", // Immortal
   ]
   return rankColors[Math.min(rank, rankColors.length - 1)]
-}
-
-/**
- * Formats a wallet address for display
- * @param address The wallet address
- * @returns Shortened address
- */
-export function formatAddress(address: string): string {
-  if (!address || address.length < 10) return address
-  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-}
-
-/**
- * Formats a date for display
- * @param date The date to format
- * @returns Formatted date string
- */
-export function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })
-}
-
-/**
- * Formats a percentage for display
- * @param value The percentage value
- * @returns Formatted percentage string
- */
-export function formatPercent(value: number): string {
-  return `${value.toFixed(2)}%`
 }
 
 /**

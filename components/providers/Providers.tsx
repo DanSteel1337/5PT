@@ -1,6 +1,12 @@
 /**
- * @file Providers.tsx
+ * @file components/providers/Providers.tsx
  * @description Root providers component for the application
+ *
+ * IMPORTANT ARCHITECTURE NOTE:
+ * - This component is REQUIRED and should NOT be deleted
+ * - It is used ONLY ONCE in app/layout.tsx
+ * - It provides all necessary providers for the application
+ * - It follows the required provider nesting order
  *
  * This component wraps the application with all necessary providers:
  * - ThemeProvider: For theme context
@@ -25,10 +31,10 @@ import { type ReactNode, useState, useEffect } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider } from "wagmi"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
-import { config } from "@/lib/wagmi-config"
+import { wagmiConfig } from "@/lib/wagmi-config"
 import { getDefaultWallets } from "@rainbow-me/rainbowkit"
 import { bsc, bscTestnet } from "wagmi/chains"
-import { rainbowkitTheme } from "@/lib/rainbowkit-theme"
+import { theme } from "@/lib/rainbowkit-theme"
 
 interface ProvidersProps {
   children: ReactNode
@@ -40,9 +46,6 @@ const { connectors } = getDefaultWallets({
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
   chains: [bsc, bscTestnet],
 })
-
-// Create a client for TanStack Query
-const queryClient = new QueryClient()
 
 /**
  * Providers Component
@@ -56,24 +59,12 @@ const queryClient = new QueryClient()
  * 2. WagmiProvider
  * 3. QueryClientProvider
  * 4. RainbowKitProvider
- *
- * @example
- * ```tsx
- * // In app/layout.tsx
- * export default function RootLayout({ children }) {
- *   return (
- *     <html lang="en">
- *       <body>
- *         <Providers>{children}</Providers>
- *       </body>
- *     </html>
- *   )
- * }
- * ```
  */
-export function Providers({ children }: ProvidersProps) {
+function Providers({ children }: ProvidersProps) {
   // CRITICAL: Mounting check to prevent hydration errors
   const [mounted, setMounted] = useState(false)
+  // Create a client for TanStack Query
+  const [queryClient] = useState(() => new QueryClient())
 
   useEffect(() => {
     setMounted(true)
@@ -81,9 +72,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-      <WagmiProvider config={config}>
+      <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider theme={rainbowkitTheme} chains={[bsc, bscTestnet]}>
+          <RainbowKitProvider theme={theme} chains={[bsc, bscTestnet]}>
             {mounted ? children : null}
           </RainbowKitProvider>
         </QueryClientProvider>
@@ -92,4 +83,6 @@ export function Providers({ children }: ProvidersProps) {
   )
 }
 
+// Export both named and default exports to support both import styles
+export { Providers }
 export default Providers

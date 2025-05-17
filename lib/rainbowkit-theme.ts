@@ -20,7 +20,7 @@ import { type Theme, darkTheme } from "@rainbow-me/rainbowkit"
  * Extends the default dark theme with custom colors to match
  * the application's design system.
  */
-export const rainbowkitTheme: Theme = {
+export const theme: Theme = {
   ...darkTheme(),
   colors: {
     ...darkTheme().colors,

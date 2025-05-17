@@ -1,20 +1,33 @@
 /**
  * @file ConnectButton.tsx
- * @description A customized RainbowKit connect button for wallet connection
+ * @description Custom wallet connection button using RainbowKit
  *
- * This component provides a styled wallet connection button that integrates
- * with RainbowKit and wagmi. It handles different connection states and
- * provides a consistent UI across the application with proper error handling
- * and loading states.
+ * ⚠️ IMPORTANT ARCHITECTURE NOTES ⚠️
+ *
+ * 1. NETWORK DISPLAY:
+ *    - This component has been MODIFIED to NOT display network information
+ *    - The NetworkSwitcher component is responsible for displaying network info
+ *    - DO NOT add network display back to this component to avoid duplication
+ *
+ * 2. COMPONENT RELATIONSHIPS:
+ *    - Used alongside NetworkSwitcher in the DashboardHeader
+ *    - NetworkSwitcher handles network display/switching
+ *    - This component handles ONLY wallet connection and account display
+ *
+ * 3. RAINBOWKIT CUSTOMIZATION:
+ *    - RainbowKit's default ConnectButton shows both network and account
+ *    - We've customized it to show ONLY the account to avoid duplication
+ *    - The chain button has been intentionally removed
+ *
+ * 4. USAGE GUIDELINES:
+ *    - Always use alongside NetworkSwitcher
+ *    - Never modify to display network information
+ *    - Do not create alternative wallet connection components
  *
  * @dependencies
- * - @rainbow-me/rainbowkit: Provides the ConnectButton component
+ * - @rainbow-me/rainbowkit: Provides ConnectButton.Custom component
  * - wagmi: Provides wallet connection hooks
  * - components/ui/CyberButton: Used for styling the button
- *
- * @related
- * - components/providers/Providers.tsx: Provides the Web3 context
- * - lib/wagmi-config.ts: Provides network detection utilities
  */
 
 "use client"
@@ -28,13 +41,8 @@ import { CyberButton } from "@/components/ui/CyberButton"
  * CustomConnectButton Component
  *
  * A styled wallet connection button that integrates with RainbowKit.
- *
- * ⚠️ IMPORTANT: RainbowKit Integration Guidelines ⚠️
- *
- * 1. DO NOT import RainbowKit styles here
- * 2. ALWAYS use mounting checks to prevent hydration errors
- * 3. ALWAYS wrap the button in a relative positioned div with z-index
- *    to ensure proper modal positioning
+ * Modified to NOT display network information to avoid duplication
+ * with the NetworkSwitcher component.
  */
 export function CustomConnectButton() {
   // CRITICAL: Mounting check to prevent hydration errors
@@ -133,10 +141,11 @@ export function CustomConnectButton() {
 
                   return (
                     <div className="flex items-center gap-2">
-                      <CyberButton variant="outline" size="sm" onClick={openChainModal} className="text-purple-400">
-                        {chain.name}
-                      </CyberButton>
-
+                      {/* 
+                        IMPORTANT: Chain button intentionally removed
+                        The NetworkSwitcher component already displays the current network
+                        Adding it back here would cause duplication in the UI
+                      */}
                       <CyberButton variant="outline" size="sm" onClick={openAccountModal} className="text-purple-400">
                         {account.displayName}
                       </CyberButton>

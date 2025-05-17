@@ -9,6 +9,10 @@ import { SectionContainer } from "@/components/ui/section-container"
 import { ContentCard } from "@/components/ui/content-card"
 import { PieChart, Layers, Coins, Shield } from "lucide-react"
 
+/**
+ * Tokenomics section component
+ * Displays token distribution, details, and economics
+ */
 export function Tokenomics() {
   const [mounted, setMounted] = useState(false)
   const containerRef = useRef(null)
@@ -277,5 +281,8 @@ function TokenomicsCard({ icon, title, value, subtitle }) {
     </motion.div>
   )
 }
+
+// For backward compatibility
+export const TokenomicsSection = Tokenomics
 
 export default Tokenomics
