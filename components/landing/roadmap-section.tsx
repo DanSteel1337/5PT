@@ -1,67 +1,148 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { SectionContainer } from "@/components/ui/section-container"
 import { cn } from "@/lib/utils"
+import { useMounted } from "@/hooks/use-mounted"
+import React from "react"
 
-// Reorganized roadmap data - removed duplicate entry and renumbered
-const roadmapItems = [
-  {
-    number: "01",
-    title: "Start Five Pillars Presale Phase",
-    date: "May 25, 2025",
-  },
-  {
-    number: "02",
-    title: "Official Launch of Five Pillars Token Sale",
-    date: "June 1, 2025",
-  },
-  {
-    number: "03",
-    title: "1st Rollout of Five Pillars Crypto Debit Cards",
-    date: "June 10, 2025",
-  },
-  {
-    number: "04",
-    title: "Launch of Five Pillars Smart Lottery",
-    date: "July 15, 2025",
-  },
-  {
-    number: "05",
-    title: "End of Token Sale",
-    date: "October 1, 2025",
-  },
-  {
-    number: "06",
-    title: "Exchange Listing of Five Pillars Token",
-    date: "October 15, 2025",
-  },
-]
+// Create a memoized RoadmapItem component
+// Add this component before the RoadmapSection component:
+const RoadmapItem = React.memo(function RoadmapItem({ item, index, activeIndex, onMouseEnter, onMouseLeave }) {
+  const isEven = index % 2 === 0
 
-// Pre-generate random values for particles to avoid updates during render
-const particles = Array.from({ length: 15 }).map(() => ({
-  top: `${Math.random() * 100}%`,
-  left: `${Math.random() * 100}%`,
-  delay: `${Math.random() * 5}s`,
-  duration: `${5 + Math.random() * 10}s`,
-}))
+  const timelineNodeClasses = cn(
+    "absolute top-0 w-6 h-6 rounded-full bg-black border-2 border-purple-500 z-20 transform -translate-y-1/2",
+    "transition-all duration-300 ease-out",
+    activeIndex === index ? "scale-150 border-blue-400 shadow-[0_0_15px_rgba(139,92,246,0.8)]" : "",
+    isEven
+      ? "md:right-0 md:translate-x-1/2 left-[30px] -translate-x-1/2"
+      : "md:left-0 md:-translate-x-1/2 left-[30px] -translate-x-1/2",
+  )
+
+  const cardClasses = cn(
+    "bg-black/40 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 md:p-8 relative overflow-hidden transition-all duration-300",
+    "hover:bg-black/60 group-hover:border-purple-400/40",
+    isEven ? "md:mr-10 ml-16 md:ml-0" : "md:ml-10 ml-16 md:mr-0",
+  )
+
+  return (
+    <motion.div
+      className={cn(
+        "relative mb-16 md:mb-24 group",
+        isEven ? "md:pr-[50%] text-left" : "md:pl-[50%] md:text-right text-left",
+      )}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      style={{ willChange: "transform, opacity" }}
+    >
+      {/* Timeline node */}
+      <div
+        className={timelineNodeClasses}
+        role="button"
+        tabIndex={0}
+        aria-label={`Timeline milestone ${index + 1}: ${item.title}`}
+        onMouseEnter={() => onMouseEnter(index)}
+        onMouseLeave={onMouseLeave}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            onMouseEnter(index)
+          }
+        }}
+      >
+        <div className="absolute inset-1 bg-purple-900 rounded-full"></div>
+      </div>
+
+      {/* Content card */}
+      <div className={cardClasses}>
+        {/* Animated corner */}
+        <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
+          <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-purple-500/30 to-transparent transform rotate-45 translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+
+        {/* Number */}
+        <div className="flex items-center mb-3">
+          <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 mr-3">
+            {item.number}
+          </span>
+          <div className="h-px flex-grow bg-gradient-to-r from-purple-500/50 to-transparent"></div>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl md:text-2xl font-bold mb-2 text-white">{item.title}</h3>
+
+        {/* Date */}
+        <div className="inline-block px-4 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-sm font-medium text-purple-300">
+          {item.date}
+        </div>
+
+        {/* Hover effect */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+      </div>
+    </motion.div>
+  )
+})
 
 export function RoadmapSection() {
-  const [mounted, setMounted] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const mounted = useMounted()
 
-  // Use refs to store event handlers
-  const handleMouseEnter = useRef((index: number) => {
+  const roadmapItems = React.useMemo(
+    () => [
+      {
+        number: "01",
+        title: "Start Five Pillars Presale Phase",
+        date: "May 25, 2025",
+      },
+      {
+        number: "02",
+        title: "Official Launch of Five Pillars Token Sale",
+        date: "June 1, 2025",
+      },
+      {
+        number: "03",
+        title: "1st Rollout of Five Pillars Crypto Debit Cards",
+        date: "June 10, 2025",
+      },
+      {
+        number: "04",
+        title: "Launch of Five Pillars Smart Lottery",
+        date: "July 15, 2025",
+      },
+      {
+        number: "05",
+        title: "End of Token Sale",
+        date: "October 1, 2025",
+      },
+      {
+        number: "06",
+        title: "Exchange Listing of Five Pillars Token",
+        date: "October 15, 2025",
+      },
+    ],
+    [],
+  )
+
+  const particles = React.useMemo(
+    () =>
+      Array.from({ length: 8 }).map(() => ({
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        delay: `${Math.random() * 5}s`,
+        duration: `${5 + Math.random() * 10}s`,
+      })),
+    [],
+  )
+
+  const handleMouseEnter = React.useCallback((index: number) => {
     setActiveIndex(index)
-  }).current
+  }, [])
 
-  const handleMouseLeave = useRef(() => {
+  const handleMouseLeave = React.useCallback(() => {
     setActiveIndex(null)
-  }).current
-
-  useEffect(() => {
-    setMounted(true)
   }, [])
 
   if (!mounted) return null
@@ -84,81 +165,16 @@ export function RoadmapSection() {
 
       {/* Roadmap items */}
       <div className="relative z-10 max-w-5xl mx-auto">
-        {roadmapItems.map((item, index) => {
-          // Pre-compute classes to avoid conditional logic during render
-          const timelineNodeClasses = cn(
-            "absolute top-0 w-6 h-6 rounded-full bg-black border-2 border-purple-500 z-20 transform -translate-y-1/2",
-            "transition-all duration-300 ease-out",
-            activeIndex === index ? "scale-150 border-blue-400 shadow-[0_0_15px_rgba(139,92,246,0.8)]" : "",
-            index % 2 === 0
-              ? "md:right-0 md:translate-x-1/2 left-[30px] -translate-x-1/2"
-              : "md:left-0 md:-translate-x-1/2 left-[30px] -translate-x-1/2",
-          )
-
-          const cardClasses = cn(
-            "bg-black/40 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 md:p-8 relative overflow-hidden transition-all duration-300",
-            "hover:bg-black/60 group-hover:border-purple-400/40",
-            index % 2 === 0 ? "md:mr-10 ml-16 md:ml-0" : "md:ml-10 ml-16 md:mr-0",
-          )
-
-          return (
-            <motion.div
-              key={index}
-              className={cn(
-                "relative mb-16 md:mb-24 group",
-                index % 2 === 0 ? "md:pr-[50%] text-left" : "md:pl-[50%] md:text-right text-left",
-              )}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              {/* Timeline node */}
-              <div
-                className={timelineNodeClasses}
-                role="button"
-                tabIndex={0}
-                aria-label={`Timeline milestone ${index + 1}: ${item.title}`}
-                onMouseEnter={() => handleMouseEnter(index)}
-                onMouseLeave={handleMouseLeave}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    handleMouseEnter(index)
-                  }
-                }}
-              >
-                <div className="absolute inset-1 bg-purple-900 rounded-full"></div>
-              </div>
-
-              {/* Content card */}
-              <div className={cardClasses}>
-                {/* Animated corner */}
-                <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
-                  <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-purple-500/30 to-transparent transform rotate-45 translate-x-1/2 -translate-y-1/2"></div>
-                </div>
-
-                {/* Number */}
-                <div className="flex items-center mb-3">
-                  <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 mr-3">
-                    {item.number}
-                  </span>
-                  <div className="h-px flex-grow bg-gradient-to-r from-purple-500/50 to-transparent"></div>
-                </div>
-
-                {/* Title */}
-                <h3 className="text-xl md:text-2xl font-bold mb-2 text-white">{item.title}</h3>
-
-                {/* Date */}
-                <div className="inline-block px-4 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-sm font-medium text-purple-300">
-                  {item.date}
-                </div>
-
-                {/* Hover effect */}
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-              </div>
-            </motion.div>
-          )
-        })}
+        {roadmapItems.map((item, index) => (
+          <RoadmapItem
+            key={index}
+            item={item}
+            index={index}
+            activeIndex={activeIndex}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          />
+        ))}
       </div>
 
       {/* Animated particles - using pre-generated random values */}
@@ -171,6 +187,7 @@ export function RoadmapSection() {
             left: particle.left,
             animationDelay: particle.delay,
             animationDuration: particle.duration,
+            willChange: "transform",
           }}
           aria-hidden="true"
         />

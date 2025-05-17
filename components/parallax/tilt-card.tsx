@@ -14,8 +14,9 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import { useRef, useCallback } from "react"
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
+import { useMounted } from "@/hooks/use-mounted"
 
 /**
  * TiltCard Component Props
@@ -37,7 +38,7 @@ interface TiltCardProps {
  * The card rotates based on the mouse position relative to the card's center.
  *
  * @example
- * ```tsx
+ * \`\`\`tsx
  * // Basic usage
  * <TiltCard className="bg-blue-900/20 backdrop-blur-sm rounded-xl p-6 border border-blue-500/20">
  *   <h2 className="text-2xl font-bold text-white">Interactive Card</h2>
@@ -48,11 +49,11 @@ interface TiltCardProps {
  * <TiltCard intensity={10} className="bg-purple-900/20 backdrop-blur-sm rounded-xl p-6">
  *   <div className="text-white">Subtle tilt effect</div>
  * </TiltCard>
- * ```
+ * \`\`\`
  */
 export function TiltCard({ children, className = "", intensity = 15 }: TiltCardProps) {
   // Client-side mounting check for SSR compatibility
-  const [mounted, setMounted] = useState(false)
+  const mounted = useMounted()
   const ref = useRef<HTMLDivElement>(null)
 
   // Motion values for the card's rotation
@@ -73,35 +74,33 @@ export function TiltCard({ children, className = "", intensity = 15 }: TiltCardP
    * Handles mouse movement over the card
    * Updates the x and y motion values based on mouse position
    */
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!ref.current) return
 
-    const rect = ref.current.getBoundingClientRect()
-    const width = rect.width
-    const height = rect.height
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
+      const rect = ref.current.getBoundingClientRect()
+      const width = rect.width
+      const height = rect.height
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
 
-    // Calculate the position of the mouse relative to the card (0 to 1)
-    const xPct = mouseX / width - 0.5
-    const yPct = mouseY / height - 0.5
+      // Calculate the position of the mouse relative to the card (0 to 1)
+      const xPct = mouseX / width - 0.5
+      const yPct = mouseY / height - 0.5
 
-    x.set(xPct)
-    y.set(yPct)
-  }
+      x.set(xPct)
+      y.set(yPct)
+    },
+    [x, y],
+  )
 
   /**
    * Resets the card position when mouse leaves
    */
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     x.set(0)
     y.set(0)
-  }
-
-  // Set mounted state after component mounts
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  }, [x, y])
 
   // SSR-safe rendering
   if (!mounted) {
@@ -118,6 +117,7 @@ export function TiltCard({ children, className = "", intensity = 15 }: TiltCardP
         rotateX,
         rotateY,
         transformStyle: "preserve-3d",
+        willChange: "transform",
       }}
     >
       <div style={{ transform: "translateZ(0)" }}>{children}</div>

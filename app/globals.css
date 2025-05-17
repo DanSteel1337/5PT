@@ -299,39 +299,49 @@
 /* Custom classes */
 .animate-float {
   animation: float 6s ease-in-out infinite;
+  will-change: transform;
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
 }
 
 .animate-pulse-slow {
-  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
+}
+
+.animate-spin-slow {
+  animation: spin 15s linear infinite;
+  will-change: transform;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin 20s linear infinite reverse;
+  will-change: transform;
 }
 
 .animate-gradient {
   background-size: 200% 200%;
-  animation: gradient-shift 5s ease infinite;
+  animation: gradient 8s ease infinite;
+  will-change: background-position;
 }
 
-.animate-text-flicker {
-  animation: text-flicker 5s infinite;
-}
-
-.animate-neon-pulse {
-  animation: neon-pulse 3s infinite;
-}
-
-.animate-glitch {
-  animation: glitch 0.5s infinite;
-}
-
-.animate-rotate {
-  animation: rotate 20s linear infinite;
+.animate-gradient-x {
+  background-size: 200% 100%;
+  animation: gradient-x 8s ease infinite;
+  will-change: background-position;
 }
 
 .animate-particle-flow {
-  animation: particle-flow 3s ease-out infinite;
+  animation: particle-flow 3s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-shine {
+  animation: shine 1.5s ease-in-out;
+  will-change: transform;
 }
 
 /* UPDATED: Lighter glass card with better visibility */

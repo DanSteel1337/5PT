@@ -52,7 +52,7 @@ export function Navbar() {
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* FIX: Don't wrap Logo in Link if Logo already has href prop */}
+        {/* Logo */}
         <div className="z-10">
           <Logo size={36} className="py-1" href="/" />
         </div>
@@ -60,7 +60,7 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           <motion.div
-            className="flex gap-6"
+            className="flex gap-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -69,7 +69,6 @@ export function Navbar() {
             <NavLink href="/#features" label="Features" />
             <NavLink href="/#tokenomics" label="Tokenomics" />
             <NavLink href="/#roadmap" label="Roadmap" />
-            {/* Removed any links to early-investor section if they existed */}
           </motion.div>
 
           <motion.div
@@ -108,7 +107,6 @@ export function Navbar() {
               <MobileNavLink href="/#features" label="Features" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#tokenomics" label="Tokenomics" onClick={() => setIsMobileMenuOpen(false)} />
               <MobileNavLink href="/#roadmap" label="Roadmap" onClick={() => setIsMobileMenuOpen(false)} />
-              {/* Removed any links to early-investor section if they existed */}
               <div className="pt-2">
                 <CustomConnectButton />
               </div>
@@ -122,7 +120,7 @@ export function Navbar() {
 
 function NavLink({ href, label }) {
   return (
-    <Link href={href} className="relative text-white/80 hover:text-white transition-colors group">
+    <Link href={href} className="relative text-white/80 hover:text-white transition-colors group px-2 py-1 text-center">
       {label}
       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 group-hover:w-full transition-all duration-300"></span>
     </Link>
@@ -133,7 +131,7 @@ function MobileNavLink({ href, label, onClick }) {
   return (
     <Link
       href={href}
-      className="text-white/80 hover:text-white py-2 transition-colors border-b border-purple-900/20"
+      className="text-white/80 hover:text-white py-3 transition-colors border-b border-purple-900/20 text-center"
       onClick={onClick}
     >
       {label}

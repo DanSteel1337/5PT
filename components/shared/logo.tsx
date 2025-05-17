@@ -47,7 +47,20 @@ export function Logo({
       if (!ctx) return
 
       const particles: Particle[] = []
-      const particleCount = 20
+      const getOptimalParticleCount = (): number => {
+        // Base count
+        const baseCount = 8
+
+        // Check if device is high-end
+        const isHighEnd = typeof window !== "undefined" && window.navigator.hardwareConcurrency > 4
+
+        // Scale based on size
+        const sizeFactor = size > 50 ? 1.5 : 1
+
+        return Math.floor(baseCount * (isHighEnd ? sizeFactor : 0.5))
+      }
+      const particleCount = getOptimalParticleCount()
+      let animationId: number
 
       class ParticleImpl implements Particle {
         x: number
@@ -56,27 +69,35 @@ export function Logo({
         speedX: number
         speedY: number
         color: string
+        frameCount = 0
+        updateFrequency: number
 
         constructor() {
           this.x = Math.random() * canvas.width
           this.y = Math.random() * canvas.height
-          this.size = Math.random() * 3 + 1
-          this.speedX = (Math.random() - 0.5) * 1
-          this.speedY = (Math.random() - 0.5) * 1
+          this.size = Math.random() * 2 + 1 // Reduced size range
+          this.speedX = (Math.random() - 0.5) * 0.8 // Reduced speed
+          this.speedY = (Math.random() - 0.5) * 0.8 // Reduced speed
           this.color = `rgba(139, 92, 246, ${Math.random() * 0.5 + 0.3})`
+          // Optimize update frequency based on device capability
+          this.updateFrequency = window.navigator.hardwareConcurrency > 4 ? 1 : 2
         }
 
         update(): void {
-          this.x += this.speedX
-          this.y += this.speedY
+          // Only update position every 1 or 2 frames based on device capability
+          if (this.frameCount % this.updateFrequency === 0) {
+            this.x += this.speedX
+            this.y += this.speedY
 
-          if (this.x > canvas.width || this.x < 0) {
-            this.speedX = -this.speedX
-          }
+            if (this.x > canvas.width || this.x < 0) {
+              this.speedX = -this.speedX
+            }
 
-          if (this.y > canvas.height || this.y < 0) {
-            this.speedY = -this.speedY
+            if (this.y > canvas.height || this.y < 0) {
+              this.speedY = -this.speedY
+            }
           }
+          this.frameCount++
         }
 
         draw(): void {
@@ -102,13 +123,20 @@ export function Logo({
           particles[i].draw()
         }
 
-        requestAnimationFrame(animate)
+        animationId = requestAnimationFrame(animate)
       }
 
       init()
       animate()
+
+      // Cleanup function
+      return () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId)
+        }
+      }
     }
-  }, [mounted, animated, isInView])
+  }, [mounted, animated, isInView, size])
 
   if (!mounted) return null
 
@@ -127,6 +155,7 @@ export function Logo({
             width={size * 1.5}
             height={size * 1.5}
             className="absolute -left-[25%] -top-[25%] z-0 pointer-events-none"
+            style={{ willChange: "transform" }}
           />
         )}
         <div className="absolute inset-0 rounded-full bg-purple-500/10 animate-pulse"></div>

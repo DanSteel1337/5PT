@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { CyberButton } from "@/components/ui/cyber-button"
@@ -8,13 +8,17 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { ArrowRight, Info, Settings, Flame, Percent } from "lucide-react"
 import { ContentCard } from "@/components/ui/content-card"
+import { useMounted } from "@/hooks/use-mounted"
 
 /**
  * Investment calculator component for 5PT Finance
  * Allows users to simulate investment returns based on various parameters
  */
 export function InvestmentCalculator() {
-  const [mounted, setMounted] = useState(false)
+  // Use the mounting hook
+  const mounted = useMounted()
+
+  // State management
   const [investmentAmount, setInvestmentAmount] = useState(1000)
   const [referrals, setReferrals] = useState(5)
   const [referralVolume, setReferralVolume] = useState(5000)
@@ -29,105 +33,104 @@ export function InvestmentCalculator() {
   // Pool eligibility tracking
   const [eligiblePools, setEligiblePools] = useState([])
 
-  // Pool data based on latest 5PT Investment Contract
-  const pools = [
-    {
-      id: 1,
-      name: "Pool 1",
-      personalInvestRequired: 550,
-      totalDirectInvestRequired: 550,
-      directRefsRequired: 1,
-      share: 0.0175,
-      usdValuePersonal: 962.5,
-      usdValueDirect: 962.5,
-    },
-    {
-      id: 2,
-      name: "Pool 2",
-      personalInvestRequired: 1450,
-      totalDirectInvestRequired: 1450,
-      directRefsRequired: 3,
-      share: 0.0175,
-      usdValuePersonal: 2537.5,
-      usdValueDirect: 2537.5,
-    },
-    {
-      id: 3,
-      name: "Pool 3",
-      personalInvestRequired: 3000,
-      totalDirectInvestRequired: 6000,
-      directRefsRequired: 5,
-      share: 0.0175,
-      usdValuePersonal: 5250,
-      usdValueDirect: 10500,
-    },
-    {
-      id: 4,
-      name: "Pool 4",
-      personalInvestRequired: 5500,
-      totalDirectInvestRequired: 11000,
-      directRefsRequired: 10,
-      share: 0.0175,
-      usdValuePersonal: 9625,
-      usdValueDirect: 19250,
-    },
-    {
-      id: 5,
-      name: "Pool 5",
-      personalInvestRequired: 14250,
-      totalDirectInvestRequired: 28500,
-      directRefsRequired: 15,
-      share: 0.0175,
-      usdValuePersonal: 24937.5,
-      usdValueDirect: 49875,
-    },
-    {
-      id: 6,
-      name: "Pool 6",
-      personalInvestRequired: 28500,
-      totalDirectInvestRequired: 85500,
-      directRefsRequired: 20,
-      share: 0.01,
-      usdValuePersonal: 49875,
-      usdValueDirect: 149625,
-    },
-    {
-      id: 7,
-      name: "Pool 7",
-      personalInvestRequired: 57000,
-      totalDirectInvestRequired: 171000,
-      directRefsRequired: 20,
-      share: 0.01,
-      usdValuePersonal: 99750,
-      usdValueDirect: 299250,
-    },
-    {
-      id: 8,
-      name: "Pool 8",
-      personalInvestRequired: 100000, // Whitelist only, using high value as placeholder
-      totalDirectInvestRequired: 0,
-      directRefsRequired: 0,
-      share: 0.02,
-      whitelistOnly: true,
-      usdValuePersonal: 175000,
-      usdValueDirect: 0,
-    },
-    {
-      id: 9,
-      name: "Pool 9",
-      personalInvestRequired: 200000, // Whitelist only, using high value as placeholder
-      totalDirectInvestRequired: 0,
-      directRefsRequired: 0,
-      share: 0.02,
-      whitelistOnly: true,
-      usdValuePersonal: 350000,
-      usdValueDirect: 0,
-    },
-  ]
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // Memoize the pools array
+  const pools = useMemo(
+    () => [
+      {
+        id: 1,
+        name: "Pool 1",
+        personalInvestRequired: 550,
+        totalDirectInvestRequired: 550,
+        directRefsRequired: 1,
+        share: 0.0175,
+        usdValuePersonal: 962.5,
+        usdValueDirect: 962.5,
+      },
+      {
+        id: 2,
+        name: "Pool 2",
+        personalInvestRequired: 1450,
+        totalDirectInvestRequired: 1450,
+        directRefsRequired: 3,
+        share: 0.0175,
+        usdValuePersonal: 2537.5,
+        usdValueDirect: 2537.5,
+      },
+      {
+        id: 3,
+        name: "Pool 3",
+        personalInvestRequired: 3000,
+        totalDirectInvestRequired: 6000,
+        directRefsRequired: 5,
+        share: 0.0175,
+        usdValuePersonal: 5250,
+        usdValueDirect: 10500,
+      },
+      {
+        id: 4,
+        name: "Pool 4",
+        personalInvestRequired: 5500,
+        totalDirectInvestRequired: 11000,
+        directRefsRequired: 10,
+        share: 0.0175,
+        usdValuePersonal: 9625,
+        usdValueDirect: 19250,
+      },
+      {
+        id: 5,
+        name: "Pool 5",
+        personalInvestRequired: 14250,
+        totalDirectInvestRequired: 28500,
+        directRefsRequired: 15,
+        share: 0.0175,
+        usdValuePersonal: 24937.5,
+        usdValueDirect: 49875,
+      },
+      {
+        id: 6,
+        name: "Pool 6",
+        personalInvestRequired: 28500,
+        totalDirectInvestRequired: 85500,
+        directRefsRequired: 20,
+        share: 0.01,
+        usdValuePersonal: 49875,
+        usdValueDirect: 149625,
+      },
+      {
+        id: 7,
+        name: "Pool 7",
+        personalInvestRequired: 57000,
+        totalDirectInvestRequired: 171000,
+        directRefsRequired: 20,
+        share: 0.01,
+        usdValuePersonal: 99750,
+        usdValueDirect: 299250,
+      },
+      {
+        id: 8,
+        name: "Pool 8",
+        personalInvestRequired: 100000, // Whitelist only, using high value as placeholder
+        totalDirectInvestRequired: 0,
+        directRefsRequired: 0,
+        share: 0.02,
+        whitelistOnly: true,
+        usdValuePersonal: 175000,
+        usdValueDirect: 0,
+      },
+      {
+        id: 9,
+        name: "Pool 9",
+        personalInvestRequired: 200000, // Whitelist only, using high value as placeholder
+        totalDirectInvestRequired: 0,
+        directRefsRequired: 0,
+        share: 0.02,
+        whitelistOnly: true,
+        usdValuePersonal: 350000,
+        usdValueDirect: 0,
+      },
+    ],
+    [],
+  )
 
   // Update eligible pools when investment amount, referrals, or referral volume changes
   useEffect(() => {
@@ -145,12 +148,10 @@ export function InvestmentCalculator() {
     })
 
     setEligiblePools(newEligiblePools)
-  }, [investmentAmount, referrals, referralVolume])
+  }, [investmentAmount, referrals, referralVolume, pools])
 
-  if (!mounted) return null
-
-  // Calculate returns based on investment amount, eligible pools, and simulation days
-  const calculateReturns = () => {
+  // Memoize the calculateReturns function
+  const calculateReturns = useCallback(() => {
     // Apply deposit tax to get actual invested amount
     const depositTaxAmount = (investmentAmount * depositTax) / 100
     const actualInvestedAmount = investmentAmount - depositTaxAmount
@@ -252,15 +253,32 @@ export function InvestmentCalculator() {
       roi: (totalEarnings / actualInvestedAmount) * 100,
       eligiblePools: eligiblePools,
     }
-  }
+  }, [
+    investmentAmount,
+    depositTax,
+    simulationDays,
+    eligiblePools,
+    pools,
+    referralVolume,
+    referrals,
+    autoCompound,
+    claimFrequency,
+    claimTax,
+    reinvestPercentage,
+  ])
 
-  const results = calculateReturns()
-  const lastDayResult = results.dailyResults[results.dailyResults.length - 1]
+  // IMPORTANT: Calculate results BEFORE any conditional returns
+  // This ensures hooks are always called in the same order
+  const results = useMemo(() => calculateReturns(), [calculateReturns])
+  const lastDayResult = useMemo(() => results.dailyResults[results.dailyResults.length - 1], [results])
 
   // Format number with 3 decimal places
-  const formatWithDecimals = (value) => {
+  const formatWithDecimals = useCallback((value) => {
     return value.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })
-  }
+  }, [])
+
+  // Only return the rendered UI if mounted
+  if (!mounted) return null
 
   return (
     <>
@@ -270,6 +288,7 @@ export function InvestmentCalculator() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
+        style={{ willChange: "transform, opacity" }}
       >
         <div className="grid md:grid-cols-2 gap-8">
           {/* Calculator Inputs */}
@@ -619,6 +638,7 @@ export function InvestmentCalculator() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
+        style={{ willChange: "transform, opacity" }}
       >
         <Link href="/dashboard">
           <CyberButton variant="primary" size="lg" className="animate-pulse">
